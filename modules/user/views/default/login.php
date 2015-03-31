@@ -6,13 +6,13 @@ use yii\bootstrap\ActiveForm;
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model app\models\LoginForm */
 
-$this->title = 'Login';
+$this->title = 'Вход';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-login">
+<div class="user-default-login">
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>Please fill out the following fields to login:</p>
+    <!-- p>Please fill out the following fields to login:</p -->
 
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
@@ -29,6 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $form->field($model, 'rememberMe', [
         'template' => "<div class=\"col-lg-offset-1 col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
+        'checkboxTemplate' => "<div class=\"checkbox col-lg-offset-1 col-lg-3\">\n{beginLabel}\n{input}\n{labelTitle}\n{endLabel}\n<div class=\"col-lg-8\">{error}</div>\n{hint}\n</div>",
     ])->checkbox() ?>
 
     <div class="form-group">

@@ -2,16 +2,18 @@
 
 $config = [
     'id' => 'app',
+    'defaultRoute' => 'main/default/index',
     'components' => [
         'request' => [
             'cookieValidationKey' => 'MRUy44nr8pp124k94uZaxH0JI9KD92w-',
         ],
         'user' => [
-            'identityClass' => 'app\models\User',
+            'identityClass' => 'app\modules\user\models\User',
             'enableAutoLogin' => true,
+            'loginUrl' => ['user/default/login'],
         ],
         'errorHandler' => [
-            'errorAction' => 'site/error',
+            'errorAction' => 'main/default/error',
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,

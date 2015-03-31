@@ -35,13 +35,13 @@ AppAsset::register($this);
             echo Nav::widget([
                 'options' => ['class' => 'navbar-nav navbar-right'],
                 'items' => [
-                    ['label' => 'Home', 'url' => ['/site/index']],
-                    ['label' => 'About', 'url' => ['/site/about']],
-                    ['label' => 'Contact', 'url' => ['/site/contact']],
+                    ['label' => 'Главная', 'url' => ['/']],
+//                    ['label' => 'About', 'url' => ['/site/about']],
+                    ['label' => 'Контакт', 'url' => ['/contact']],
                     Yii::$app->user->isGuest ?
-                        ['label' => 'Login', 'url' => ['/site/login']] :
-                        ['label' => 'Logout (' . Yii::$app->user->identity->username . ')',
-                            'url' => ['/site/logout'],
+                        ['label' => 'Вход', 'url' => ['/user/default/login']] :
+                        ['label' => 'Выход (' . Yii::$app->user->identity->username . ')',
+                            'url' => ['/user/default/logout'],
                             'linkOptions' => ['data-method' => 'post']],
                 ],
             ]);
