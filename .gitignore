@@ -29,3 +29,5 @@ src
 tests
 runtime
 assets
+/config/*-local.php
+/config/db*.php

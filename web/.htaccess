@@ -1,0 +1,23 @@
+RewriteEngine on
+
+###############################################################################
+#                                                                             #
+#           Begin rewrite rules for "Under construction" page                 #
+#                                                                             #
+###############################################################################
+# RewriteCond %{REQUEST_URI} !/construct.html$ [NC]
+# RewriteCond %{REQUEST_URI} !\.(jpe?g?|png|gif) [NC]
+# RewriteRule .* /construct.html? [R=302,L]
+
+
+###############################################################################
+#                                                                             #
+#                  Rewrite rules for Yii start script                         #
+#                                                                             #
+###############################################################################
+# If a directory or a file exists, use it directly
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+# Otherwise forward it to index.php
+RewriteRule . index.php
+
