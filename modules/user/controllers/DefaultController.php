@@ -2,11 +2,15 @@
 
 namespace app\modules\user\controllers;
 
-use app\modules\user\models\LoginForm;
+use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
-use Yii;
+use yii\web\NotFoundHttpException;
+
+use app\modules\user\models\LoginForm;
+use app\modules\user\models\User;
+use app\modules\user\models\UserSearch;
 
 class DefaultController extends Controller
 {
@@ -15,12 +19,17 @@ class DefaultController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout'],
+                'only' => ['logout', 'create'],
                 'rules' => [
                     [
                         'actions' => ['logout'],
                         'allow' => true,
                         'roles' => ['@'],
+                    ],
+                    [
+                        'actions' => ['create'],
+                        'allow' => true,
+                        'roles' => ['createUser'],
                     ],
                 ],
             ],
@@ -33,6 +42,10 @@ class DefaultController extends Controller
         ];
     }
 
+    /**
+     *
+     * @return string|\yii\web\Response
+     */
     public function actionLogin()
     {
         if (!Yii::$app->user->isGuest) {
@@ -49,11 +62,33 @@ class DefaultController extends Controller
         }
     }
 
+    /**
+     *
+     * @return \yii\web\Response
+     */
     public function actionLogout()
     {
         Yii::$app->user->logout();
 
         return $this->goHome();
+    }
+
+    /**
+     * Creates a new User model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionCreate()
+    {
+        $model = new User();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->us_id]);
+        } else {
+            return $this->render('create', [
+                'model' => $model,
+            ]);
+        }
     }
 
 }

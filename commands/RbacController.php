@@ -9,7 +9,7 @@ class RbacController extends Controller
 {
     public function actionCreate()
     {
-        /** @var yii\rbac\DbManager $auth */
+        /** @var \yii\rbac\DbManager $auth */
         $auth = Yii::$app->authManager;
         $a = [
             $auth->assignmentTable,
@@ -20,7 +20,7 @@ class RbacController extends Controller
 
         Yii::$app->db->createCommand('set foreign_key_checks=0')->execute();
         foreach($a As $table) {
-            Yii::$app->db->createCommand('Delete From ' . $table . ' Where TRUE')->execute();
+//            Yii::$app->db->createCommand('Delete From ' . $table . ' Where TRUE')->execute();
             Yii::$app->db->createCommand()->truncateTable($table)->execute();
         }
         Yii::$app->db->createCommand('set foreign_key_checks=1')->execute();
@@ -62,7 +62,7 @@ class RbacController extends Controller
         $auth->addChild($departmentUser, $updateTask);
 
         $controlUser = $auth->createRole('control');
-        $departmentUser->description = 'Пользователь отдела мониторинга';
+        $controlUser->description = 'Пользователь отдела мониторинга';
         $auth->add($controlUser);
         $auth->addChild($controlUser, $createTask);
         $auth->addChild($controlUser, $updateDepartTask);

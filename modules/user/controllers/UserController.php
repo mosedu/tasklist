@@ -62,13 +62,18 @@ class UserController extends Controller
     {
         $model = new User();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->us_id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+        if ($model->load(Yii::$app->request->post())) {
+            if( $model->save() ) {
+                return $this->redirect(['view', 'id' => $model->us_id]);
+            }
+            else {
+                Yii::info(print_r($model->getErrors(), true));
+            }
         }
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
 
     /**

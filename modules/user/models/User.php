@@ -4,7 +4,11 @@ namespace app\modules\user\models;
 
 use Yii;
 use yii\web\IdentityInterface;
+use app\components\AttributewalkBehavior;
+use app\components\PasswordBehavior;
 use app\modules\user\models\Department;
+use yii\db\Expression;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "{{%user}}".
@@ -25,7 +29,7 @@ use app\modules\user\models\Department;
  * @property string $us_email_confirm_token
  * @property string $us_password_reset_token
  */
-class User extends \yii\db\ActiveRecord implements IdentityInterface
+class User extends ActiveRecord implements IdentityInterface
 {
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 1;
@@ -42,12 +46,50 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * @inheritdoc
      */
+    public function behaviors(){
+        $a = [
+            // при добавлении пользователя
+            [
+                'class' =>  AttributewalkBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['us_active', 'us_createtime'],
+                ],
+                'value' => function ($event, $attribute) {
+                    $aVal = [
+                        'us_active' => self::STATUS_ACTIVE,
+                        'us_createtime' => new Expression('NOW()'),
+                    ];
+                    if( isset($aVal[$attribute]) ) {
+                        return $aVal[$attribute];
+                    }
+                    return null;
+                },
+            ],
+
+            // устанавливаем пароль для нового пользователя и отправляем ему письмо
+            'passwordBehavior' => [
+                'class' => PasswordBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => true,
+                ],
+                'template' => 'user_create_info',
+                'subject' => 'Регистрация на портале ' . Yii::$app->name,
+            ],
+        ];
+
+        return $a;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
             [['us_active', 'us_dep_id'], 'integer'],
             [['us_email', 'us_password_hash', 'us_name', 'us_createtime'], 'required'],
             [['us_logintime', 'us_createtime'], 'safe'],
+            [['us_email', ], 'email', ],
             [['us_email', 'us_password_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_login', 'us_workposition', 'us_email_confirm_token', 'us_password_reset_token'], 'string', 'max' => 255],
             [['us_auth_key'], 'string', 'max' => 32]
         ];
@@ -158,7 +200,6 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return $this->us_login;
     }
 
-
     /**
      *
      * Отношение пользователя к отделу
@@ -168,4 +209,86 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function getDepartment() {
         return $this->hasOne(Department::className(), ['id' => 'us_dep_id']);
     }
+
+    /**
+     * Generates password hash from password and sets it to the model
+     *
+     * @param string $password
+     */
+    public function setPassword($password)
+    {
+        $this->us_password_hash = Yii::$app->security->generatePasswordHash($password);
+    }
+
+    /**
+     * Generates "remember me" authentication key
+     */
+    public function generateAuthKey()
+    {
+        $this->auth_key = Yii::$app->security->generateRandomString();
+    }
+
+    /**
+     * Generates new password reset token
+     */
+    public function generatePasswordResetToken()
+    {
+        $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
+    }
+
+    /**
+     * Removes password reset token
+     */
+    public function removePasswordResetToken()
+    {
+        $this->password_reset_token = null;
+    }
+
+    /**
+     * @param string $email_confirm_token
+     * @return static|null
+     */
+    public static function findByEmailConfirmToken($email_confirm_token)
+    {
+        return static::findOne(['email_confirm_token' => $email_confirm_token, 'us_active' => self::STATUS_WAIT]);
+    }
+
+    /**
+     * Generates email confirmation token
+     */
+    public function generateEmailConfirmToken()
+    {
+        $this->email_confirm_token = Yii::$app->security->generateRandomString();
+    }
+
+    /**
+     * Removes email confirmation token
+     */
+    public function removeEmailConfirmToken()
+    {
+        $this->email_confirm_token = null;
+    }
+
+    /**
+     *  Полное имя пользователя
+     */
+    public function getFullName() {
+        $s = trim($this->us_name . ' ' . $this->us_secondname);
+        if( $s == '' ) {
+            $s = $this->us_login;
+        }
+        return $this->us_lastname . ' ' . $s;
+    }
+
+    /**
+     *  Имя, фамилия пользователя
+     */
+    public function getShortName() {
+        $s = trim($this->us_name . ' ' . $this->us_secondname);
+        if( $s == '' ) {
+            $s = $this->us_lastname;
+        }
+        return $s;
+    }
+
 }

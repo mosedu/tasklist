@@ -58,6 +58,8 @@ return [
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
+            'viewPath' => '@app/views/mail',
+            'htmlLayout' => false,
         ],
         'cache' => [
             'class' => 'yii\caching\DummyCache',
