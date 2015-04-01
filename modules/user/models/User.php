@@ -2,102 +2,70 @@
 
 namespace app\modules\user\models;
 
-class User extends \yii\base\Object implements \yii\web\IdentityInterface
+use Yii;
+
+/**
+ * This is the model class for table "{{%user}}".
+ *
+ * @property integer $us_id
+ * @property integer $us_active
+ * @property string $us_email
+ * @property string $us_password_hash
+ * @property string $us_name
+ * @property string $us_secondname
+ * @property string $us_lastname
+ * @property string $us_login
+ * @property string $us_logintime
+ * @property string $us_createtime
+ * @property string $us_workposition
+ * @property string $us_auth_key
+ * @property string $us_email_confirm_token
+ * @property string $us_password_reset_token
+ */
+class User extends \yii\db\ActiveRecord
 {
-    public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
-
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
-
     /**
      * @inheritdoc
      */
-    public static function findIdentity($id)
+    public static function tableName()
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        return '{{%user}}';
     }
 
     /**
      * @inheritdoc
      */
-    public static function findIdentityByAccessToken($token, $type = null)
+    public function rules()
     {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Finds user by username
-     *
-     * @param  string      $username
-     * @return static|null
-     */
-    public static function findByUsername($username)
-    {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return [
+            [['us_active'], 'integer'],
+            [['us_email', 'us_password_hash', 'us_name', 'us_createtime'], 'required'],
+            [['us_logintime', 'us_createtime'], 'safe'],
+            [['us_email', 'us_password_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_login', 'us_workposition', 'us_email_confirm_token', 'us_password_reset_token'], 'string', 'max' => 255],
+            [['us_auth_key'], 'string', 'max' => 32]
+        ];
     }
 
     /**
      * @inheritdoc
      */
-    public function getId()
+    public function attributeLabels()
     {
-        return $this->id;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getAuthKey()
-    {
-        return $this->authKey;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function validateAuthKey($authKey)
-    {
-        return $this->authKey === $authKey;
-    }
-
-    /**
-     * Validates password
-     *
-     * @param  string  $password password to validate
-     * @return boolean if password provided is valid for current user
-     */
-    public function validatePassword($password)
-    {
-        return $this->password === $password;
+        return [
+            'us_id' => 'Us ID',
+            'us_active' => 'Us Active',
+            'us_email' => 'Us Email',
+            'us_password_hash' => 'Us Password Hash',
+            'us_name' => 'Us Name',
+            'us_secondname' => 'Us Secondname',
+            'us_lastname' => 'Us Lastname',
+            'us_login' => 'Us Login',
+            'us_logintime' => 'Us Logintime',
+            'us_createtime' => 'Us Createtime',
+            'us_workposition' => 'Us Workposition',
+            'us_auth_key' => 'Us Auth Key',
+            'us_email_confirm_token' => 'Us Email Confirm Token',
+            'us_password_reset_token' => 'Us Password Reset Token',
+        ];
     }
 }
