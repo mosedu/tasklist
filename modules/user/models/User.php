@@ -85,8 +85,8 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return static::find()
             ->where([
-                'id' => $id,
-                'status' => self::STATUS_ACTIVE,
+                'us_id' => $id,
+                'us_active' => self::STATUS_ACTIVE,
             ])
             ->with('department')
             ->one();
@@ -97,7 +97,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return static::find()
             ->where([
                 'us_auth_key' => $token,
-                'status' => self::STATUS_ACTIVE,
+                'us_active' => self::STATUS_ACTIVE,
             ])
             ->with('department')
             ->one();
