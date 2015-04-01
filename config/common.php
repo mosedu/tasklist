@@ -23,11 +23,17 @@ return [
         'user' => [
             'class' => 'app\modules\user\Module',
         ],
+        'task' => [
+            'class' => 'app\modules\task\Module',
+        ],
     ],
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
             'charset' => 'utf8',
+        ],
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
         ],
         'urlManager' => [
             'class' => 'yii\web\UrlManager',

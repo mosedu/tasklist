@@ -1,5 +1,7 @@
 <?php
 
+use yii\web\User as WebUser;
+
 $config = [
     'id' => 'app',
     'defaultRoute' => 'main/default/index',
@@ -11,6 +13,7 @@ $config = [
             'identityClass' => 'app\modules\user\models\User',
             'enableAutoLogin' => true,
             'loginUrl' => ['user/default/login'],
+            'on ' . WebUser::EVENT_AFTER_LOGIN => ['app\modules\user\models\User', 'afterLogin']
         ],
         'errorHandler' => [
             'errorAction' => 'main/default/error',
