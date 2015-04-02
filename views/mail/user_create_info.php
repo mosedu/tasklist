@@ -31,7 +31,7 @@ $aLink = ['login'];
 
 <p>Данные для входа:</p>
 
-<p>Логин: <?= Html::encode($model->us_login) ?></p>
+<p>Email: <?= Html::encode($model->us_email) ?></p>
 
 <p>Пароль: <?= Html::encode($model->newPassword) ?></p>
 

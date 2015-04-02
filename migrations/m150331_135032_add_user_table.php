@@ -5,6 +5,7 @@ use yii\db\Migration;
 use yii\db\Expression;
 use yii\base\InvalidConfigException;
 use yii\rbac\DbManager;
+use app\modules\user\models\User;
 
 /*************************************************************
  *                    RUN BEFORE THIS:                       *
@@ -39,10 +40,11 @@ class m150331_135032_add_user_table extends Migration
             'dep_id' => Schema::TYPE_PK,
             'dep_name' => Schema::TYPE_STRING . ' NOT NULL',
             'dep_shortname' => Schema::TYPE_STRING . '',
-            'dep_active' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 0',
+            'dep_active' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 1',
+            'dep_user_roles' => Schema::TYPE_STRING,
         ], $tableOptionsMyISAM);
 
-        $sSql = 'Insert Into {{%department}} (dep_name, dep_shortname, dep_active) Values (\'Отдел мониторинга и контроля\', \'Контроль\', 1)';
+        $sSql = 'Insert Into {{%department}} (dep_name, dep_shortname, dep_active, dep_user_roles) Values (\'Отдел мониторинга и контроля\', \'Контроль\', 1, \''.User::ROLE_CONTROL.'\')';
         $nEl = $this->db->createCommand($sSql)->execute();
         echo "\n-------------------------------------\nInsert {$nEl} department\n-------------------------------------\n";
 

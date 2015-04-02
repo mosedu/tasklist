@@ -5,6 +5,7 @@ use yii\web\User as WebUser;
 $config = [
     'id' => 'app',
     'defaultRoute' => 'main/default/index',
+    'language' => 'ru',
     'components' => [
         'request' => [
             'cookieValidationKey' => 'MRUy44nr8pp124k94uZaxH0JI9KD92w-',

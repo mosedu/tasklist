@@ -3,11 +3,13 @@
 namespace app\modules\user\controllers;
 
 use Yii;
-use app\modules\user\models\Department;
-use app\modules\user\models\DepartmentSearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+
+use app\modules\user\models\Department;
+use app\modules\user\models\DepartmentSearch;
 
 /**
  * DepartmentController implements the CRUD actions for Department model.
@@ -17,6 +19,16 @@ class DepartmentController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'actions' => ['create', 'view', 'delete', 'index', 'update'],
+                        'allow' => true,
+                        'roles' => ['createUser'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -63,7 +75,8 @@ class DepartmentController extends Controller
         $model = new Department();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->dep_id]);
+            return $this->redirect(['index']);
+//            return $this->redirect(['view', 'id' => $model->dep_id]);
         } else {
             return $this->render('create', [
                 'model' => $model,

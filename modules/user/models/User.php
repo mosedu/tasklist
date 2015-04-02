@@ -9,6 +9,7 @@ use app\components\PasswordBehavior;
 use app\modules\user\models\Department;
 use yii\db\Expression;
 use yii\db\ActiveRecord;
+use yii\rbac\Role;
 
 /**
  * This is the model class for table "{{%user}}".
@@ -35,6 +36,20 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_ACTIVE = 1;
     const STATUS_WAIT = 2;
 
+    const STATUS_TEXT_DELETED = 'Удален';
+    const STATUS_TEXT_ACTIVE = 'Активен';
+    const STATUS_TEXT_WAIT = 'Карантин';
+
+    const ROLE_DEPARTMENT = 'department';
+    const ROLE_CONTROL = 'control';
+    const ROLE_ADMIN = 'admin';
+
+    const ROLE_TEXT_DEPARTMENT = 'Обычный';
+    const ROLE_TEXT_CONTROL = 'Контроль';
+    const ROLE_TEXT_ADMIN = 'Админ';
+
+    public $newPassword = '';
+
     /**
      * @inheritdoc
      */
@@ -52,17 +67,46 @@ class User extends ActiveRecord implements IdentityInterface
             [
                 'class' =>  AttributewalkBehavior::className(),
                 'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => ['us_active', 'us_createtime'],
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['us_active', 'us_createtime', 'us_login'],
                 ],
                 'value' => function ($event, $attribute) {
+                    /** @var yii\base\Event $event */
+                    /** @var app\modules\user\models\User $model */
+                    $model = $event->sender;
                     $aVal = [
                         'us_active' => self::STATUS_ACTIVE,
                         'us_createtime' => new Expression('NOW()'),
                     ];
+                    if( empty($model->us_login) ) {
+                        $aVal['us_login'] = preg_replace('/\\W/', '', $model->us_email);
+                    }
                     if( isset($aVal[$attribute]) ) {
                         return $aVal[$attribute];
                     }
                     return null;
+                },
+            ],
+
+            // добавляем роль пользователю после сохранения
+            [
+                'class' =>  AttributewalkBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_AFTER_INSERT => ['us_dep_id'],
+                ],
+                'value' => function ($event, $attribute) {
+                    /** @var User $model */
+                    $model = $event->sender;
+                    $auth = Yii::$app->authManager;
+                    if( !empty($model->us_dep_id) ) {
+                        /** @var Role $role */
+                        $role = Department::getDepartmentrole($model->us_dep_id);
+                        Yii::info($event->name . ': ' . $model->us_dep_id . ' -> ' . (($role !== null) ? $role->name : 'null'));
+                        if( $role !== null ) {
+                            $auth->assign($role, $model->us_id);
+                            Yii::info($event->name . ': assign ' . $role->name . ' to ' . $model->us_id);
+                        }
+                    }
+                    return $model->us_dep_id;
                 },
             ],
 
@@ -87,7 +131,7 @@ class User extends ActiveRecord implements IdentityInterface
     {
         return [
             [['us_active', 'us_dep_id'], 'integer'],
-            [['us_email', 'us_password_hash', 'us_name', 'us_createtime'], 'required'],
+            [['us_email', 'us_name'], 'required'],
             [['us_logintime', 'us_createtime'], 'safe'],
             [['us_email', ], 'email', ],
             [['us_email', 'us_password_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_login', 'us_workposition', 'us_email_confirm_token', 'us_password_reset_token'], 'string', 'max' => 255],
@@ -207,7 +251,7 @@ class User extends ActiveRecord implements IdentityInterface
      * @return \yii\db\ActiveQuery
      */
     public function getDepartment() {
-        return $this->hasOne(Department::className(), ['id' => 'us_dep_id']);
+        return $this->hasOne(Department::className(), ['dep_id' => 'us_dep_id']);
     }
 
     /**
@@ -225,7 +269,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function generateAuthKey()
     {
-        $this->auth_key = Yii::$app->security->generateRandomString();
+        $this->us_auth_key = Yii::$app->security->generateRandomString();
     }
 
     /**
@@ -233,7 +277,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function generatePasswordResetToken()
     {
-        $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
+        $this->us_password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
     }
 
     /**
@@ -241,7 +285,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function removePasswordResetToken()
     {
-        $this->password_reset_token = null;
+        $this->us_password_reset_token = null;
     }
 
     /**
@@ -250,7 +294,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function findByEmailConfirmToken($email_confirm_token)
     {
-        return static::findOne(['email_confirm_token' => $email_confirm_token, 'us_active' => self::STATUS_WAIT]);
+        return static::findOne(['us_email_confirm_token' => $email_confirm_token, 'us_active' => self::STATUS_WAIT]);
     }
 
     /**
@@ -258,7 +302,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function generateEmailConfirmToken()
     {
-        $this->email_confirm_token = Yii::$app->security->generateRandomString();
+        $this->us_email_confirm_token = Yii::$app->security->generateRandomString();
     }
 
     /**
@@ -266,7 +310,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public function removeEmailConfirmToken()
     {
-        $this->email_confirm_token = null;
+        $this->us_email_confirm_token = null;
     }
 
     /**
@@ -289,6 +333,83 @@ class User extends ActiveRecord implements IdentityInterface
             $s = $this->us_lastname;
         }
         return $s;
+    }
+
+    /**
+     * Отправка письма пользователю
+     *
+     * @param string $template имя шаблона письма
+     * @param string $subject тема письма
+     * @param array $data данные для письма
+     */
+    public function sendNotificate($template, $subject = '', $data = []) {
+        if( $subject === '' ) {
+            $subject = 'Уведомление портала ' . Yii::$app->name;
+        }
+        Yii::$app->mailer->compose($template, ['model' => $this,])
+            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
+            ->setTo($this->us_email)
+            ->setSubject($subject)
+            ->send();
+    }
+
+    /**
+     * Получение списка ролей
+     * @return array список ролей - ключ - id роли, значение - заголовок для отображения
+     */
+    public static function getUserRoles()
+    {
+        return [
+            self::ROLE_DEPARTMENT => self::ROLE_TEXT_DEPARTMENT,
+            self::ROLE_CONTROL => self::ROLE_TEXT_CONTROL,
+            self::ROLE_ADMIN => self::ROLE_TEXT_ADMIN,
+
+        ];
+    }
+
+    /**
+     * Получение названия роли
+     * @param string $role
+     * @return string
+     */
+    public static function getRoleTitle($role)
+    {
+        $a = self::getUserRoles();
+        return isset($a[$role]) ? $a[$role] : '';
+    }
+
+    /**
+     * Получение списка статусов
+     * @return array список статусов - ключ - id статуса, значение - заголовок для отображения
+     */
+    public static function getUserStatuses()
+    {
+        return [
+            self::STATUS_DELETED => self::STATUS_TEXT_DELETED,
+            self::STATUS_ACTIVE => self::STATUS_TEXT_ACTIVE,
+            self::STATUS_WAIT => self::STATUS_TEXT_WAIT,
+        ];
+    }
+
+    /**
+     * Получение статуса
+     * @return string
+     */
+    public function getUserStatus()
+    {
+        $a = [
+            self::STATUS_ACTIVE => self::STATUS_TEXT_ACTIVE,
+            self::STATUS_DELETED => self::STATUS_TEXT_DELETED,
+            self::STATUS_WAIT => self::STATUS_TEXT_WAIT,
+        ];
+
+        $a = [
+            self::STATUS_ACTIVE => '+',
+            self::STATUS_DELETED => '-',
+            self::STATUS_WAIT => '?',
+        ];
+
+        return isset($a[$this->us_active]) ? $a[$this->us_active] : '~';
     }
 
 }

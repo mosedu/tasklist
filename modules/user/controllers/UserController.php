@@ -67,8 +67,11 @@ class UserController extends Controller
                 return $this->redirect(['view', 'id' => $model->us_id]);
             }
             else {
-                Yii::info(print_r($model->getErrors(), true));
+                Yii::info("On save: " . print_r($model->getErrors(), true));
             }
+        }
+        else {
+            Yii::info("On load: " . print_r($model->getErrors(), true));
         }
 
         return $this->render('create', [

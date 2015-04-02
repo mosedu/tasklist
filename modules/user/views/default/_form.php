@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 // use yii\widgets\ActiveForm;
 use yii\bootstrap\ActiveForm;
+use app\modules\user\models\Department;
 
 /* @var $this yii\web\View */
 /* @var $model app\modules\user\models\User */
@@ -60,6 +61,10 @@ use yii\bootstrap\ActiveForm;
 
     <div class="col-sm-4">
         <?= $form->field($model, 'us_workposition')->textInput(['maxlength' => 255]) ?>
+    </div>
+
+    <div class="col-sm-4">
+        <?= $form->field($model, 'us_dep_id')->dropDownList(Department::getList(false))  ?>
     </div>
 
     <div class="clearfix"></div>

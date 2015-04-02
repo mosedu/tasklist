@@ -24,7 +24,6 @@ class RbacController extends Controller
             Yii::$app->db->createCommand()->truncateTable($table)->execute();
         }
         Yii::$app->db->createCommand('set foreign_key_checks=1')->execute();
-//        return;
 
         // ----------------------------------------------------       Добавление прав на пользователей
         $createUser = $auth->createPermission('createUser');
@@ -55,7 +54,7 @@ class RbacController extends Controller
         $auth->addChild($updateDepartTask, $updateTask);
 
         // ----------------------------------------------------       Добавление ролей пользователей
-        $departmentUser = $auth->createRole('departmentUser');
+        $departmentUser = $auth->createRole('department');
         $departmentUser->description = 'Пользователь подразделения';
         $auth->add($departmentUser);
         $auth->addChild($departmentUser, $createTask);

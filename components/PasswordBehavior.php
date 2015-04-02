@@ -39,6 +39,8 @@ class PasswordBehavior extends Behavior
      */
     public function events()
     {
+//        $events = parent::events();
+        $events = [];
         foreach ($this->attributes as $i => $event) {
             $events[$i] = 'setNewPassword';
         }

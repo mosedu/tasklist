@@ -20,6 +20,8 @@ class DepartmentSearch extends Department
         return [
             [['dep_id', 'dep_active'], 'integer'],
             [['dep_name', 'dep_shortname'], 'safe'],
+            [['dep_user_roles'], 'string', 'max' => 255],
+            [['dep_user_roles'], 'in', 'range' => array_keys(User::getUserRoles())],
         ];
     }
 
@@ -58,6 +60,7 @@ class DepartmentSearch extends Department
         $query->andFilterWhere([
             'dep_id' => $this->dep_id,
             'dep_active' => $this->dep_active,
+            'dep_user_roles' => $this->dep_user_roles,
         ]);
 
         $query->andFilterWhere(['like', 'dep_name', $this->dep_name])
