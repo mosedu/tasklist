@@ -61,13 +61,13 @@ class RbacController extends Controller
         $departmentUser->description = 'Пользователь подразделения';
         $auth->add($departmentUser);
         $auth->addChild($departmentUser, $createTask);
-        $auth->addChild($departmentUser, $updateTask);
+        $auth->addChild($departmentUser, $updateDepartTask);
 
         $controlUser = $auth->createRole('control');
         $controlUser->description = 'Пользователь отдела мониторинга';
         $auth->add($controlUser);
         $auth->addChild($controlUser, $createTask);
-        $auth->addChild($controlUser, $updateDepartTask);
+        $auth->addChild($controlUser, $updateTask);
         $auth->addChild($controlUser, $createUser);
         $auth->addChild($controlUser, $updateUser);
 

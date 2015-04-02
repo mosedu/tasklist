@@ -41,7 +41,7 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                '' => 'main/default/index',
+                '' => 'task/default/index',
                 'contact' => 'main/contact/index',
                 '<_a:error>' => 'main/default/<_a>',
                 '<_a:(login|logout)>' => 'user/default/<_a>',

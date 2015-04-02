@@ -18,7 +18,7 @@ class TasklistSearch extends Tasklist
     public function rules()
     {
         return [
-            [['task_id', 'task_dep_id', 'task_num', 'task_type', 'task_timechanges', 'task_progress'], 'integer'],
+            [['task_id', 'task_dep_id', 'task_num', 'task_type', 'task_numchanges', 'task_progress'], 'integer'],
             [['task_direct', 'task_name', 'task_createtime', 'task_finaltime', 'task_actualtime', 'task_reasonchanges', 'task_summary'], 'safe'],
         ];
     }
@@ -63,7 +63,7 @@ class TasklistSearch extends Tasklist
             'task_createtime' => $this->task_createtime,
             'task_finaltime' => $this->task_finaltime,
             'task_actualtime' => $this->task_actualtime,
-            'task_timechanges' => $this->task_timechanges,
+            'task_numchanges' => $this->task_numchanges,
             'task_progress' => $this->task_progress,
         ]);
 
