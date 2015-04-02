@@ -34,6 +34,7 @@ return [
         ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
+            'defaultRoles' => ['guest'],
         ],
         'urlManager' => [
             'class' => 'yii\web\UrlManager',

@@ -54,6 +54,9 @@ class RbacController extends Controller
         $auth->addChild($updateDepartTask, $updateTask);
 
         // ----------------------------------------------------       Добавление ролей пользователей
+        $guestUser = $auth->createRole('guest');
+        $auth->add($guestUser);
+
         $departmentUser = $auth->createRole('department');
         $departmentUser->description = 'Пользователь подразделения';
         $auth->add($departmentUser);

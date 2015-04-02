@@ -40,10 +40,12 @@ class User extends ActiveRecord implements IdentityInterface
     const STATUS_TEXT_ACTIVE = 'Активен';
     const STATUS_TEXT_WAIT = 'Карантин';
 
+    const ROLE_GUEST = 'guest';
     const ROLE_DEPARTMENT = 'department';
     const ROLE_CONTROL = 'control';
     const ROLE_ADMIN = 'admin';
 
+    const ROLE_TEXT_GUEST = 'Гость';
     const ROLE_TEXT_DEPARTMENT = 'Обычный';
     const ROLE_TEXT_CONTROL = 'Контроль';
     const ROLE_TEXT_ADMIN = 'Админ';
@@ -224,6 +226,15 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Получение пользователя по логину
+     * @param string $userlogin логин пользователя
+     * @return null|static
+     */
+    public static function findByEmail($email) {
+        return static::findOne(['us_email' => $email, 'us_active' => self::STATUS_ACTIVE]);
+    }
+
+    /**
      * Validates password
      *
      * @param string $password password to validate
@@ -369,7 +380,7 @@ class User extends ActiveRecord implements IdentityInterface
             self::ROLE_DEPARTMENT => self::ROLE_TEXT_DEPARTMENT,
             self::ROLE_CONTROL => self::ROLE_TEXT_CONTROL,
             self::ROLE_ADMIN => self::ROLE_TEXT_ADMIN,
-
+//            self::ROLE_TEXT_GUEST => self::ROLE_TEXT_GUEST,
         ];
     }
 

@@ -9,4 +9,10 @@ return [
     'modules' => [
         'gii' => 'yii\gii\Module',
     ],
+    'components' => [
+        'urlManager' => [
+            'hostInfo' => 'http://example.com',
+            'baseUrl' => '',
+        ],
+    ],
 ];
