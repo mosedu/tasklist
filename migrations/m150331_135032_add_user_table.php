@@ -58,6 +58,7 @@ class m150331_135032_add_user_table extends Migration
             'us_secondname' => Schema::TYPE_STRING,
             'us_lastname' => Schema::TYPE_STRING,
             'us_login' => Schema::TYPE_STRING,
+            'us_role_name' => Schema::TYPE_STRING,
             'us_logintime' => Schema::TYPE_DATETIME,
             'us_createtime' => Schema::TYPE_DATETIME . ' NOT NULL',
             'us_workposition' => Schema::TYPE_STRING,
@@ -78,6 +79,7 @@ class m150331_135032_add_user_table extends Migration
             'us_name' => 'admin',
             'us_login' => 'admin',
             'us_auth_key' => Yii::$app->security->generateRandomString(),
+            'us_role_name' => User::ROLE_ADMIN,
             'us_workposition' => 'admin',
             'us_createtime' => new Expression('NOW()'),
         ];

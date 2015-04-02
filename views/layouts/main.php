@@ -4,6 +4,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
+use app\modules\user\models\User;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -32,18 +33,32 @@ AppAsset::register($this);
                     'class' => 'navbar-inverse navbar-fixed-top',
                 ],
             ]);
+
+            // ['label' => 'About', 'url' => ['/site/about']],
+            // ['label' => 'Контакт', 'url' => ['/contact']],
+            $aItems = [
+                ['label' => 'Главная', 'url' => ['/']],
+            ];
+
+            if( Yii::$app->user->can('createUser') ) {
+                $aItems = array_merge(
+                    $aItems,
+                    [
+                        ['label' => 'Пользователи', 'url' => ['/user']],
+                        ['label' => 'Отделы', 'url' => ['/user/department']],
+                    ]
+                );
+            }
+
+            $aItems[] = Yii::$app->user->isGuest ?
+                ['label' => 'Вход', 'url' => ['/user/default/login']] :
+                ['label' => 'Выход (' . Yii::$app->user->identity->username . ')',
+                    'url' => ['/user/default/logout'],
+                    'linkOptions' => ['data-method' => 'post']];
+
             echo Nav::widget([
                 'options' => ['class' => 'navbar-nav navbar-right'],
-                'items' => [
-                    ['label' => 'Главная', 'url' => ['/']],
-//                    ['label' => 'About', 'url' => ['/site/about']],
-                    ['label' => 'Контакт', 'url' => ['/contact']],
-                    Yii::$app->user->isGuest ?
-                        ['label' => 'Вход', 'url' => ['/user/default/login']] :
-                        ['label' => 'Выход (' . Yii::$app->user->identity->username . ')',
-                            'url' => ['/user/default/logout'],
-                            'linkOptions' => ['data-method' => 'post']],
-                ],
+                'items' => $aItems,
             ]);
             NavBar::end();
         ?>

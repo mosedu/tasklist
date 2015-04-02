@@ -21,7 +21,7 @@ class UserSearch extends User
     {
         return [
             [['us_id', 'us_active', 'us_dep_id'], 'integer'],
-            [['fname', 'us_email', 'us_password_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_login', 'us_logintime', 'us_createtime', 'us_workposition', 'us_auth_key', 'us_email_confirm_token', 'us_password_reset_token'], 'safe'],
+            [['fname', 'us_role_name', 'us_email', 'us_password_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_login', 'us_logintime', 'us_createtime', 'us_workposition', 'us_auth_key', 'us_email_confirm_token', 'us_password_reset_token'], 'safe'],
         ];
     }
 
@@ -77,7 +77,8 @@ class UserSearch extends User
 //            'us_createtime' => $this->us_createtime,
         ]);
 
-        $query->andFilterWhere(['like', 'us_email', $this->us_email]);
+        $query->andFilterWhere(['like', 'us_email', $this->us_email])
+            ->andFilterWhere(['like', 'us_role_name', $this->us_role_name]);
         if( !empty($this->fname) ) {
             $query->andFilterWhere([
                 'or',

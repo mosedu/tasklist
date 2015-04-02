@@ -111,7 +111,14 @@ class DepartmentController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        // ->delete();
+        if( $model ) {
+            $model->dep_active = $model->dep_active === Department::STATUS_ACTIVE ? Department::STATUS_DELETED : Department::STATUS_ACTIVE;
+            if( !$model->save() ) {
+                Yii::warning('Department::actionDelete('.$id.') ERROR : ' . print_r($model->getErrors(), true));
+            }
+        }
 
         return $this->redirect(['index']);
     }

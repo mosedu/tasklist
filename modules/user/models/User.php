@@ -67,19 +67,23 @@ class User extends ActiveRecord implements IdentityInterface
             [
                 'class' =>  AttributewalkBehavior::className(),
                 'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => ['us_active', 'us_createtime', 'us_login'],
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['us_active', 'us_createtime', 'us_login', 'us_role_name'],
                 ],
                 'value' => function ($event, $attribute) {
-                    /** @var yii\base\Event $event */
-                    /** @var app\modules\user\models\User $model */
                     $model = $event->sender;
                     $aVal = [
                         'us_active' => self::STATUS_ACTIVE,
                         'us_createtime' => new Expression('NOW()'),
+                        'us_role_name' => ''
                     ];
+                    if( $attribute === 'us_role_name' ) {
+                        $role = Department::getDepartmentrole($model->us_dep_id);
+                        $aVal['us_role_name'] = $role->name;
+                    }
                     if( empty($model->us_login) ) {
                         $aVal['us_login'] = preg_replace('/\\W/', '', $model->us_email);
                     }
+
                     if( isset($aVal[$attribute]) ) {
                         return $aVal[$attribute];
                     }
@@ -135,7 +139,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['us_logintime', 'us_createtime'], 'safe'],
             [['us_email', ], 'email', ],
             [['us_email', 'us_password_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_login', 'us_workposition', 'us_email_confirm_token', 'us_password_reset_token'], 'string', 'max' => 255],
-            [['us_auth_key'], 'string', 'max' => 32]
+            [['us_auth_key', 'us_role_name'], 'string', 'max' => 32]
         ];
     }
 
@@ -157,9 +161,11 @@ class User extends ActiveRecord implements IdentityInterface
             'us_logintime' => 'Logintime',
             'us_createtime' => 'Createtime',
             'us_workposition' => 'Должность',
+            'us_role_name' => 'Права',
             'us_auth_key' => 'Auth Key',
             'us_email_confirm_token' => 'Email Confirm Token',
             'us_password_reset_token' => 'Password Reset Token',
+            'fname' => 'ФИО',
         ];
     }
 
@@ -412,4 +418,24 @@ class User extends ActiveRecord implements IdentityInterface
         return isset($a[$this->us_active]) ? $a[$this->us_active] : '~';
     }
 
+    /**
+     * Получение ролей пользователя
+     *
+     * @param $userID
+     * @return array
+     *
+     */
+    public static function getAuthRoles($userID) {
+        $aRole = array_values(Yii::$app->getAuthManager()->getRolesByUser($userID));
+        return $aRole;
+        /*
+        if (isset($aRole[0])) {
+            $role = $aRole[0];
+        } else {
+            $role = Yii::$app->getAuthManager()->getRole('YOUR_DEFAULT_ROLE');
+        }
+
+        return $role;
+        */
+    }
 }
