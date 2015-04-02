@@ -23,6 +23,7 @@ class m150401_124249_create_task_table extends Migration
             'task_reasonchanges' => Schema::TYPE_TEXT . ' DEFAULT \'\'',               // 8
             'task_progress' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 0',       // 9
             'task_summary' => Schema::TYPE_TEXT . ' DEFAULT \'\'',                  // 10
+            'task_active' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 0',
         ], $tableOptionsMyISAM);
 
         $this->refreshCache();

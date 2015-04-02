@@ -112,4 +112,5 @@ class Department extends \yii\db\ActiveRecord
 
         return isset($a[$this->dep_active]) ? $a[$this->dep_active] : '~';
     }
+
 }

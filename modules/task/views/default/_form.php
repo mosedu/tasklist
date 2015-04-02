@@ -83,6 +83,7 @@ $aTextParamSummary = [
                 ]
             ]
         ) ?>
+        <?= $form->field($model, 'task_progress')->dropDownList(Tasklist::getAllProgresses()) ?>
     </div>
 
     <?php
