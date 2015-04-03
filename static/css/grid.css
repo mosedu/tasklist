@@ -1,0 +1,30 @@
+.griddate {
+    font-size: 0.9em;
+}
+
+.griddate span, .griddate span.inline {
+    display: block;
+    font-size: 0.9em;
+    color: #999999;
+}
+
+.griddate span.inline {
+    display: inline;
+}
+
+.gridwidth20 {
+    max-width: 20em;
+}
+
+.gridwidth10 {
+    max-width: 10em;
+}
+
+.gridwidth7 {
+    max-width: 7em;
+}
+
+td.commandcell {
+    white-space: nowrap;
+}
+

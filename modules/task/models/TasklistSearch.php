@@ -55,6 +55,10 @@ class TasklistSearch extends Tasklist
             return $dataProvider;
         }
 
+        if( !Yii::$app->user->can('createUser') ) {
+            $this->task_dep_id = Yii::$app->user->getIdentity()->us_dep_id;
+        }
+
         $query->andFilterWhere([
             'task_id' => $this->task_id,
             'task_dep_id' => $this->task_dep_id,
