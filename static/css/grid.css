@@ -28,3 +28,10 @@ td.commandcell {
     white-space: nowrap;
 }
 
+.colorcell_yellow {
+    background-color: #eeee77;
+}
+
+.colorcell_red {
+    background-color: #ff7777;
+}

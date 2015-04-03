@@ -20,12 +20,12 @@ class DefaultController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['create', 'view', 'delete', ],
+                        'actions' => ['view', 'delete', ],
                         'allow' => true,
                         'roles' => ['createUser'],
                     ],
                     [
-                        'actions' => ['index', ],
+                        'actions' => ['index', 'create', ],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -75,9 +75,12 @@ class DefaultController extends Controller
     public function actionCreate()
     {
         $model = new Tasklist();
+        $model->setDepartmentByUser();
+
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->task_id]);
+            return $this->redirect(['index']);
+//            return $this->redirect(['view', 'id' => $model->task_id]);
         } else {
             return $this->render('create', [
                 'model' => $model,

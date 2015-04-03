@@ -92,17 +92,33 @@ $aColumns = [
             */
             return date('d.m.Y', strtotime($model->task_finaltime)); // . $sdop;
         },
-        'contentOptions' => [
-            'class' => 'griddate',
-        ],
+        'contentOptions' => function ($model, $key, $index, $column) {
+            $diff = strtotime($model->task_finaltime) - time();
+
+            return [
+                'class' => 'griddate' . (($model->task_progress != Tasklist::PROGRESS_FINISH) ? (( $diff < 0 ) ? ' colorcell_red' : (( $diff < 24 * 3600 * 7 ) ? ' colorcell_yellow' : '')) : ''),
+            ];
+        },
     ],
     [
         'class' => 'yii\grid\DataColumn',
         'attribute' => 'task_actualtime',
-//                'header' => 'Новый срок',
         'filter' => false,
         'content' => function ($model, $key, $index, $column) {
             return date('d.m.Y', strtotime($model->task_actualtime)) . (($model->task_numchanges > 0) ? (' <b>[' . $model->task_numchanges . ']</b>') : '');
+        },
+        'contentOptions' => function ($model, $key, $index, $column) {
+            return [
+                'class' => 'griddate',
+            ];
+        },
+    ],
+    [
+        'class' => 'yii\grid\DataColumn',
+        'attribute' => 'task_progress',
+        'filter' => false,
+        'content' => function ($model, $key, $index, $column) {
+            return $model->getTaskProgress();
         },
         'contentOptions' => [
             'class' => 'griddate',

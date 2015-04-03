@@ -59,7 +59,7 @@ class Tasklist extends \yii\db\ActiveRecord
             [
                 'class' =>  AttributewalkBehavior::className(),
                 'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => ['task_actualtime', 'task_finaltime', 'task_active', 'task_createtime', 'task_num', ],
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['task_dep_id', 'task_actualtime', 'task_finaltime', 'task_active', 'task_createtime', 'task_num', ],
                 ],
                 'value' => function ($event, $attribute) {
                     /** @var Tasklist $model */
@@ -70,6 +70,10 @@ class Tasklist extends \yii\db\ActiveRecord
 
                         case 'task_finaltime':
                             return $model->task_actualtime; // дата установленная при создании - это наша плановая
+
+                        case 'task_dep_id':
+                            $model->setDepartmentByUser();
+                            return $model->task_dep_id;
 
                         case 'task_createtime':
                             return new Expression('NOW()');
@@ -230,7 +234,24 @@ class Tasklist extends \yii\db\ActiveRecord
         }
 
 
-        return $query->count();
+        return $query->max('task_num');
     }
 
+    /**
+     *
+     * Установка отдела по пользователю
+     *
+     * @param User $user
+     * @return \yii\db\ActiveQuery
+     */
+    public function setDepartmentByUser($user = null) {
+        if( !Yii::$app->user->can('createUser') ) {
+            if( $user ) {
+                $this->task_dep_id = $user->us_dep_id;
+            }
+            else if( Yii::$app->user->identity ) {
+                $this->task_dep_id = Yii::$app->user->identity->us_dep_id;
+            }
+        }
+    }
 }

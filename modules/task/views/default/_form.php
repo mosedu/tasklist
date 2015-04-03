@@ -28,6 +28,10 @@ $aTextParamSummary = [
     ],
 ];
 
+$aDisable = [];
+if( !Yii::$app->user->can('createUser') ) {
+    $aDisable = ['readonly' => true, 'disabled' => true];
+}
 ?>
 
 <div class="tasklist-form">
@@ -65,7 +69,7 @@ $aTextParamSummary = [
     </div>
 
     <div class="col-sm-4">
-        <?= $form->field($model, 'task_dep_id')->dropDownList(Department::getList(false)) ?>
+        <?= $form->field($model, 'task_dep_id')->dropDownList(Department::getList(false), $aDisable) ?>
         <?= $form->field($model, 'task_type')->dropDownList(Tasklist::getAllTypes()) ?>
         <?= $form->field($model, 'task_actualtime')->widget(
             DatePicker::className(),
