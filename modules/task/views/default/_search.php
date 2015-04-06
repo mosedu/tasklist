@@ -26,6 +26,12 @@ $sCss = <<<EOT
 }
 EOT;
 
+if( $model->datestart && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model->datestart, $a) ) {
+    $model->datestart = "{$a[3]}.{$a[2]}.{$a[1]}";
+}
+if( $model->datefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model->datefinish, $a) ) {
+    $model->datefinish = "{$a[3]}.{$a[2]}.{$a[1]}";
+}
 // $this->registerCss($sCss);
 
 /* @var $this yii\web\View */
@@ -93,7 +99,7 @@ EOT;
     </div>
 
     <div class="col-sm-4">
-        <?= $form->field($model, 'task_dep_id')->dropDownList(Department::getList(false)) ?>
+        <?= $form->field($model, 'task_dep_id')->dropDownList(array_merge(['0' => ''], Department::getList(false))) ?>
     </div>
 
     <div class="col-sm-4">
@@ -144,7 +150,13 @@ EOT;
             ]) ?>
     </div>
 
-    <?php // echo $form->field($model, 'task_type') ?>
+    <div class="col-sm-2">
+        <?php echo $form->field($model, 'task_type')->dropDownList(array_merge(['' => ''], Tasklist::getAllTypes())) ?>
+    </div>
+
+    <div class="col-sm-2">
+        <?php echo $form->field($model, 'task_progress')->dropDownList(array_merge(['' => ''], Tasklist::getAllProgresses())) ?>
+    </div>
 
     <?php // echo $form->field($model, 'task_createtime') ?>
 

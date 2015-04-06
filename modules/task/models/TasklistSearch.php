@@ -23,6 +23,7 @@ class TasklistSearch extends Tasklist
             [['datestart', 'datefinish', ], 'filter', 'filter' => function($val) { if( $val && preg_match('|^(\\d{2})\\.(\\d{2})\\.(\\d{4})$|', $val, $a) ) { $val = "{$a[3]}-{$a[2]}-{$a[1]}"; } return $val; }],
             [['task_id', 'task_dep_id', 'task_num', 'task_type', 'task_numchanges', 'task_progress'], 'integer'],
             [['datestart', 'datefinish', 'task_direct', 'task_name', 'task_createtime', 'task_finaltime', 'task_actualtime', 'task_reasonchanges', 'task_summary'], 'safe'],
+            [['task_dep_id'], 'filter', 'filter' => function($val){ return ( $val <=0 ) ? null : $val; }, ],
         ];
     }
 
@@ -78,14 +79,22 @@ class TasklistSearch extends Tasklist
             $this->task_dep_id = Yii::$app->user->getIdentity()->us_dep_id;
         }
 
+        if( $this->datestart ) {
+            $query->andFilterWhere(['>=', 'task_finaltime', $this->datestart]);
+        }
+
+        if( $this->datefinish ) {
+            $query->andFilterWhere(['<', 'task_finaltime', $this->datefinish]);
+        }
+
         $query->andFilterWhere([
             'task_id' => $this->task_id,
             'task_dep_id' => $this->task_dep_id,
             'task_num' => $this->task_num,
             'task_type' => $this->task_type,
-            'task_createtime' => $this->task_createtime,
-            'task_finaltime' => $this->task_finaltime,
-            'task_actualtime' => $this->task_actualtime,
+//            'task_createtime' => $this->task_createtime,
+//            'task_finaltime' => $this->task_finaltime,
+//            'task_actualtime' => $this->task_actualtime,
             'task_numchanges' => $this->task_numchanges,
             'task_progress' => $this->task_progress,
         ]);
