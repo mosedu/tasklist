@@ -6,6 +6,7 @@ use yii\bootstrap\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\web\JsExpression;
 use yii\web\View;
+use kartik\date\DatePicker;
 
 use app\modules\user\models\Department;
 use app\modules\task\models\Tasklist;
@@ -32,7 +33,7 @@ EOT;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="tasklist-search" id="<?= $idserchblock; ?>" style="<?= 'display: none; ' ?>clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; padding-bottom: 1em; margin-bottom: 2em;">
+<div class="tasklist-search" id="<?= $idserchblock; ?>" style="<?= '/*display: none; */' ?>clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; padding-bottom: 1em; margin-bottom: 2em;">
 
     <?php $form = ActiveForm::begin([
         'action' => $action,
@@ -72,11 +73,22 @@ EOT;
 //            'disabled' => true,
         ]
     ];
+
+    $aDateParam = [
+        'horizontalCssClasses' => [
+            'label' => 'col-sm-3',
+            'offset' => 'col-sm-offset-1',
+            'wrapper' => 'col-sm-6',
+        ],
+        'inputOptions' => [
+//            'disabled' => true,
+        ]
+    ];
     ?>
 
     <?php //echo $form->field($model, 'task_id') ?>
 
-    <div class="col-sm-2">
+    <div class="col-sm-4">
         <?= $form->field($model, 'task_num', $aNumParam) ?>
     </div>
 
@@ -84,12 +96,52 @@ EOT;
         <?= $form->field($model, 'task_dep_id')->dropDownList(Department::getList(false)) ?>
     </div>
 
-    <div class="col-sm-6">
-        <?= $form->field($model, 'task_direct') ?>
+    <div class="col-sm-4">
+        <?= $form->field($model, 'task_direct', $aNumParam) ?>
     </div>
 
     <div class="col-sm-12">
         <?= $form->field($model, 'task_name', $aSubjectParam) ?>
+    </div>
+
+    <div class="col-sm-4">
+        <?= $form->field($model, 'datestart', $aNumParam)->widget(
+            DatePicker::className(),
+            [
+            'options' => ['placeholder' => 'от'],
+            'type' => DatePicker::TYPE_INPUT,
+            'pluginOptions' => [
+                'format' => 'dd.mm.yyyy',
+                'todayHighlight' => true,
+                'autoclose'=>true,
+            ],
+            'pluginEvents' => [
+                'changeDate' => 'function(event) {
+                    var startDate = new Date(event.date.valueOf());
+                    jQuery("#tasklistsearch-datefinish").datepicker("setStartDate", startDate);
+                }',
+        ],
+        ]) ?>
+    </div>
+
+    <div class="col-sm-4">
+        <?= $form->field($model, 'datefinish', $aDateParam)->widget(
+            DatePicker::className(),
+            [
+                'options' => ['placeholder' => 'до'],
+                'type' => DatePicker::TYPE_INPUT,
+                'pluginOptions' => [
+                    'format' => 'dd.mm.yyyy',
+                    'todayHighlight' => true,
+                    'autoclose'=>true,
+                ],
+                'pluginEvents' => [
+                    'changeDate' => 'function(event) {
+                        var startDate = new Date(event.date.valueOf());
+                        jQuery("#tasklistsearch-datestart").datepicker("setEndDate", startDate);
+                    }',
+                ],
+            ]) ?>
     </div>
 
     <?php // echo $form->field($model, 'task_type') ?>

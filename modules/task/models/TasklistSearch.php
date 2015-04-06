@@ -12,15 +12,34 @@ use app\modules\task\models\Tasklist;
  */
 class TasklistSearch extends Tasklist
 {
+    public $datestart;
+    public $datefinish;
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
+            [['datestart', 'datefinish', ], 'filter', 'filter' => function($val) { if( $val && preg_match('|^(\\d{2})\\.(\\d{2})\\.(\\d{4})$|', $val, $a) ) { $val = "{$a[3]}-{$a[2]}-{$a[1]}"; } return $val; }],
             [['task_id', 'task_dep_id', 'task_num', 'task_type', 'task_numchanges', 'task_progress'], 'integer'],
-            [['task_direct', 'task_name', 'task_createtime', 'task_finaltime', 'task_actualtime', 'task_reasonchanges', 'task_summary'], 'safe'],
+            [['datestart', 'datefinish', 'task_direct', 'task_name', 'task_createtime', 'task_finaltime', 'task_actualtime', 'task_reasonchanges', 'task_summary'], 'safe'],
         ];
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return array_merge(
+            parent::attributeLabels(),
+            [
+                'datestart' => 'Срок от',
+                'datefinish' => 'Срок до',
+            ]
+        );
+
     }
 
     /**
