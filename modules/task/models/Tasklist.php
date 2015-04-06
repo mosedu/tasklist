@@ -6,6 +6,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
+use yii\behaviors\AttributeBehavior;
 
 use app\components\AttributewalkBehavior;
 use app\modules\user\models\Department;
@@ -52,6 +53,10 @@ class Tasklist extends \yii\db\ActiveRecord
     const PROGRESS_TEXT_FINISH = 'Завершена';
     const PROGRESS_TEXT_WAIT = 'Отложена';
 
+    const FINTIME_INTERVAL = 604800; //  24 * 3600 * 7, диапазн до даты task_finaltime, когда нужно покрасить ячейку этой даты
+
+    public $_oldAttributes = [];
+
 
     public function behaviors()
     {
@@ -85,6 +90,18 @@ class Tasklist extends \yii\db\ActiveRecord
                             return Tasklist::getCounttask($model->task_dep_id) + 1;
                     }
                 },
+            ],
+            // сохраним предыдущие аттрибуты
+            [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_AFTER_FIND => '_oldAttributes',
+                ],
+                'value' => function ($event) {
+                    $ob = $event->sender;
+                    return $ob->getTaskattibutes();
+                },
+
             ],
         ];
     }
@@ -254,4 +271,37 @@ class Tasklist extends \yii\db\ActiveRecord
             }
         }
     }
+
+    /**
+     *
+     * Получение цветов для выделения
+     *
+     * @return array
+     */
+    public function getStatusAttributes() {
+        $aRet = [
+            'fintimeclass' => '',
+            'acttimeclass' => '',
+        ];
+        $diff = strtotime($this->task_finaltime) - time();
+        if( $this->task_progress != Tasklist::PROGRESS_FINISH ) {
+            $aRet['fintimeclass'] = ( $diff < 0 ) ? ' colorcell_red' : (( $diff < self::FINTIME_INTERVAL ) ? ' colorcell_yellow' : '');
+        }
+        else {
+            $sfin = date('Ymd', strtotime($this->task_finaltime));
+            $sact = date('Ymd', strtotime($this->task_actualtime));
+            $aRet['acttimeclass'] = ( $sact < $sfin ) ? ' colorcell_green' : (( $sact > $sfin ) ? ' colorcell_red' : '');
+        }
+    }
+
+    /**
+     * Получение атрибутов модели
+     *
+     * @return array
+     */
+    public function getTaskattibutes() {
+        return $this->attributes;
+    }
+
+
 }

@@ -5,10 +5,10 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\modules\task\models\Tasklist */
 
-$this->title = 'Update Tasklist: ' . ' ' . $model->task_id;
-$this->params['breadcrumbs'][] = ['label' => 'Tasklists', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->task_id, 'url' => ['view', 'id' => $model->task_id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->title = 'Изменение ' . ' ' . $model->task_name;
+// $this->params['breadcrumbs'][] = ['label' => 'Tasklists', 'url' => ['index']];
+//$this->params['breadcrumbs'][] = ['label' => $model->task_id, 'url' => ['view', 'id' => $model->task_id]];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="tasklist-update">
 

@@ -10,9 +10,12 @@ use yii\web\NotFoundHttpException;
 
 use app\modules\task\models\Tasklist;
 use app\modules\task\models\TasklistSearch;
+use app\rbac\DepartmentRule;
 
 class DefaultController extends Controller
 {
+    public $_model = null;
+
     public function behaviors()
     {
         return [
@@ -29,6 +32,18 @@ class DefaultController extends Controller
                         'allow' => true,
                         'roles' => ['@'],
                     ],
+                    [
+                        'actions' => ['update', ],
+                        'allow' => true,
+                        'roles' => ['updateTask', ],
+                    ],
+/*                    [
+                        'class' => DepartmentRule::className(),
+                        'params' => ['task' => $this->tasklist, ],
+                        'actions' => ['update', ],
+                        'allow' => true,
+                        'roles' => ['updateTask', ],
+                    ], */
                 ],
             ],
             'verbs' => [
@@ -77,12 +92,31 @@ class DefaultController extends Controller
         $model = new Tasklist();
         $model->setDepartmentByUser();
 
-
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);
 //            return $this->redirect(['view', 'id' => $model->task_id]);
         } else {
             return $this->render('create', [
+                'model' => $model,
+            ]);
+        }
+    }
+
+    /**
+     * Updates an existing Tasklist model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+//            return $this->redirect(['view', 'id' => $model->task_id]);
+        } else {
+            return $this->render('update', [
                 'model' => $model,
             ]);
         }
@@ -105,6 +139,20 @@ class DefaultController extends Controller
     }
 
     /**
+     * Получение модели в проверке прав доступа
+     *
+     * @return Tasklist the loaded model
+     */
+    public function getTasklist() {
+        list ($route, $params) =  Yii::$app->request->resolve();
+        Yii::info('params = ' . print_r($params, true) . "\nroute = " . print_r($route, true));
+        Yii::info('this->actionParams = ' . print_r($this->actionParams, true));
+        if( isset($params['id']) ) {
+            return $this->findModel($params['id']);
+        }
+    }
+
+    /**
      * Finds the Tasklist model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
@@ -113,15 +161,19 @@ class DefaultController extends Controller
      */
     protected function findModel($id)
     {
-        $model = Tasklist::find()
+        if( $this->_model !== null ) {
+            return $this->_model;
+        }
+        $this->_model = Tasklist::find()
             ->where([
                 'task_id' => $id,
                 'task_active' => Tasklist::STATUS_ACTIVE,
             ])
             ->with('department')
             ->one();
-        if ( $model !== null) {
-            return $model;
+
+        if ( $this->_model !== null) {
+            return $this->_model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }

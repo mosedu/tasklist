@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\web\View;
 
 use app\assets\GriddataAsset;
 use app\modules\task\models\Tasklist;
@@ -158,7 +159,47 @@ if( Yii::$app->user->can('createUser') ) {
 <div class="tasklist-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php echo ''; /* $this->render('_search', ['model' => $searchModel]); */ ?>
+    <div class="col-sm-12 no-horisontal-padding">
+        <div class="form-group">
+            <?= Html::a('Скрыть', '#', ['class' => 'btn btn-default pull-right no-horisontal-margin', 'id'=>'hidesearchpanel', 'role'=>"button"]) ?>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+<?php
+$idserchblock = 'idsearchpanel';
+echo $this->render(
+    '_search',
+    [
+        'model' => $searchModel,
+        'action' => ['index'],
+        'idserchblock' => $idserchblock,
+    ]
+);
+
+// показ/скрытие формы фильтрации
+$sJs =  <<<EOT
+var oPanel = jQuery("#{$idserchblock}"),
+    oLink = jQuery("#hidesearchpanel"),
+    renameButton = function() {
+        oLink.text((oPanel.is(":visible") ? "Скрыть" : "Показать") + " форму поиска");
+    },
+    toggleSearchPanel = function() {
+        oPanel.toggle();
+        renameButton();
+    };
+
+renameButton();
+oLink.on(
+    "click",
+    function(event){ event.preventDefault(); toggleSearchPanel(); return false; }
+);
+
+EOT;
+$this->registerJs($sJs, View::POS_READY , 'togglesearchpanel');
+
+?>
 
     <p>
         <?= Html::a('Добавить задачу', ['create'], ['class' => 'btn btn-success']) ?>

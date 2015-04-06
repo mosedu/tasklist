@@ -11,9 +11,11 @@
 namespace app\rbac;
 
 use yii\rbac\Rule;
+use yii\filters\AccessRule;
 
 class DepartmentRule extends Rule {
     public $name = 'isDepartment';
+    public $params = [];
 
     /**
      * @param app\modules\user\models\User $user the user ID.
@@ -25,6 +27,9 @@ class DepartmentRule extends Rule {
     public function execute($user, $item, $params)
     {
         /** @var app\modules\user\models\User $user */
-        return isset($params['task']) ? (($params['task']->task_dep_id == $user->us_dep_id) || ($user->us_dep_id == 1)) : false;
+        \Yii::info('user = ' . print_r($user, true));
+        \Yii::info('item = ' . print_r($item, true));
+        \Yii::info('params = ' . print_r($params, true));
+        return isset($params['task']) ? (($params['task']->task_dep_id == $user->identity->us_dep_id) || ($user->identity->us_dep_id == 1)) : false;
     }
 }
