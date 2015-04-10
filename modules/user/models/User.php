@@ -379,7 +379,7 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             self::ROLE_DEPARTMENT => self::ROLE_TEXT_DEPARTMENT,
             self::ROLE_CONTROL => self::ROLE_TEXT_CONTROL,
-            self::ROLE_ADMIN => self::ROLE_TEXT_ADMIN,
+//            self::ROLE_ADMIN => self::ROLE_TEXT_ADMIN,
 //            self::ROLE_TEXT_GUEST => self::ROLE_TEXT_GUEST,
         ];
     }
