@@ -39,7 +39,7 @@ if( $model->datefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model->d
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="tasklist-search" id="<?= $idserchblock; ?>" style="<?= '/*display: none; */' ?>clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; padding-bottom: 1em; margin-bottom: 2em;">
+<div class="tasklist-search" id="<?= $idserchblock; ?>" style="<?= 'display: none; ' ?>clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; padding-bottom: 1em; margin-bottom: 2em;">
 
     <?php $form = ActiveForm::begin([
         'action' => $action,

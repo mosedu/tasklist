@@ -39,7 +39,7 @@ $aColumns = [
 //                        color: '.$model->.';
             // <span class="inline glyphicon glyphicon-'.$sGlyth.'" style=" color: ' . $sColor . '; font-size: 1.25em;">
             return
-                '<span class="inline glyphicon glyphicon-'.$sGlyth.'" style="float: right; display: block; font-size: 1.25em;"></span>' .
+                '<span class="inline glyphicon glyphicon-'.$sGlyth.'" style="float: right; display: block; font-size: 1.25em; text-align: right;"><br />' . $model->getTaskType() . '</span>' .
                 '<span class="inline"><span style="font-size: 1.25em;"> ' . Html::a(
                 $model->task_num,
                 ['default/update', 'id'=>$model->task_id],
@@ -59,7 +59,7 @@ $aColumns = [
         'filter' => false,
         'content' => function ($model, $key, $index, $column) {
             // $sGlyth = $model->task_type == Tasklist::TYPE_PLAN ? 'calendar' : 'flash';
-            return Html::encode($model->task_name) . '<span>' . $model->getTaskType() . ', ' . $model->task_direct . '</span>';
+            return Html::encode($model->task_name) . '<span>' . $model->task_direct . '</span>'; //  . $model->getTaskType() . ', '
         },
         'contentOptions' => [
             'class' => 'griddate',
@@ -162,10 +162,21 @@ if( Yii::$app->user->can('createUser') ) {
     );
 }
 
+$aStat = Tasklist::getStatdata();
+// $sDop = print_r($aStat, true);
+
+$sDop = 'Задачи: активные: ' . $aStat['active']
+      . ' просроченные: ' . $aStat['defect']
+      . ' отложенные: ' . $aStat['wait'];
+
 ?>
 
 <div>
-    <h1><?= Html::encode($this->title) ?></h1>
+
+    <div class="col-sm-12">
+        <h1><?= Html::encode($this->title) ?></h1>
+        <p><?= Html::encode($sDop) ?></p>
+    </div>
     <?php echo ''; /* $this->render('_search', ['model' => $searchModel]); */ ?>
     <div class="col-sm-6 no-horisontal-padding">
         <div class="form-group">

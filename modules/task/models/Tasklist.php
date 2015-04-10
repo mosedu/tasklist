@@ -2,6 +2,7 @@
 
 namespace app\modules\task\models;
 
+use app\modules\user\models\User;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
@@ -9,6 +10,7 @@ use yii\db\Expression;
 use yii\behaviors\AttributeBehavior;
 use yii\base\Event;
 use yii\helpers\Html;
+use yii\db\Query;
 
 use app\components\AttributewalkBehavior;
 use app\modules\user\models\Department;
@@ -388,6 +390,34 @@ class Tasklist extends \yii\db\ActiveRecord
         }
 
         return $aChanged;
+    }
+
+    /**
+     * Получение статистики
+     *
+     * @return array
+     */
+    public static function getStatdata() {
+        $nRole = Yii::$app->user->identity->department ? Yii::$app->user->identity->department->dep_user_roles : User::ROLE_ADMIN;
+        // $aStat = [];
+        /** @var Query $query */
+        $query = (new Query())
+            ->select([
+                'SUM(IF(task_progress = '.self::PROGRESS_WORK.', 1, 0)) As active',
+                'SUM(IF(task_progress = '.self::PROGRESS_WORK.' And NOW() > task_finaltime, 1, 0)) As defect',
+                'SUM(IF(task_progress = '.self::PROGRESS_WAIT.', 1, 0)) As wait',
+            ])
+            ->from([self::tableName() . ' f']);
+//        ->where('f.fl_id In (' . implode(',', $aStatFlags) . ')')
+//            ->groupBy(['f.fl_name', 'f.fl_id', 'f.fl_sname']);
+
+        if( $nRole == User::ROLE_DEPARTMENT ) {
+            $query->andFilterWhere(['task_dep_id' => Yii::$app->user->identity->department->dep_id]);
+        }
+
+        $aStat = $query->createCommand()->queryOne();
+
+        return $aStat;
     }
 
 
