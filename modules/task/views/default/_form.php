@@ -135,7 +135,7 @@ EOT;
                      s += dt.getFullYear()
 //                     console.log(s);
                      jQuery('#" . Html::getInputId($model, 'reasonchange') . "').attr('data-old', s);
-                     if( s != '" . $model->task_actualtime . "' ) {
+                     if( s != '" . $model->task_actualtime . "' && ".($model->isNewRecord ? 'false' : 'true')." ) {
                         ob.show();
 //                        console.log('need show');
                      }
