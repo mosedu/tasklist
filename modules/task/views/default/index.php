@@ -37,7 +37,10 @@ $aColumns = [
                 }
             }
 //                        color: '.$model->.';
-            return '<span class="inline"><span class="inline glyphicon glyphicon-'.$sGlyth.'" style=" color: ' . $sColor . '; font-size: 1.25em;"> ' . Html::a(
+            // <span class="inline glyphicon glyphicon-'.$sGlyth.'" style=" color: ' . $sColor . '; font-size: 1.25em;">
+            return
+                '<span class="inline glyphicon glyphicon-'.$sGlyth.'" style="float: right; display: block; font-size: 1.25em;"></span>' .
+                '<span class="inline"><span style="font-size: 1.25em;"> ' . Html::a(
                 $model->task_num,
                 ['default/update', 'id'=>$model->task_id],
                 ['title' => "Задача " . $model->getTaskType() . ', редактировать']
@@ -55,6 +58,7 @@ $aColumns = [
 //                'filter' => Tasklist::getAllTypes(),
         'filter' => false,
         'content' => function ($model, $key, $index, $column) {
+            // $sGlyth = $model->task_type == Tasklist::TYPE_PLAN ? 'calendar' : 'flash';
             return Html::encode($model->task_name) . '<span>' . $model->getTaskType() . ', ' . $model->task_direct . '</span>';
         },
         'contentOptions' => [
@@ -106,11 +110,13 @@ $aColumns = [
         'attribute' => 'task_actualtime',
         'filter' => false,
         'content' => function ($model, $key, $index, $column) {
+            // $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime($model->task_actualtime));
             return date('d.m.Y', strtotime($model->task_actualtime)) . (($model->task_numchanges > 0) ? (' <b>[' . $model->task_numchanges . ']</b>') : '');
         },
         'contentOptions' => function ($model, $key, $index, $column) {
+            $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime($model->task_actualtime));
             return [
-                'class' => 'griddate',
+                'class' => 'griddate' . (($model->task_progress == Tasklist::PROGRESS_FINISH) ? (( $diff < 0 ) ? ' colorcell_red' : (( $diff > 0 ) ? ' colorcell_green' : '')) : ''),
             ];
         },
     ],
@@ -132,6 +138,7 @@ $aColumns = [
 
     [
         'class' => 'yii\grid\ActionColumn',
+        'template'=>'{update}', // {view}  {answer} {toword} {delete}
         'contentOptions' => [
             'class' => 'commandcell',
         ],

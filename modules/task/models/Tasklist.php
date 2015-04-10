@@ -129,7 +129,7 @@ class Tasklist extends \yii\db\ActiveRecord
                         case '_oldAttributes':
                             $aChanged = $model->getChangeattibutes();
                             if (isset($aChanged['task_actualtime'])) {
-                                Yii::info('task_actualtime CHANGED: ' . $aChanged['task_actualtime']['old'] . ' -> ' . $aChanged['task_actualtime']['new']);
+//                                Yii::info('task_actualtime CHANGED: ' . $aChanged['task_actualtime']['old'] . ' -> ' . $aChanged['task_actualtime']['new']);
                                 $model->task_numchanges++;
                                 $model->task_reasonchanges .= "{$aChanged['task_actualtime']['old']} -> {$aChanged['task_actualtime']['new']}\t" . $model->reasonchange . "\t" . Yii::$app->user->getId() . "\n";
                             }
@@ -189,7 +189,7 @@ class Tasklist extends \yii\db\ActiveRecord
             'task_num' => 'Номер',
             'task_direct' => 'Направление',
             'task_name' => 'Наименование',
-            'task_type' => 'Свойство',
+            'task_type' => 'Тип',
             'task_createtime' => 'Создана',
             'task_finaltime' => 'Базовый срок',
             'task_actualtime' => 'Реальный срок',

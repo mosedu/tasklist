@@ -161,5 +161,17 @@ EOT;
     </div>
 
     <?php ActiveForm::end(); ?>
+    <?php
+    if( $model->task_reasonchanges != '' ) {
+        $a = explode("\n", $model->task_reasonchanges);
+        foreach($a As $v) {
+            $v = trim($v);
+            if( $v == '' ) {
+                continue;
+            }
+            $aPart = explode("\t", $v);
+        }
+    }
+    ?>
 
 </div>
