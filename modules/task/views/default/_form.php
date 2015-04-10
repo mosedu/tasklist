@@ -147,7 +147,7 @@ EOT;
                         ]
                     ]
                     ) ?>
-                <?= $form->field($model, 'reasonchange', ['options' => ['style' => 'display: none;', 'class' => "form-group field-tasklist-reasonchange"]])->textarea(['rows' => 2, 'data-old'=>$model->_oldAttributes['task_actualtime'], ]) ?>
+                <?= $form->field($model, 'reasonchange', ['options' => ['style' => 'display: none;', 'class' => "form-group field-tasklist-reasonchange"]])->textarea(['rows' => 2, 'data-old'=>$model->isNewRecord ? '' : $model->_oldAttributes['task_actualtime'], ]) ?>
     </div>
 
     <div class="clearfix"></div>
