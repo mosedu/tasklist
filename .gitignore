@@ -28,6 +28,6 @@ phpunit.phar
 src
 tests
 runtime
-assets
+/web/assets
 /config/*-local.php
 /config/db*.php
