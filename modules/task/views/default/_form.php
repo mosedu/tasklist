@@ -155,13 +155,14 @@ EOT;
     <div class="col-sm-8">
         <div class="col-sm-2">
             <div class="form-group">
-                <?= Html::submitButton($model->isNewRecord ? 'Создать' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success btn-block' : 'btn btn-primary btn-block']) ?>
+                <?= Html::submitButton('Сохранить изменения', ['class' => $model->isNewRecord ? 'btn btn-success btn-block' : 'btn btn-primary btn-block']) ?>
             </div>
         </div>
     </div>
 
     <?php ActiveForm::end(); ?>
     <?php
+    // $model->isNewRecord ? 'Создать' :
     if( $model->task_reasonchanges != '' ) {
         $a = explode("\n", $model->task_reasonchanges);
         foreach($a As $v) {
