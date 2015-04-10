@@ -404,7 +404,7 @@ class Tasklist extends \yii\db\ActiveRecord
         $query = (new Query())
             ->select([
                 'SUM(IF(task_progress = '.self::PROGRESS_WORK.', 1, 0)) As active',
-                'SUM(IF(task_progress = '.self::PROGRESS_WORK.' And NOW() > task_finaltime, 1, 0)) As defect',
+                'SUM(IF(task_progress <> '.self::PROGRESS_FINISH.' And NOW() > task_finaltime, 1, 0)) As defect',
                 'SUM(IF(task_progress = '.self::PROGRESS_WAIT.', 1, 0)) As wait',
             ])
             ->from([self::tableName() . ' f']);
