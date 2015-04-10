@@ -163,22 +163,25 @@ if( Yii::$app->user->can('createUser') ) {
 }
 
 ?>
-<div class="tasklist-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php echo ''; /* $this->render('_search', ['model' => $searchModel]); */ ?>
-    <div class="col-sm-6 no-horisontal-padding">
-        <div class="form-group">
-            <?= Html::a('Добавить задачу', ['create'], ['class' => 'btn btn-success']) ?>
-            <div class="clearfix"></div>
-        </div>
+<h1><?= Html::encode($this->title) ?></h1>
+<div>
+<?php echo ''; /* $this->render('_search', ['model' => $searchModel]); */ ?>
+<div class="col-sm-6 no-horisontal-padding">
+    <div class="form-group">
+        <?= Html::a('Добавить задачу', ['create'], ['class' => 'btn btn-success']) ?>
+        <div class="clearfix"></div>
     </div>
-    <div class="col-sm-6 no-horisontal-padding">
-        <div class="form-group">
-            <?= Html::a('Скрыть', '#', ['class' => 'btn btn-default pull-right no-horisontal-margin', 'id'=>'hidesearchpanel', 'role'=>"button"]) ?>
-            <div class="clearfix"></div>
-        </div>
+</div>
+<div class="col-sm-6 no-horisontal-padding">
+    <div class="form-group">
+        <?= Html::a('Скрыть', '#', ['class' => 'btn btn-default pull-right no-horisontal-margin', 'id'=>'hidesearchpanel', 'role'=>"button"]) ?>
+        <div class="clearfix"></div>
     </div>
+</div>
+</div>
+
+<div class="tasklist-index">
 
 <?php
 $idserchblock = 'idsearchpanel';
