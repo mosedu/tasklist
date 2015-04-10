@@ -159,15 +159,9 @@ class Tasklist extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        return [
+        $aRules = [
             [['task_type', 'task_progress', 'task_active', ], 'filter', 'filter' => 'intval'],
             [['task_dep_id', 'task_name', 'task_direct', 'task_actualtime', 'task_type', 'task_progress', ], 'required'],
-            [['reasonchange', ], 'required',
-                'when' => function($model) { return $model->task_actualtime != $model->_oldAttributes['task_actualtime']; },
-                'whenClient' => "function (attribute, value) {
-                 console.log(jQuery('#".Html::getInputId($this, 'reasonchange')."').attr('data-old') + ' ? ' + '".$this->_oldAttributes['task_actualtime']."');
-                return jQuery('#".Html::getInputId($this, 'reasonchange')."').attr('data-old') != '".$this->_oldAttributes['task_actualtime']."'; }",
-            ],
             [['task_summary', ], 'required',
                 'when' => function($model) { return $model->task_progress == Tasklist::PROGRESS_FINISH; },
                 'whenClient' => "function (attribute, value) { return jQuery('#".Html::getInputId($this, 'task_summary')."').attr('data-req') == 1; }",
@@ -176,6 +170,16 @@ class Tasklist extends \yii\db\ActiveRecord
             [['task_direct', 'task_name', 'task_reasonchanges', 'task_summary', 'reasonchange'], 'string'],
             [['task_createtime', 'task_finaltime', 'task_actualtime'], 'safe']
         ];
+        if( !$this->isNewRecord ) {
+            $aRules[] =
+            [['reasonchange', ], 'required',
+                'when' => function($model) { return $model->task_actualtime != $model->_oldAttributes['task_actualtime']; },
+                'whenClient' => "function (attribute, value) {
+                 console.log(jQuery('#".Html::getInputId($this, 'reasonchange')."').attr('data-old') + ' ? ' + '".$this->_oldAttributes['task_actualtime']."');
+                return jQuery('#".Html::getInputId($this, 'reasonchange')."').attr('data-old') != '".$this->_oldAttributes['task_actualtime']."'; }",
+            ];
+        }
+        return $aRules;
     }
 
     /**
