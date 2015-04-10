@@ -175,16 +175,22 @@ $sDop = 'Задачи: активные: ' . $aStat['active']
 
     <div class="col-sm-12">
         <h1><?= Html::encode($this->title) ?></h1>
-        <p><?= Html::encode($sDop) ?></p>
     </div>
+
     <?php echo ''; /* $this->render('_search', ['model' => $searchModel]); */ ?>
-    <div class="col-sm-6 no-horisontal-padding">
+    <div class="col-sm-8 no-horisontal-padding">
+        <div class="form-group">
+            <p><?= Html::encode($sDop) ?></p>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+    <div class="col-sm-2 no-horisontal-padding">
         <div class="form-group">
             <?= Html::a('Добавить задачу', ['create'], ['class' => 'btn btn-success']) ?>
             <div class="clearfix"></div>
         </div>
     </div>
-    <div class="col-sm-6 no-horisontal-padding">
+    <div class="col-sm-2 no-horisontal-padding">
         <div class="form-group">
             <?= Html::a('Скрыть', '#', ['class' => 'btn btn-default pull-right no-horisontal-margin', 'id'=>'hidesearchpanel', 'role'=>"button"]) ?>
             <div class="clearfix"></div>
