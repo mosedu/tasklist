@@ -36,6 +36,11 @@ class DefaultController extends Controller
                         'actions' => ['update', ],
                         'allow' => true,
                         'roles' => ['updateTask', ],
+/*                        'matchCallback' => function ($rule, $action) {
+                            $model = $action->controller->getTasklist();
+                            return Yii::$app->getUser()->can('updateDepartTask', ['task' => $model, ]);
+                        },
+*/
                     ],
 /*                    [
                         'class' => DepartmentRule::className(),

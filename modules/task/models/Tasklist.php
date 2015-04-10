@@ -7,6 +7,8 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 use yii\behaviors\AttributeBehavior;
+use yii\base\Event;
+use yii\helpers\Html;
 
 use app\components\AttributewalkBehavior;
 use app\modules\user\models\Department;
@@ -56,6 +58,7 @@ class Tasklist extends \yii\db\ActiveRecord
     const FINTIME_INTERVAL = 604800; //  24 * 3600 * 7, диапазн до даты task_finaltime, когда нужно покрасить ячейку этой даты
 
     public $_oldAttributes = [];
+    public $reasonchange = ''; // причина изменения даты
 
 
     public function behaviors()
@@ -65,7 +68,9 @@ class Tasklist extends \yii\db\ActiveRecord
                 'class' =>  AttributewalkBehavior::className(),
                 'attributes' => [
                     ActiveRecord::EVENT_BEFORE_INSERT => ['task_dep_id', 'task_actualtime', 'task_finaltime', 'task_active', 'task_createtime', 'task_num', ],
+                    ActiveRecord::EVENT_AFTER_FIND => ['_oldAttributes', ],
                 ],
+                /** @var Event $event */
                 'value' => function ($event, $attribute) {
                     /** @var Tasklist $model */
                     $model = $event->sender;
@@ -88,6 +93,10 @@ class Tasklist extends \yii\db\ActiveRecord
 
                         case 'task_num':
                             return Tasklist::getCounttask($model->task_dep_id) + 1;
+
+                        case '_oldAttributes':
+                            $model->task_actualtime = date('d.m.Y', strtotime($model->task_actualtime));
+                            return $this->getTaskattibutes();
                     }
                 },
             ],
@@ -98,10 +107,41 @@ class Tasklist extends \yii\db\ActiveRecord
                     ActiveRecord::EVENT_AFTER_FIND => '_oldAttributes',
                 ],
                 'value' => function ($event) {
-                    $ob = $event->sender;
-                    return $ob->getTaskattibutes();
+                    /** @var Tasklist $model */
+                    $model = $event->sender;
+                    return $model->getTaskattibutes();
                 },
+            ],
 
+            // проверим изменение аттрибутов
+            [
+                'class' =>  AttributewalkBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['_oldAttributes', 'task_actualtime']
+                ],
+                'value' => function ($event, $attribute) {
+                    /** @var Tasklist $model */
+                    $model = $event->sender;
+                    switch($attribute) {
+                        case 'task_actualtime':
+                            return date('Y-m-d H:i:s', strtotime($model->task_actualtime) + 24 * 3600 - 1);
+
+                        case '_oldAttributes':
+                            $aChanged = $model->getChangeattibutes();
+                            if (isset($aChanged['task_actualtime'])) {
+                                Yii::info('task_actualtime CHANGED: ' . $aChanged['task_actualtime']['old'] . ' -> ' . $aChanged['task_actualtime']['new']);
+                                $model->task_numchanges++;
+                                $model->task_reasonchanges .= "{$aChanged['task_actualtime']['old']} -> {$aChanged['task_actualtime']['new']}\t" . $model->reasonchange . "\t" . Yii::$app->user->getId() . "\n";
+                            }
+                            if (isset($aChanged['task_progress']) && ($aChanged['task_progress']['new'] == Tasklist::PROGRESS_FINISH) ) {
+                                $this->task_actualtime = date('Y-m-d 00:00:00');
+                            }
+                            if( count($aChanged) > 0 ) {
+                                // TODO: тут поставить логирование кто и что изменил
+                            }
+                            return $model->_oldAttributes;
+                    }
+                },
             ],
         ];
     }
@@ -120,9 +160,20 @@ class Tasklist extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['task_type', 'task_progress', 'task_active', ], 'filter', 'filter' => 'intval'],
             [['task_dep_id', 'task_name', 'task_direct', 'task_actualtime', 'task_type', 'task_progress', ], 'required'],
+            [['reasonchange', ], 'required',
+                'when' => function($model) { return $model->task_actualtime != $model->_oldAttributes['task_actualtime']; },
+                'whenClient' => "function (attribute, value) {
+                 console.log(jQuery('#".Html::getInputId($this, 'reasonchange')."').attr('data-old') + ' ? ' + '".$this->_oldAttributes['task_actualtime']."');
+                return jQuery('#".Html::getInputId($this, 'reasonchange')."').attr('data-old') != '".$this->_oldAttributes['task_actualtime']."'; }",
+            ],
+            [['task_summary', ], 'required',
+                'when' => function($model) { return $model->task_progress == Tasklist::PROGRESS_FINISH; },
+                'whenClient' => "function (attribute, value) { return jQuery('#".Html::getInputId($this, 'task_summary')."').attr('data-req') == 1; }",
+            ],
             [['task_dep_id', 'task_num', 'task_type', 'task_numchanges', 'task_progress', 'task_active', ], 'integer'],
-            [['task_direct', 'task_name', 'task_reasonchanges', 'task_summary'], 'string'],
+            [['task_direct', 'task_name', 'task_reasonchanges', 'task_summary', 'reasonchange'], 'string'],
             [['task_createtime', 'task_finaltime', 'task_actualtime'], 'safe']
         ];
     }
@@ -144,6 +195,7 @@ class Tasklist extends \yii\db\ActiveRecord
             'task_actualtime' => 'Реальный срок',
             'task_numchanges' => 'Изменения',
             'task_reasonchanges' => 'Причина',
+            'reasonchange' => 'Причина переноса',
             'task_progress' => 'Статус',
             'task_summary' => 'Отчет',
             'task_active' => 'Удалена',
@@ -301,6 +353,37 @@ class Tasklist extends \yii\db\ActiveRecord
      */
     public function getTaskattibutes() {
         return $this->attributes;
+    }
+
+    /**
+     * Получение измененных аттрибутов модели
+     *
+     * @return array
+     */
+    public function getChangeattibutes() {
+        $aChanged = [];
+        $aNewAttr = $this->getTaskattibutes();
+        foreach($aNewAttr As $k=>$v) {
+            if( !isset($this->_oldAttributes) ) {
+                $aChanged[$k] = [
+                    'old' => null,
+                    'new' => $v,
+                ];
+            }
+            else {
+                if( $this->_oldAttributes[$k] !== $v ) {
+                    $aChanged[$k] = [
+                        'old' => $this->_oldAttributes[$k],
+                        'new' => $v,
+                    ];
+                }
+            }
+        }
+        if( count($aChanged) > 0 ) {
+            Yii::info('getChangeattibutes(): ' . print_r($aChanged, true));
+        }
+
+        return $aChanged;
     }
 
 

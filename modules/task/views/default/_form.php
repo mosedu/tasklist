@@ -3,10 +3,12 @@
 use yii\helpers\Html;
 // use yii\widgets\ActiveForm;
 use yii\bootstrap\ActiveForm;
+use yii\web\View;
 
 use app\modules\user\models\Department;
 use app\modules\task\models\Tasklist;
 use kartik\date\DatePicker;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $model app\modules\task\models\Tasklist */
@@ -66,39 +68,87 @@ if( !Yii::$app->user->can('createUser') ) {
     <div class="col-sm-8">
         <?= $form->field($model, 'task_direct', $aTextParam)->textarea(['rows' => 2]) ?>
         <?= $form->field($model, 'task_name', $aTextParam)->textarea(['rows' => 2]) ?>
+        <?php
+        $bFinished = ($model->task_progress == Tasklist::PROGRESS_FINISH);
+        if( !$model->isNewRecord ) {
+            ?>
+                <?= $form->field($model, 'task_summary', $aTextParam)->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0]) ?>
+        <?php
+        }
+        $sIdProgress = Html::getInputId($model, 'task_progress');
+        $sIdSummary = Html::getInputId($model, 'task_summary');
+        $nFinish = Tasklist::PROGRESS_FINISH;
+        $sJs = <<<EOT
+var oSelProgress = jQuery("#{$sIdProgress}"),
+    oSummary = jQuery("#{$sIdSummary}");
+oSelProgress.on(
+    "change",
+    function(event) {
+        if( jQuery(this).val() == {$nFinish} ) {
+            oSummary.attr("data-req", 1);
+        }
+        else {
+            oSummary.attr("data-req", 0);
+        }
+    }
+);
+EOT;
+        $this->registerJs($sJs, View::POS_READY, 'changeprogress');
+
+        ?>
     </div>
 
     <div class="col-sm-4">
-        <?= $form->field($model, 'task_dep_id')->dropDownList(Department::getList(false), $aDisable) ?>
-        <?= $form->field($model, 'task_type')->dropDownList(Tasklist::getAllTypes()) ?>
-        <?= $form->field($model, 'task_actualtime')->widget(
-            DatePicker::className(),
-            [
-                'model' => $model,
-                'attribute' => 'task_actualtime',
-                'type' => DatePicker::TYPE_COMPONENT_APPEND,
-                //            'pickerButton' => false,
-                'removeButton' => false,
-                'options' => [
-                    'placeholder' => 'Срок исполнения',
-                ],
-                'pluginOptions' => [
-                    'autoclose'=>true,
-                ]
-            ]
-        ) ?>
-        <?= $form->field($model, 'task_progress')->dropDownList(Tasklist::getAllProgresses()) ?>
+        <?php
+            $bEditDates = !$bFinished || Yii::$app->user->can('createUser');
+            ?>
+                <?= $form->field($model, 'task_dep_id')->dropDownList(Department::getList(false), $aDisable) ?>
+                <?= $form->field($model, 'task_type')->dropDownList(Tasklist::getAllTypes(), $bEditDates ? [] : $aDisable) ?>
+                <?= $form->field($model, 'task_progress')->dropDownList(Tasklist::getAllProgresses(), $bEditDates ? [] : $aDisable) ?>
+                <?= $form->field($model, 'task_actualtime')->widget(
+                    DatePicker::className(),
+                    [
+                        'model' => $model,
+                        'attribute' => 'task_actualtime',
+                        'disabled' => !$bEditDates,
+                        'readonly' => !$bEditDates,
+                        'type' => DatePicker::TYPE_COMPONENT_APPEND,
+                        //            'pickerButton' => false,
+                        'removeButton' => false,
+                        'options' => [
+                            'placeholder' => 'Срок исполнения',
+                        ],
+                        'pluginOptions' => [
+                            'autoclose' => true,
+                        ],
+                        'pluginEvents' => [
+                            "changeDate" => "function(e) {
+//                    console.log(e);
+                     var dt = new Date(e.date),
+                         s = '',
+                         n = dt.getDate(),
+                         ob = jQuery('.field-tasklist-reasonchange');
+//                     console.log('ob = ', ob);
+                     s += ((n < 10) ? '0' : '') + n + '.';
+                     n = dt.getMonth() + 1;
+                     s += ((n < 10) ? '0' : '') + n + '.';
+                     s += dt.getFullYear()
+//                     console.log(s);
+                     jQuery('#" . Html::getInputId($model, 'reasonchange') . "').attr('data-old', s);
+                     if( s != '" . $model->task_actualtime . "' ) {
+                        ob.show();
+//                        console.log('need show');
+                     }
+                     else {
+                        ob.hide();
+//                        console.log('need hide');
+                     }
+                     }",
+                        ]
+                    ]
+                    ) ?>
+                <?= $form->field($model, 'reasonchange', ['options' => ['style' => 'display: none;', 'class' => "form-group field-tasklist-reasonchange"]])->textarea(['rows' => 2, 'data-old'=>$model->_oldAttributes['task_actualtime'], ]) ?>
     </div>
-
-    <?php
-        if( !$model->isNewRecord ) {
-    ?>
-        <div class="col-sm-8">
-            <?= $form->field($model, 'task_summary', $aTextParam)->textarea(['rows' => 4]) ?>
-        </div>
-    <?php
-        }
-    ?>
 
     <div class="clearfix"></div>
 
