@@ -31,3 +31,4 @@ runtime
 /web/assets
 /config/*-local.php
 /config/db*.php
+/web/upload
