@@ -2,11 +2,13 @@
 
 namespace app\modules\task\controllers;
 
+use app\modules\user\models\User;
 use Yii;
 use yii\web\Controller;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
+use yii\web\ForbiddenHttpException;
 
 use app\modules\task\models\Tasklist;
 use app\modules\task\models\TasklistSearch;
@@ -28,20 +30,20 @@ class DefaultController extends Controller
                         'roles' => ['createUser'],
                     ],
                     [
-                        'actions' => ['index', 'create', ],
+                        'actions' => ['index', 'create', 'update', ],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
-                    [
-                        'actions' => ['update', ],
-                        'allow' => true,
-                        'roles' => ['updateTask', ],
-/*                        'matchCallback' => function ($rule, $action) {
-                            $model = $action->controller->getTasklist();
-                            return Yii::$app->getUser()->can('updateDepartTask', ['task' => $model, ]);
-                        },
-*/
-                    ],
+//                    [
+//                        'actions' => ['update', ],
+//                        'allow' => true,
+//                        'roles' => ['@', ],
+//                        'matchCallback' => function ($rule, $action) {
+//                            $model = $action->controller->getTasklist();
+//                            return Yii::$app->getUser()->can('updateTask', ['task' => $model, ]);
+//                            return Yii::$app->getUser()->can('updateDepartTask', ['task' => $model, ]);
+//                        },
+//                    ],
 /*                    [
                         'class' => DepartmentRule::className(),
                         'params' => ['task' => $this->tasklist, ],
@@ -116,6 +118,12 @@ class DefaultController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $oUser = Yii::$app->user->identity;
+//        $bDeny = ($model->task_dep_id != $oUser->us_dep_id) && ($oUser->us_dep_id != 1);
+        $bDeny = ($model->task_dep_id != $oUser->us_dep_id) && ($oUser->department->dep_user_roles != User::ROLE_CONTROL);
+        if( $bDeny ) {
+            throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);
