@@ -59,7 +59,7 @@ $aColumns = [
         'filter' => false,
         'content' => function ($model, $key, $index, $column) {
             // $sGlyth = $model->task_type == Tasklist::TYPE_PLAN ? 'calendar' : 'flash';
-            return Html::encode($model->task_name) . '<span>' . $model->task_direct . '</span>'; //  . $model->getTaskType() . ', '
+            return Html::a(Html::encode($model->task_name), ['update', 'id'=>$model->task_id]) . '<span>' . $model->task_direct . '</span>'; //  . $model->getTaskType() . ', '
         },
         'contentOptions' => [
             'class' => 'griddate',
@@ -204,7 +204,7 @@ $sDop = 'Задачи: активные: ' . $aStat['active']
     <?php echo ''; /* $this->render('_search', ['model' => $searchModel]); */ ?>
     <div class="col-sm-8 no-horisontal-padding">
         <div class="form-group">
-            <p><?= Html::encode($sDop) ?></p>
+            <p><span style="color: #999999;"><?= date('d.m.Y') ?></span> <?= Html::encode($sDop) ?></p>
             <div class="clearfix"></div>
         </div>
     </div>
