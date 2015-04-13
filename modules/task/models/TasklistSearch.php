@@ -15,6 +15,9 @@ class TasklistSearch extends Tasklist
     public $datestart;
     public $datefinish;
 
+    public $actdatestart;
+    public $actdatefinish;
+
     public $showFilterForm = 0; // показывать/скрывать форму фильтрации
     public $showFinishedTask = 0; // показывать/скрывать завершенные задачи
     public $showTaskSummary = 0; // показывать/скрывать поле отчет о выполнении
@@ -25,7 +28,7 @@ class TasklistSearch extends Tasklist
     public function rules()
     {
         return [
-            [['datestart', 'datefinish', ], 'filter', 'filter' => function($val) { if( $val && preg_match('|^(\\d{2})\\.(\\d{2})\\.(\\d{4})$|', $val, $a) ) { $val = "{$a[3]}-{$a[2]}-{$a[1]}"; } return $val; }],
+            [['datestart', 'datefinish', 'actdatestart', 'actdatefinish'], 'filter', 'filter' => function($val) { if( $val && preg_match('|^(\\d{2})\\.(\\d{2})\\.(\\d{4})$|', $val, $a) ) { $val = "{$a[3]}-{$a[2]}-{$a[1]}"; } return $val; }],
             [['task_id', 'task_dep_id', 'task_num', 'task_type', 'task_numchanges', 'task_progress'], 'integer'],
             [['datestart', 'datefinish', 'task_direct', 'task_name', 'task_createtime', 'task_finaltime', 'task_actualtime', 'task_reasonchanges', 'task_summary'], 'safe'],
             [['task_dep_id'], 'filter', 'filter' => function($val){ return ( $val <=0 ) ? null : $val; }, ],
@@ -42,8 +45,10 @@ class TasklistSearch extends Tasklist
         return array_merge(
             parent::attributeLabels(),
             [
-                'datestart' => 'Срок от',
-                'datefinish' => 'Срок до',
+                'datestart' => 'Базовый срок от',
+                'datefinish' => 'до',
+                'actdatestart' => 'Актуальный срок от',
+                'actdatefinish' => 'до',
                 'showFilterForm' => 'Форма',
                 'showFinishedTask' => 'Завершенные',
                 'showTaskSummary' => 'Отчет',
@@ -95,6 +100,14 @@ class TasklistSearch extends Tasklist
 
         if( $this->datefinish ) {
             $query->andFilterWhere(['<', 'task_finaltime', $this->datefinish]);
+        }
+
+        if( $this->actdatestart ) {
+            $query->andFilterWhere(['>=', 'task_actualtime', $this->actdatestart]);
+        }
+
+        if( $this->actdatefinish ) {
+            $query->andFilterWhere(['<', 'task_actualtime', $this->actdatefinish]);
         }
 
         if( !$this->showFinishedTask ) {

@@ -103,13 +103,28 @@ if( $model->datefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model->d
         <?= $form->field($model, 'task_num', $aNumParam) ?>
     </div>
 
-    <div class="col-sm-4">
-        <?= $form->field($model, 'task_dep_id')->dropDownList(array_merge(['0' => ''], Department::getList(false))) ?>
+    <div class="col-sm-2">
+        <?php echo $form->field($model, 'task_type')->dropDownList(array_merge(['' => ''], Tasklist::getAllTypes())) ?>
     </div>
 
-    <div class="col-sm-4">
-        <?= $form->field($model, 'task_direct', $aNumParam) ?>
+    <div class="col-sm-2">
+        <?php echo $form->field($model, 'task_progress')->dropDownList(array_merge(['' => ''], Tasklist::getAllProgresses())) ?>
     </div>
+
+    <?php
+    if( Yii::$app->user->can('createUser') ) {
+    ?>
+
+        <div class="col-sm-4">
+            <?= $form->field($model, 'task_dep_id')->dropDownList(array_merge(['0' => ''], Department::getList(false))) ?>
+        </div>
+
+    <?php
+    }
+    ?>
+    <!-- div class="col-sm-4">
+        <?= $form->field($model, 'task_direct', $aNumParam) ?>
+    </div -->
 
     <div class="col-sm-12">
         <?= $form->field($model, 'task_name', $aSubjectParam) ?>
@@ -155,12 +170,46 @@ if( $model->datefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model->d
             ]) ?>
     </div>
 
-    <div class="col-sm-2">
-        <?php echo $form->field($model, 'task_type')->dropDownList(array_merge(['' => ''], Tasklist::getAllTypes())) ?>
+    <div class="clearfix"></div>
+
+    <div class="col-sm-4">
+        <?= $form->field($model, 'actdatestart', $aNumParam)->widget(
+            DatePicker::className(),
+            [
+                'options' => ['placeholder' => 'от'],
+                'type' => DatePicker::TYPE_INPUT,
+                'pluginOptions' => [
+                    'format' => 'dd.mm.yyyy',
+                    'todayHighlight' => true,
+                    'autoclose'=>true,
+                ],
+                'pluginEvents' => [
+                    'changeDate' => 'function(event) {
+                    var startDate = new Date(event.date.valueOf());
+                    jQuery("#tasklistsearch-actdatefinish").datepicker("setStartDate", startDate);
+                }',
+                ],
+            ]) ?>
     </div>
 
-    <div class="col-sm-2">
-        <?php echo $form->field($model, 'task_progress')->dropDownList(array_merge(['' => ''], Tasklist::getAllProgresses())) ?>
+    <div class="col-sm-4">
+        <?= $form->field($model, 'actdatefinish', $aDateParam)->widget(
+            DatePicker::className(),
+            [
+                'options' => ['placeholder' => 'до'],
+                'type' => DatePicker::TYPE_INPUT,
+                'pluginOptions' => [
+                    'format' => 'dd.mm.yyyy',
+                    'todayHighlight' => true,
+                    'autoclose'=>true,
+                ],
+                'pluginEvents' => [
+                    'changeDate' => 'function(event) {
+                        var startDate = new Date(event.date.valueOf());
+                        jQuery("#tasklistsearch-actdatestart").datepicker("setEndDate", startDate);
+                    }',
+                ],
+            ]) ?>
     </div>
 
     <?php // echo $form->field($model, 'task_createtime') ?>
