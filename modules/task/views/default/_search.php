@@ -39,7 +39,7 @@ if( $model->datefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model->d
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="tasklist-search" id="<?= $idserchblock; ?>" style="<?= 'display: none; ' ?>clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; padding-bottom: 1em; margin-bottom: 2em;">
+<div class="tasklist-search" id="<?= $idserchblock; ?>" style="<?= ($model->showFilterForm ? '' : 'display: none; ') ?>clear: both; border: 1px solid #777777; border-radius: 4px; background-color: #eeeeee; padding-top: 2em; padding-bottom: 1em; margin-bottom: 2em;">
 
     <?php $form = ActiveForm::begin([
         'action' => $action,
@@ -89,6 +89,11 @@ if( $model->datefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model->d
         'inputOptions' => [
 //            'disabled' => true,
         ]
+    ];
+
+    $aCheckBoxOptions = [
+//        'template' => "<div class=\"col-sm-4\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
+        'template' => "<div class=\"checkbox col-sm-4\">\n{beginLabel}\n{input}\n{labelTitle}\n{endLabel}\n<div class=\"col-sm-12\">{error}</div>\n{hint}\n</div>",
     ];
     ?>
 
@@ -172,7 +177,31 @@ if( $model->datefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model->d
 
     <?php // echo $form->field($model, 'task_summary') ?>
 
-    <div class="col-sm-12">
+    <div class="col-sm-8"><div style="display: none">
+        <?php
+            Yii::$app->params['panelcheckbox'] = [
+                Html::getInputId($model, 'showFilterForm') => [
+                    'icon' => 'search',
+                    'name' => Html::getInputName($model, 'showFilterForm'),
+                    'title' => Html::encode('Показать/скрыть панель фильтрации'),
+                ],
+                Html::getInputId($model, 'showFinishedTask') => [
+                    'icon' => 'ok',
+                    'name' => Html::getInputName($model, 'showFinishedTask'),
+                    'title' => Html::encode('Показать/скрыть завершенные задачи'),
+                ],
+                Html::getInputId($model, 'showTaskSummary') => [
+                    'icon' => 'file',
+                    'name' => Html::getInputName($model, 'showTaskSummary'),
+                    'title' => Html::encode('Показать/скрыть поле Отчет'),
+                ],
+            ];
+            echo $form->field($model, 'showFilterForm')->checkbox($aCheckBoxOptions);
+            echo $form->field($model, 'showFinishedTask')->checkbox($aCheckBoxOptions);
+            echo $form->field($model, 'showTaskSummary')->checkbox($aCheckBoxOptions);
+        ?>
+        </div></div>
+    <div class="col-sm-4">
         <!-- div class="form-group" -->
         <?= Html::a('Сбросить настройки', $action, ['class' => 'btn btn-default pull-right']) ?>
         <div class="pull-right" style="width: 2em;">&nbsp;</div>

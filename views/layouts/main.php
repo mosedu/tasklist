@@ -6,6 +6,8 @@ use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 use app\modules\user\models\User;
 
+use yii\helpers\Json;
+
 /* @var $this \yii\web\View */
 /* @var $content string */
 
@@ -36,18 +38,65 @@ AppAsset::register($this);
 
             // ['label' => 'About', 'url' => ['/site/about']],
             // ['label' => 'Контакт', 'url' => ['/contact']],
-            $aItems = [
-                ['label' => 'Главная', 'url' => ['/']],
-            ];
+            $aLists = [];
+            $aItems = [];
+            if( isset(Yii::$app->params['panelcheckbox']) ) {
+                // выводим дополнительные кнопки, если они есть
+                $aItems[] = '<li class="panelcheckbox"></li>';
+                $sAttr = Json::encode(Yii::$app->params['panelcheckbox']);
+                $sJs = <<<EOT
+var oButton = {$sAttr},
+    oIns = jQuery(".panelcheckbox");
+
+for(var i in oButton) {
+    var oData = oButton[i],
+        oCheckbox = jQuery("#" + i),
+        val = oCheckbox.prop('checked'),
+        fOnClick = function(ob){
+            return function(event){
+                event.preventDefault();
+                ob.trigger("click");
+                ob.parents("form:first").trigger("submit");
+                return false;
+            };
+        };
+    if( oCheckbox.length == 0 ) {
+        continue;
+    }
+    var oLink = jQuery("<a href=\"#\" style=\"float: left;\" class=\""+(val ? "panelcb-on" : "panelcb-of")+"\" title=\""+oData.title+"\"><span class=\"glyphicon glyphicon-"+oData.icon+"\"></span></a>"); //  "+val+"
+    oLink.on("click", fOnClick(oCheckbox));
+    oIns.append(oLink);
+}
+EOT;
+                $sCss = <<<EOT
+.navbar-inverse .navbar-nav > li > a.panelcb-on {
+    color: #33ff33;
+}
+.navbar-inverse .navbar-nav > li > a.panelcb-on:hover {
+    color: #ffffff;
+}
+EOT;
+
+                $this->registerJs($sJs);
+                $this->registerCss($sCss);
+            }
+
+            $aItems[] = ['label' => 'Задачи', 'url' => ['/']];
 
             if( Yii::$app->user->can('createUser') ) {
-                $aItems = array_merge(
-                    $aItems,
+                $aLists = array_merge(
+                    $aLists,
                     [
                         ['label' => 'Пользователи', 'url' => ['/user']],
                         ['label' => 'Отделы', 'url' => ['/user/department']],
                     ]
                 );
+            }
+            if( count($aLists) > 0 ) {
+                $aItems[] = [
+                    'label' => 'Доролнительно',
+                    'items' => $aLists,
+                ];
             }
 
             $aItems[] = Yii::$app->user->isGuest ?

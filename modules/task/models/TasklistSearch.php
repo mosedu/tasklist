@@ -14,6 +14,11 @@ class TasklistSearch extends Tasklist
 {
     public $datestart;
     public $datefinish;
+
+    public $showFilterForm = 0; // показывать/скрывать форму фильтрации
+    public $showFinishedTask = 0; // показывать/скрывать завершенные задачи
+    public $showTaskSummary = 0; // показывать/скрывать поле отчет о выполнении
+
     /**
      * @inheritdoc
      */
@@ -24,6 +29,7 @@ class TasklistSearch extends Tasklist
             [['task_id', 'task_dep_id', 'task_num', 'task_type', 'task_numchanges', 'task_progress'], 'integer'],
             [['datestart', 'datefinish', 'task_direct', 'task_name', 'task_createtime', 'task_finaltime', 'task_actualtime', 'task_reasonchanges', 'task_summary'], 'safe'],
             [['task_dep_id'], 'filter', 'filter' => function($val){ return ( $val <=0 ) ? null : $val; }, ],
+            [['showFilterForm', 'showFinishedTask', 'showTaskSummary'], 'integer', ],
         ];
     }
 
@@ -38,6 +44,9 @@ class TasklistSearch extends Tasklist
             [
                 'datestart' => 'Срок от',
                 'datefinish' => 'Срок до',
+                'showFilterForm' => 'Форма',
+                'showFinishedTask' => 'Завершенные',
+                'showTaskSummary' => 'Отчет',
             ]
         );
 
@@ -68,6 +77,7 @@ class TasklistSearch extends Tasklist
         ]);
 
         $this->load($params);
+        $this->setCookie($params);
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to any records when validation fails
@@ -87,11 +97,16 @@ class TasklistSearch extends Tasklist
             $query->andFilterWhere(['<', 'task_finaltime', $this->datefinish]);
         }
 
+        if( !$this->showFinishedTask ) {
+            $query->andFilterWhere(['<>', 'task_progress', Tasklist::PROGRESS_FINISH]);
+        }
+
         $query->andFilterWhere([
             'task_id' => $this->task_id,
             'task_dep_id' => $this->task_dep_id,
             'task_num' => $this->task_num,
             'task_type' => $this->task_type,
+            'task_active' => Tasklist::STATUS_ACTIVE,
 //            'task_createtime' => $this->task_createtime,
 //            'task_finaltime' => $this->task_finaltime,
 //            'task_actualtime' => $this->task_actualtime,
@@ -105,5 +120,40 @@ class TasklistSearch extends Tasklist
             ->andFilterWhere(['like', 'task_summary', $this->task_summary]);
 
         return $dataProvider;
+    }
+
+    /**
+     * Установка значений флажков из входных данных в куки или по какам, если не было входных данных
+     *
+     * @param array $params
+     */
+    public function setCookie($params) {
+        $aNames = ['showFilterForm', 'showFinishedTask', 'showTaskSummary'];
+        $sFormName = $this->formName();
+        $aCookies = Yii::$app->request->cookies;
+        if( isset($params[$sFormName]) ) {
+            $data = $params[$sFormName];
+            foreach($aNames As $v) {
+                if( isset($data[$v]) ) {
+                    Yii::$app->response->cookies->add(new \yii\web\Cookie([
+                        'name' => $v,
+                        'value' => $data[$v],
+                    ]));
+                }
+                else {
+                    if( $aCookies->has($v) ) {
+                        $this->$v = $aCookies->getValue($v);
+                    }
+                }
+            }
+        }
+        else {
+            foreach ($aNames As $v) {
+                if( $aCookies->has($v) ) {
+                    $this->$v = $aCookies->getValue($v);
+                }
+            }
+        }
+
     }
 }

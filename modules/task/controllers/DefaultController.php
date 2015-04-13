@@ -138,6 +138,7 @@ class DefaultController extends Controller
         $model = $this->findModel($id); // ->delete();
         if( $model !== null ) {
             $model->task_active = Tasklist::STATUS_DELETED;
+            $model->save();
         }
 
         return $this->redirect(['index']);

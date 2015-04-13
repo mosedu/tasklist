@@ -136,13 +136,6 @@ $aColumns = [
     // 'task_progress',
     // 'task_summary:ntext',
 
-    [
-        'class' => 'yii\grid\ActionColumn',
-        'template'=>'{update}', // {view}  {answer} {toword} {delete}
-        'contentOptions' => [
-            'class' => 'commandcell',
-        ],
-    ],
 ];
 
 if( Yii::$app->user->can('createUser') ) {
@@ -161,6 +154,37 @@ if( Yii::$app->user->can('createUser') ) {
         $aColumns
     );
 }
+
+if( $searchModel->showTaskSummary ) {
+    $aColumns = array_merge(
+        $aColumns,
+        [[
+            'class' => 'yii\grid\DataColumn',
+            'attribute' => 'task_summary',
+            'filter' => false,
+            'content' => function ($model, $key, $index, $column) {
+                return Html::encode($model->task_summary);
+            },
+            'contentOptions' => [
+                'class' => 'griddate',
+            ],
+        ]]
+    );
+
+}
+
+$aColumns = array_merge(
+    $aColumns,
+    [[
+
+    'class' => 'yii\grid\ActionColumn',
+    'template'=>'{update}' . (Yii::$app->user->can('createUser') ? ' {delete}' : ''), // {view}  {answer} {toword}
+    'contentOptions' => [
+        'class' => 'commandcell',
+    ],
+    ]]
+);
+
 
 $aStat = Tasklist::getStatdata();
 // $sDop = print_r($aStat, true);
@@ -186,13 +210,13 @@ $sDop = 'Задачи: активные: ' . $aStat['active']
     </div>
     <div class="col-sm-2 no-horisontal-padding">
         <div class="form-group">
-            <?= Html::a('Добавить задачу', ['create'], ['class' => 'btn btn-success']) ?>
+            <?= '' /*Html::a('Скрыть', '#', ['class' => 'btn btn-default pull-right no-horisontal-margin', 'id'=>'hidesearchpanel', 'role'=>"button"])*/ ?>
             <div class="clearfix"></div>
         </div>
     </div>
     <div class="col-sm-2 no-horisontal-padding">
         <div class="form-group">
-            <?= Html::a('Скрыть', '#', ['class' => 'btn btn-default pull-right no-horisontal-margin', 'id'=>'hidesearchpanel', 'role'=>"button"]) ?>
+            <?= Html::a('Добавить задачу', ['create'], ['class' => 'btn btn-success']) ?>
             <div class="clearfix"></div>
         </div>
     </div>

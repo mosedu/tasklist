@@ -132,7 +132,16 @@ class Tasklist extends \yii\db\ActiveRecord
                             $aChanged = $model->getChangeattibutes();
                             if (isset($aChanged['task_actualtime'])) {
 //                                Yii::info('task_actualtime CHANGED: ' . $aChanged['task_actualtime']['old'] . ' -> ' . $aChanged['task_actualtime']['new']);
-                                $model->task_numchanges++;
+                                if( preg_match('|^(\\d+)\\.(\\d+)\\.(\\d+)$|', $aChanged['task_actualtime']['old'], $aOld)
+                                 && preg_match('|^(\\d+)\\.(\\d+)\\.(\\d+)$|', $aChanged['task_actualtime']['new'], $aNew)) {
+                                    // меняем счетчик только при изменении в сторону увеличения
+                                    if( $aNew[3] . $aNew[2] . $aNew[1] > $aOld[3] . $aOld[2] . $aOld[1] ) {
+                                        $model->task_numchanges++;
+                                    }
+                                }
+                                else {
+                                    Yii::info('ERROR: not found date in aChanged[task_actualtime]: ' . print_r($aChanged['task_actualtime'], true));
+                                }
                                 $model->task_reasonchanges .= "{$aChanged['task_actualtime']['old']} -> {$aChanged['task_actualtime']['new']}\t" . $model->reasonchange . "\t" . Yii::$app->user->getId() . "\n";
                             }
                             if (isset($aChanged['task_progress']) && ($aChanged['task_progress']['new'] == Tasklist::PROGRESS_FINISH) ) {
@@ -407,7 +416,8 @@ class Tasklist extends \yii\db\ActiveRecord
                 'SUM(IF(task_progress <> '.self::PROGRESS_FINISH.' And NOW() > task_finaltime, 1, 0)) As defect',
                 'SUM(IF(task_progress = '.self::PROGRESS_WAIT.', 1, 0)) As wait',
             ])
-            ->from([self::tableName() . ' f']);
+            ->from([self::tableName() . ' f'])
+            ->where(['task_active' => Tasklist::STATUS_ACTIVE]);
 //        ->where('f.fl_id In (' . implode(',', $aStatFlags) . ')')
 //            ->groupBy(['f.fl_name', 'f.fl_id', 'f.fl_sname']);
 
