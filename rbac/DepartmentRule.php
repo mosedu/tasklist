@@ -35,7 +35,7 @@ class DepartmentRule extends Rule {
         }
         \Yii::info('user = ' . print_r($oUser->attributes, true));
         \Yii::info('item = ' . print_r($item, true));
-        \Yii::info('params = ' . implode(', ', array_keys($params)) . print_r($params['task']->attributes, true) );
+        \Yii::info('params = ' . implode(', ', array_keys($params)) . print_r(isset($params['task']) ? $params['task']->attributes : [], true) );
         $bRet = isset($params['task']) ? (($params['task']->task_dep_id == $oUser->us_dep_id) || ($oUser->us_dep_id == 1)) : false;
         \Yii::info('DepartmentRule(): return ' . ($bRet ? 'true' : 'false') );
         return $bRet;
