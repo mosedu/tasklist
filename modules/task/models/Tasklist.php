@@ -208,7 +208,7 @@ class Tasklist extends \yii\db\ActiveRecord
             'task_createtime' => 'Создана',
             'task_finaltime' => 'Базовый срок',
             'task_actualtime' => 'Реальный срок',
-            'task_numchanges' => 'Изменения',
+            'task_numchanges' => 'Переносы',
             'task_reasonchanges' => 'Причина',
             'reasonchange' => 'Причина переноса',
             'task_progress' => 'Статус',

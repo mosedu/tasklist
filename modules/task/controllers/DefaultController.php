@@ -30,7 +30,7 @@ class DefaultController extends Controller
                         'roles' => ['createUser'],
                     ],
                     [
-                        'actions' => ['index', 'create', 'update', ],
+                        'actions' => ['index', 'create', 'update', 'export', ],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -150,6 +150,35 @@ class DefaultController extends Controller
         }
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * Экпорт в Excel
+     */
+    public function actionExport()
+    {
+        $searchModel = new TasklistSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $format = Yii::$app->request->getQueryParam('format', 'xls');
+
+        $sf = $this->renderPartial(
+            'export-excel',
+            [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'format' => $format,
+            ]
+        );
+
+        Yii::info('in controller: ' . $sf);
+
+        if( file_exists($sf) ) {
+            Yii::$app->response->sendFile($sf);
+        }
+        else {
+            echo $sf;
+//            throw new NotFoundHttpException('The requested export file does not exist.');
+        }
     }
 
     /**

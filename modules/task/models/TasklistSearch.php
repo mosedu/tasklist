@@ -156,4 +156,25 @@ class TasklistSearch extends Tasklist
         }
 
     }
+
+    /**
+     * Получаем массив аттрибутов для создания ссылки
+     *
+     * @return array
+     */
+    public function getSearchParams() {
+        $aAttr = $this->safeAttributes();
+        $aRet = [];
+        $sFormName = $this->formName();
+
+        foreach($aAttr As $v) {
+            if( empty($this->$v) ) {
+                continue;
+            }
+            $aRet[$sFormName . '['.$v.']'] = $this->$v;
+        }
+
+        return $aRet;
+    }
+
 }

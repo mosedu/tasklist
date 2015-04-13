@@ -179,23 +179,30 @@ if( $model->datefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model->d
 
     <div class="col-sm-8"><div style="display: none">
         <?php
-            Yii::$app->params['panelcheckbox'] = [
-                Html::getInputId($model, 'showFilterForm') => [
-                    'icon' => 'search',
-                    'name' => Html::getInputName($model, 'showFilterForm'),
-                    'title' => Html::encode('Показать/скрыть панель фильтрации'),
-                ],
-                Html::getInputId($model, 'showFinishedTask') => [
-                    'icon' => 'ok',
-                    'name' => Html::getInputName($model, 'showFinishedTask'),
-                    'title' => Html::encode('Показать/скрыть завершенные задачи'),
-                ],
-                Html::getInputId($model, 'showTaskSummary') => [
-                    'icon' => 'file',
-                    'name' => Html::getInputName($model, 'showTaskSummary'),
-                    'title' => Html::encode('Показать/скрыть поле Отчет'),
-                ],
-            ];
+            if( !isset(Yii::$app->params['panelcheckbox']) ) {
+                Yii::$app->params['panelcheckbox'] = [];
+            }
+            Yii::$app->params['panelcheckbox'] = array_merge(
+                Yii::$app->params['panelcheckbox'],
+                [
+                    Html::getInputId($model, 'showFilterForm') => [
+                        'icon' => 'search',
+                        'name' => Html::getInputName($model, 'showFilterForm'),
+                        'title' => Html::encode('Показать/скрыть панель фильтрации'),
+                    ],
+                    Html::getInputId($model, 'showFinishedTask') => [
+                        'icon' => 'ok',
+                        'name' => Html::getInputName($model, 'showFinishedTask'),
+                        'title' => Html::encode('Показать/скрыть завершенные задачи'),
+                    ],
+                    Html::getInputId($model, 'showTaskSummary') => [
+                        'icon' => 'file',
+                        'name' => Html::getInputName($model, 'showTaskSummary'),
+                        'title' => Html::encode('Показать/скрыть поле Отчет'),
+                    ],
+                ]
+            );
+
             echo $form->field($model, 'showFilterForm')->checkbox($aCheckBoxOptions);
             echo $form->field($model, 'showFinishedTask')->checkbox($aCheckBoxOptions);
             echo $form->field($model, 'showTaskSummary')->checkbox($aCheckBoxOptions);

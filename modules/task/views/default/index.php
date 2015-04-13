@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\web\View;
+use yii\helpers\Url;
 
 use app\assets\GriddataAsset;
 use app\modules\task\models\Tasklist;
@@ -256,6 +257,21 @@ oLink.on(
 
 EOT;
 $this->registerJs($sJs, View::POS_READY , 'togglesearchpanel');
+
+if( !isset(Yii::$app->params['panelcheckbox']) ) {
+    Yii::$app->params['panelcheckbox'] = [];
+}
+Yii::$app->params['panelcheckbox'] = array_merge(
+    Yii::$app->params['panelcheckbox'],
+    [
+        'exporttoexcelbutton' => [
+            'icon' => 'floppy-disk',
+            'link' => Url::to(array_merge(['export'], $searchModel->getSearchParams(), ['format' => 'xls'])),
+            'linkOptions' => ['target' => '_blank'],
+            'title' => Html::encode('Экспорт в Excel'),
+        ],
+    ]
+);
 
 ?>
 

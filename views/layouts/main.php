@@ -51,7 +51,8 @@ var oButton = {$sAttr},
 for(var i in oButton) {
     var oData = oButton[i],
         oCheckbox = jQuery("#" + i),
-        val = oCheckbox.prop('checked'),
+        val = ( oCheckbox.length > 0 ) ? oCheckbox.prop('checked') : false,
+        oLink = null,
         fOnClick = function(ob){
             return function(event){
                 event.preventDefault();
@@ -60,12 +61,36 @@ for(var i in oButton) {
                 return false;
             };
         };
-    if( oCheckbox.length == 0 ) {
-        continue;
+
+    if( oCheckbox.length > 0 ) {
+        oLink = jQuery("<a href=\"#\" style=\"float: left;\" class=\""+(val ? "panelcb-on" : "panelcb-of")+"\" title=\""+oData.title+"\"><span class=\"glyphicon glyphicon-"+oData.icon+"\"></span></a>"); //  "+val+"
+        oLink.on("click", fOnClick(oCheckbox));
     }
-    var oLink = jQuery("<a href=\"#\" style=\"float: left;\" class=\""+(val ? "panelcb-on" : "panelcb-of")+"\" title=\""+oData.title+"\"><span class=\"glyphicon glyphicon-"+oData.icon+"\"></span></a>"); //  "+val+"
-    oLink.on("click", fOnClick(oCheckbox));
-    oIns.append(oLink);
+    else {
+        if( oData.link != '' ) {
+            var aOpt = { href: oData.link, style: "float: left;", title: oData.title},
+                sOpt = "";
+            if( "linkOptions" in oData ) {
+                for(var j in oData.linkOptions) {
+                    if( j in aOpt ) {
+                        aOpt[j] += oData.linkOptions[j];
+                    }
+                    else {
+                        aOpt[j] = oData.linkOptions[j];
+                    }
+                }
+            }
+            for(var j in aOpt) {
+                sOpt += " " + j + "=\"" + aOpt[j] + "\"";
+            }
+            oLink = jQuery("<a"+sOpt+"><span class=\"glyphicon glyphicon-"+oData.icon+"\"></span></a>");
+        }
+    }
+
+    if( oLink !== null ) {
+        oIns.append(oLink);
+    }
+
 }
 EOT;
                 $sCss = <<<EOT
