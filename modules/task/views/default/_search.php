@@ -7,6 +7,7 @@ use yii\helpers\ArrayHelper;
 use yii\web\JsExpression;
 use yii\web\View;
 use kartik\date\DatePicker;
+use kartik\select2\Select2;
 
 use app\modules\user\models\Department;
 use app\modules\task\models\Tasklist;
@@ -32,6 +33,14 @@ if( $model->datestart && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model->da
 if( $model->datefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model->datefinish, $a) ) {
     $model->datefinish = "{$a[3]}.{$a[2]}.{$a[1]}";
 }
+
+if( $model->actdatestart && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model->actdatestart, $a) ) {
+    $model->actdatestart = "{$a[3]}.{$a[2]}.{$a[1]}";
+}
+if( $model->actdatefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model->actdatefinish, $a) ) {
+    $model->actdatefinish = "{$a[3]}.{$a[2]}.{$a[1]}";
+}
+
 // $this->registerCss($sCss);
 
 /* @var $this yii\web\View */
@@ -67,6 +76,30 @@ if( $model->datefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model->d
         'inputOptions' => [
 //            'disabled' => true,
         ]
+    ];
+
+    $aProgress = [
+        'horizontalCssClasses' => [
+            'label' => 'col-sm-2 col-sm-1-dop',
+            'offset' => 'col-sm-offset-1',
+            'wrapper' => 'col-sm-10 col-sm-11-dop',
+        ],
+        'inputOptions' => [
+//            'disabled' => true,
+        ]
+    ];
+
+    $aProgressWidget = [
+        'data' => Tasklist::getAllProgresses(),
+        'language' => 'ru',
+        'options' => [
+            'multiple' => true,
+//           'tags' => true,
+            'placeholder' => 'Выберите из списка ...',
+        ],
+        'pluginOptions' => [
+            'allowClear' => true,
+        ],
     ];
 
     $aNumParam = [
@@ -107,13 +140,9 @@ if( $model->datefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model->d
         <?php echo $form->field($model, 'task_type')->dropDownList(array_merge(['' => ''], Tasklist::getAllTypes())) ?>
     </div>
 
-    <div class="col-sm-2">
-        <?php echo $form->field($model, 'task_progress')->dropDownList(array_merge(['' => ''], Tasklist::getAllProgresses())) ?>
-    </div>
-
     <?php
     if( Yii::$app->user->can('createUser') ) {
-    ?>
+        ?>
 
         <div class="col-sm-4">
             <?= $form->field($model, 'task_dep_id')->dropDownList(array_merge(['0' => ''], Department::getList(false))) ?>
@@ -122,6 +151,14 @@ if( $model->datefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model->d
     <?php
     }
     ?>
+
+    <div class="col-sm-12">
+        <?php echo $form->field($model, 'task_progress', $aProgress)
+            ->widget(Select2::classname(), $aProgressWidget)
+        ?>
+        <?php // echo $form->field($model, 'task_progress')->dropDownList(array_merge(['' => ''], Tasklist::getAllProgresses())) ?>
+    </div>
+
     <!-- div class="col-sm-4">
         <?= $form->field($model, 'task_direct', $aNumParam) ?>
     </div -->

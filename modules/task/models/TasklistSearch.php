@@ -29,7 +29,8 @@ class TasklistSearch extends Tasklist
     {
         return [
             [['datestart', 'datefinish', 'actdatestart', 'actdatefinish'], 'filter', 'filter' => function($val) { if( $val && preg_match('|^(\\d{2})\\.(\\d{2})\\.(\\d{4})$|', $val, $a) ) { $val = "{$a[3]}-{$a[2]}-{$a[1]}"; } return $val; }],
-            [['task_id', 'task_dep_id', 'task_num', 'task_type', 'task_numchanges', 'task_progress'], 'integer'],
+            [['task_id', 'task_dep_id', 'task_num', 'task_type', 'task_numchanges', ], 'integer'],
+            [['task_progress'], 'in', 'range'=>array_keys(Tasklist::getAllProgresses()), 'allowArray' => true, ],
             [['datestart', 'datefinish', 'task_direct', 'task_name', 'task_createtime', 'task_finaltime', 'task_actualtime', 'task_reasonchanges', 'task_summary'], 'safe'],
             [['task_dep_id'], 'filter', 'filter' => function($val){ return ( $val <=0 ) ? null : $val; }, ],
             [['showFilterForm', 'showFinishedTask', 'showTaskSummary'], 'integer', ],
@@ -110,7 +111,7 @@ class TasklistSearch extends Tasklist
             $query->andFilterWhere(['<', 'task_actualtime', $this->actdatefinish]);
         }
 
-        if( !$this->showFinishedTask ) {
+        if( !$this->showFinishedTask && empty($this->task_progress) ) {
             $query->andFilterWhere(['<>', 'task_progress', Tasklist::PROGRESS_FINISH]);
         }
 
