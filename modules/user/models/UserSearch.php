@@ -78,7 +78,8 @@ class UserSearch extends User
         ]);
 
         $query->andFilterWhere(['like', 'us_email', $this->us_email])
-            ->andFilterWhere(['like', 'us_role_name', $this->us_role_name]);
+            ->andFilterWhere(['like', 'us_role_name', $this->us_role_name])
+            ->andFilterWhere(['in', 'us_role_name', array_keys(User::getUserRoles())]);
         if( !empty($this->fname) ) {
             $query->andFilterWhere([
                 'or',
