@@ -6,6 +6,7 @@ use yii\bootstrap\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\web\JsExpression;
 use yii\web\View;
+use yii\helpers\Json;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
 
@@ -129,9 +130,48 @@ if( $model->actdatefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model
         'template' => "<div class=\"checkbox col-sm-4\">\n{beginLabel}\n{input}\n{labelTitle}\n{endLabel}\n<div class=\"col-sm-12\">{error}</div>\n{hint}\n</div>",
     ];
 
+    $sIdProgressList = Html::getInputId($model, 'task_progress');
+    $sStartDate = Html::getInputId($model, 'datestart');
+    $sFinishDate = Html::getInputId($model, 'datefinish');
+
+    $sClearText = Json::encode([
+        Html::getInputId($model, 'task_num'),
+        Html::getInputId($model, 'task_direct'),
+        Html::getInputId($model, 'task_name'),
+        Html::getInputId($model, 'actdatestart'),
+        Html::getInputId($model, 'actdatefinish'),
+    ]);
+    $sUnset = Json::encode([
+        Html::getInputId($model, 'task_type'),
+    ]);
+    $sVal = Json::encode([Tasklist::PROGRESS_STOP, Tasklist::PROGRESS_WAIT, Tasklist::PROGRESS_WORK]);
+    //    console.log(jQuery("#{$sIdProgressList} :selected"));
     $sJs = <<<EOT
 jQuery("#setfilter7day").on("click", function(event){
-    event.preventdefault();
+    var aClear = {$sClearText},
+        aUnset = {$sUnset},
+        dCur = new Date(),
+        formatDate = function(date) {
+            var d = "" + date.getDate(),
+                m = "" + (date.getMonth() + 1),
+                y = date.getFullYear();
+            return ((d.length < 2) ? ("0" + d) : d)
+                 + "."
+                 + ((m.length < 2) ? ("0" + m) : m)
+                 + "."
+                 + y;
+        };
+    event.preventDefault();
+    jQuery("#{$sIdProgressList}").select2("val", $sVal);
+    for(var i in aClear) {
+        jQuery("#" + aClear[i]).val("");
+    }
+    for(var i in aUnset) {
+        jQuery("#" + aUnset[i] + " option").prop("selected", false);
+    }
+    jQuery("#{$sStartDate}").val(formatDate(dCur));
+    dCur.setDate(dCur.getDate() + 8);
+    jQuery("#{$sFinishDate}").val(formatDate(dCur));
     return false;
 });
 EOT;
@@ -220,7 +260,7 @@ EOT;
     </div>
 
     <div class="col-sm-1">
-        <!-- a href="#" class="btn btn-warning" id="setfilter7day">Прибл.</a -->
+        <a href="#" class="btn btn-warning" id="setfilter7day">Прибл.</a>
     </div>
 
     <div class="col-sm-1">
