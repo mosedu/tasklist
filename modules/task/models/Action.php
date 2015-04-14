@@ -4,6 +4,7 @@ namespace app\modules\task\models;
 
 use Yii;
 use yii\db\Expression;
+use app\modules\user\models\User;
 
 /**
  * This is the model class for table "{{%action}}".
@@ -160,6 +161,16 @@ class Action extends \yii\db\ActiveRecord
      */
     public function getTask() {
         return $this->hasOne(Tasklist::className(), ['task_id' => 'act_table_pk']);
+    }
+
+    /**
+     *
+     * Отношение лога к пользователю
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser() {
+        return $this->hasOne(User::className(), ['us_id' => 'act_us_id']);
     }
 
 

@@ -43,7 +43,7 @@ class ActionSearch extends Action
     {
         $query = Action::find();
 
-        $query->with(['task', 'task.department']);
+        $query->with(['task', 'task.department', 'user']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

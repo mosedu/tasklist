@@ -27,7 +27,7 @@ class ActionController extends Controller
                         'roles' => ['createUser'],
                     ],
                     [
-                        'actions' => [ 'create', 'update', 'export', 'delete', ],
+                        'actions' => [ 'create', 'update', 'delete', ],
                         'allow' => false,
                         'roles' => ['@', '?'],
                     ],

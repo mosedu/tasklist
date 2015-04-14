@@ -67,7 +67,13 @@ $this->title = 'Лог задач';
                 'filter' => false,
                 'content' => function ($model, $key, $index, $column) {
                     $sData = empty($model->act_data) ? '' : Tasklist::getChangesLogText(unserialize($model->act_data));
-                    return Html::a(Html::encode($model->task->task_name), $model->task->getUrl()) . ' (' . Html::encode($model->task->department->dep_name) . ') ' . ($sData != '' ? ('<br />' . $sData) : '') ;
+                    return Html::a(Html::encode($model->task->task_name), $model->task->getUrl())
+                         . ' ('
+                         . Html::encode($model->task->department->dep_name)
+                         . ') '
+                         . '<br />'
+                         . Html::encode($model->user->getFullName())
+                         . ($sData != '' ? ('<br />' . $sData) : '') ;
                 },
 //                'contentOptions' => function ($model, $key, $index, $column) {
 //                    $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime($model->task_actualtime));
