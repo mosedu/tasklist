@@ -46,51 +46,63 @@ AppAsset::register($this);
                 $sAttr = Json::encode(Yii::$app->params['panelcheckbox']);
                 $sJs = <<<EOT
 var oButton = {$sAttr},
-    oIns = jQuery(".panelcheckbox");
-
-for(var i in oButton) {
-    var oData = oButton[i],
-        oCheckbox = jQuery("#" + i),
-        val = ( oCheckbox.length > 0 ) ? oCheckbox.prop('checked') : false,
-        oLink = null,
-        fOnClick = function(ob){
-            return function(event){
-                event.preventDefault();
-                ob.trigger("click");
-                ob.parents("form:first").trigger("submit");
-                return false;
+    oIns = jQuery(".panelcheckbox"),
+    prepareButton = function(i, oData){
+        var oCheckbox = jQuery("#" + i),
+            val = ( oCheckbox.length > 0 ) ? oCheckbox.prop('checked') : false,
+            oLink = null,
+            fOnClick = function(ob){
+                return function(event){
+                    event.preventDefault();
+                    ob.trigger("click");
+                    ob.parents("form:first").trigger("submit");
+                    return false;
+                };
             };
-        };
 
-    if( oCheckbox.length > 0 ) {
-        oLink = jQuery("<a href=\"#\" style=\"float: left;\" class=\""+(val ? "panelcb-on" : "panelcb-of")+"\" title=\""+oData.title+"\"><span class=\"glyphicon glyphicon-"+oData.icon+"\"></span></a>"); //  "+val+"
-        oLink.on("click", fOnClick(oCheckbox));
-    }
-    else {
-        if( oData.link != '' ) {
-            var aOpt = { href: oData.link, style: "float: left;", title: oData.title},
-                sOpt = "";
-            if( "linkOptions" in oData ) {
-                for(var j in oData.linkOptions) {
-                    if( j in aOpt ) {
-                        aOpt[j] += oData.linkOptions[j];
-                    }
-                    else {
-                        aOpt[j] = oData.linkOptions[j];
+        if( oCheckbox.length > 0 ) {
+            oLink = jQuery("<a href=\"#\" style=\"float: left;\" class=\""+(val ? "panelcb-on" : "panelcb-of")+"\" title=\""+oData.title+"\"><span class=\"glyphicon glyphicon-"+oData.icon+"\"></span></a>"); //  "+val+"
+            if( 'callback' in oData ) {
+                oLink.on("click", function(event){
+                    event.preventDefault();
+                    oCheckbox.trigger("click");
+                    var f = new Function("oButton", oData.callback);
+                    f(oLink);
+                    return false;
+                });
+            }
+            else {
+                oLink.on("click", fOnClick(oCheckbox));
+            }
+        }
+        else {
+            if( oData.link != '' ) {
+                var aOpt = { href: oData.link, style: "float: left;", title: oData.title},
+                    sOpt = "";
+                if( "linkOptions" in oData ) {
+                    for(var j in oData.linkOptions) {
+                        if( j in aOpt ) {
+                            aOpt[j] += oData.linkOptions[j];
+                        }
+                        else {
+                            aOpt[j] = oData.linkOptions[j];
+                        }
                     }
                 }
+                for(var j in aOpt) {
+                    sOpt += " " + j + "=\"" + aOpt[j] + "\"";
+                }
+                oLink = jQuery("<a"+sOpt+"><span class=\"glyphicon glyphicon-"+oData.icon+"\"></span></a>");
             }
-            for(var j in aOpt) {
-                sOpt += " " + j + "=\"" + aOpt[j] + "\"";
-            }
-            oLink = jQuery("<a"+sOpt+"><span class=\"glyphicon glyphicon-"+oData.icon+"\"></span></a>");
         }
-    }
 
-    if( oLink !== null ) {
-        oIns.append(oLink);
-    }
+        if( oLink !== null ) {
+            oIns.append(oLink);
+        }
+    };
 
+for(var i in oButton) {
+    prepareButton(i, oButton[i]);
 }
 EOT;
                 $sCss = <<<EOT
@@ -147,7 +159,7 @@ EOT;
 
     <footer class="footer">
         <div class="container">
-            <p class="pull-left">&copy; Темоцентр <?= date('Y') ?></p>
+            <p class="pull-left">&copy; ТемоЦентр <?= date('Y') ?></p>
             <p class="pull-right"></p> <?php /* <?= Yii::powered() ?> */ ?>
         </div>
     </footer>

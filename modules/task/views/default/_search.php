@@ -133,6 +133,8 @@ if( $model->actdatefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model
     $sIdProgressList = Html::getInputId($model, 'task_progress');
     $sStartDate = Html::getInputId($model, 'datestart');
     $sFinishDate = Html::getInputId($model, 'datefinish');
+    $sStartActDate = Html::getInputId($model, 'actdatestart');
+    $sFinishActDate = Html::getInputId($model, 'actdatefinish');
 
     $sClearText = Json::encode([
         Html::getInputId($model, 'task_num'),
@@ -166,6 +168,42 @@ if( $model->actdatefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model
             for(var i in aUnset) {
                 jQuery("#" + aUnset[i] + " option").prop("selected", false);
             }
+        },
+        strtodate = function(s) {
+            var a;
+            s = s.replace(/\s/g, "");
+            if( s == "" ) {
+                return null;
+            }
+            a = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(s);
+            return new Date(parseInt(a[3], 10), parseInt(a[2], 10)-1, parseInt(a[1], 10));
+        },
+        setupDateInterval = function(idStart, idFinish){
+            var obStart = jQuery(idStart),
+                obFinish = jQuery(idFinish),
+                sStart = obStart.val(),
+                sFinish = obFinish.val(),
+                dStart = strtodate(sStart),
+                dFinish = strtodate(sFinish);
+
+            if( (dStart === null) && (dFinish === null) ) {
+                obStart.datepicker("setEndDate", dFinish);
+                obFinish.datepicker("setStartDate", dStart);
+                return;
+            }
+
+            if( (dStart !== null) && (dFinish !== null) ) {
+                if( dFinish < dStart ) {
+                    var t = dStart;
+                    dStart = dFinish;
+                    dFinish = t;
+                    obStart.val(sFinish);
+                    obFinish.val(sStart);
+                }
+            }
+
+            obFinish.datepicker("setStartDate", dStart);
+            obStart.datepicker("setEndDate", dFinish);
         };
 
 jQuery("#setfilter7day").on("click", function(event){
@@ -177,6 +215,7 @@ jQuery("#setfilter7day").on("click", function(event){
     jQuery("#{$sStartDate}").val(formatDate(dCur));
     dCur.setDate(dCur.getDate() + 8);
     jQuery("#{$sFinishDate}").val(formatDate(dCur));
+    setupDateInterval("#{$sStartDate}", "#{$sFinishDate}");
     return false;
 });
 
@@ -188,11 +227,13 @@ jQuery("#setfilterover").on("click", function(event){
 
     jQuery("#{$sStartDate}").val("");
     jQuery("#{$sFinishDate}").val(formatDate(dCur));
+    setupDateInterval("#{$sStartDate}", "#{$sFinishDate}");
     return false;
 });
-EOT;
-    $this->registerJs($sJs);
 
+setupDateInterval("#{$sStartDate}", "#{$sFinishDate}");
+setupDateInterval("#{$sStartActDate}", "#{$sFinishActDate}");
+EOT;
     ?>
 
     <?php //echo $form->field($model, 'task_id') ?>
@@ -349,13 +390,31 @@ EOT;
             if( !isset(Yii::$app->params['panelcheckbox']) ) {
                 Yii::$app->params['panelcheckbox'] = [];
             }
+            $sIdFilterCb = Html::getInputId($model, 'showFilterForm');
             Yii::$app->params['panelcheckbox'] = array_merge(
                 Yii::$app->params['panelcheckbox'],
                 [
-                    Html::getInputId($model, 'showFilterForm') => [
+                    $sIdFilterCb => [
                         'icon' => 'search',
                         'name' => Html::getInputName($model, 'showFilterForm'),
                         'title' => Html::encode('Показать/скрыть панель фильтрации'),
+                        'callback' => "
+                            // oButton - function parametr
+                            var oPanel = jQuery(\"#{$idserchblock}\");
+                            if( oPanel.is(\":hidden\") ) {
+                                oPanel.show();
+                                oButton.addClass(\"panelcb-on\");
+                                oButton.removeClass(\"panelcb-of\");
+                            }
+                            else {
+                                oPanel.hide();
+                                oButton.removeClass(\"panelcb-on\");
+                                oButton.addClass(\"panelcb-of\");
+                            }
+                            jQuery.ajax({
+                                data: " . '{' . $model->formName().": {showFilterForm: jQuery(\"#{$sIdFilterCb}\").is(\":checked\") ? 1: 0 }}
+                            });
+                        ",
                     ],
                     Html::getInputId($model, 'showFinishedTask') => [
                         'icon' => 'ok',
@@ -389,6 +448,14 @@ EOT;
         <?= Html::resetButton('Reset', ['class' => 'btn btn-default']) ?>
     </div -->
 
-    <?php ActiveForm::end(); ?>
+    <?php
+
+        ActiveForm::end();
+        $this->registerJs($sJs);
+
+    ?>
+
+
+
 
 </div>

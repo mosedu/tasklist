@@ -171,7 +171,6 @@ if( $searchModel->showTaskSummary ) {
             ],
         ]]
     );
-
 }
 
 $aColumns = array_merge(
@@ -185,7 +184,6 @@ $aColumns = array_merge(
     ],
     ]]
 );
-
 
 $aStat = Tasklist::getStatdata(empty($searchModel->task_dep_id) ? null : $searchModel->task_dep_id);
 // $sDop = print_r($aStat, true);
