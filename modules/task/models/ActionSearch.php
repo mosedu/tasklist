@@ -43,11 +43,25 @@ class ActionSearch extends Action
     {
         $query = Action::find();
 
+        $query->with(['task', 'task.department']);
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort'=> [
+                'defaultOrder' => [
+                    'act_createtime' => SORT_DESC
+                ],
+            ],
         ]);
 
         $this->load($params);
+
+        $dStart = null;
+        $dFinish = null;
+        if( preg_match('/^(\\d{1,2})\\.(\\d{1,2})\\.(\\d{4})$/', $this->act_createtime, $a) ) {
+            $dStart = date('Y-m-d H:i:s', mktime(0, 0, 0, $a[2], $a[1], $a[3]));
+            $dFinish = date('Y-m-d H:i:s', mktime(0, 0, 0, $a[2], $a[1]+1, $a[3]));
+        }
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to any records when validation fails
@@ -59,9 +73,13 @@ class ActionSearch extends Action
             'act_id' => $this->act_id,
             'act_us_id' => $this->act_us_id,
             'act_type' => $this->act_type,
-            'act_createtime' => $this->act_createtime,
+//            'act_createtime' => $this->act_createtime,
             'act_table_pk' => $this->act_table_pk,
         ]);
+
+        if( $dStart !== null ) {
+            $query->AndWhere(['between', 'act_createtime', $dStart, $dFinish]);
+        }
 
         $query->andFilterWhere(['like', 'act_data', $this->act_data])
             ->andFilterWhere(['like', 'act_table', $this->act_table]);

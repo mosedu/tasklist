@@ -63,6 +63,8 @@ class Tasklist extends \yii\db\ActiveRecord
     public $_oldAttributes = [];
     public $reasonchange = ''; // причина изменения даты
 
+    public static $_tmpModel = null;
+
 
     public function behaviors()
     {
@@ -423,6 +425,9 @@ class Tasklist extends \yii\db\ActiveRecord
                 ];
             }
             else {
+                if( $k == 'task_actualtime' ) {
+                    $v = date('d.m.Y', strtotime($v));
+                }
                 if( $this->_oldAttributes[$k] !== $v ) {
                     $aChanged[$k] = [
                         'old' => $this->_oldAttributes[$k],
@@ -468,6 +473,42 @@ class Tasklist extends \yii\db\ActiveRecord
         $aStat = $query->createCommand()->queryOne();
 
         return $aStat;
+    }
+
+    /**
+     * @param array $aData
+     * @return string
+     */
+    public static function getChangesLogText($aData)
+    {
+        if( self::$_tmpModel === null ) {
+            self::$_tmpModel = new Tasklist();
+        }
+
+        $aTitle = self::$_tmpModel->attributeLabels();
+        $s = '';
+        // TODO: сделать в отдельной View ????
+        foreach($aData As $k=>$v) {
+            $sDop = '';
+            if( isset($aTitle[$k]) ) {
+                $sDop .= $aTitle[$k] . ': ';
+            }
+            else {
+                $sDop .= ': ';
+            }
+            $sDop .= $v['old'] . ' -> ' . $v['new'];
+            $s .= ($s !== '' ? "\n" : '') . $sDop;
+        }
+        return $s;
+    }
+
+    /**
+     * Получение url
+     *
+     * @return string
+     */
+    public function getUrl() {
+        return '/task/default/'.$this->task_id;
     }
 
 

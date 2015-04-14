@@ -54,13 +54,13 @@ class Action extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'act_id' => 'Act ID',
-            'act_us_id' => 'Act Us ID',
-            'act_type' => 'Act Type',
-            'act_createtime' => 'Act Createtime',
-            'act_data' => 'Act Data',
-            'act_table' => 'Act Table',
-            'act_table_pk' => 'Act Table Pk',
+            'act_id' => 'id',
+            'act_us_id' => 'Поьзователь',
+            'act_type' => 'Операция',
+            'act_createtime' => 'Дата',
+            'act_data' => 'Изменения',
+            'act_table' => 'Таблица',
+            'act_table_pk' => 'id',
         ];
     }
 
@@ -150,5 +150,17 @@ class Action extends \yii\db\ActiveRecord
     public static function appendUpdate($data) {
         self::appendData(self::TYPE_UPDATE, $data);
     }
+
+
+    /**
+     *
+     * Отношение лога к задаче
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTask() {
+        return $this->hasOne(Tasklist::className(), ['task_id' => 'act_table_pk']);
+    }
+
 
 }

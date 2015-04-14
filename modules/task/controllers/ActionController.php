@@ -8,6 +8,7 @@ use app\modules\task\models\ActionSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
 
 /**
  * ActionController implements the CRUD actions for Action model.
@@ -17,6 +18,21 @@ class ActionController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'actions' => ['index', 'view', ],
+                        'allow' => true,
+                        'roles' => ['createUser'],
+                    ],
+                    [
+                        'actions' => [ 'create', 'update', 'export', 'delete', ],
+                        'allow' => false,
+                        'roles' => ['@', '?'],
+                    ],
+                ],
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [

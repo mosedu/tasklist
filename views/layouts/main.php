@@ -124,6 +124,7 @@ EOT;
                 $aLists = array_merge(
                     $aLists,
                     [
+                        ['label' => 'Лог задач', 'url' => ['/task/action']],
                         ['label' => 'Пользователи', 'url' => ['/user']],
                         ['label' => 'Отделы', 'url' => ['/user/department']],
                     ]
