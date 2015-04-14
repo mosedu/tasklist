@@ -30,6 +30,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'act_type',
             'act_createtime',
             'act_data:ntext',
+            // 'act_table',
+            // 'act_table_pk',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

@@ -19,8 +19,15 @@ class m150414_101658_add_user_act_log extends Migration
             'act_type' => Schema::TYPE_SMALLINT . ' NOT NULL DEFAULT 0',
             'act_createtime' => Schema::TYPE_DATETIME . ' NOT NULL',
             'act_data' => Schema::TYPE_TEXT . ' DEFAULT \'\'',
+            'act_table' => Schema::TYPE_STRING . ' DEFAULT \'\'',
+            'act_table_pk' => Schema::TYPE_BIGINT,
         ], $tableOptionsMyISAM);
 
+        $this->createIndex('idx_act_table_pk', '{{%action}}', 'act_table_pk');
+        $this->createIndex('idx_act_table', '{{%action}}', 'act_table');
+        $this->createIndex('idx_act_type', '{{%action}}', 'act_type');
+        $this->createIndex('idx_act_createtime', '{{%action}}', 'act_createtime');
+        $this->createIndex('idx_act_us_id', '{{%action}}', 'act_us_id');
         $this->refreshCache();
     }
 

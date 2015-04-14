@@ -18,8 +18,8 @@ class ActionSearch extends Action
     public function rules()
     {
         return [
-            [['act_id', 'act_us_id', 'act_type'], 'integer'],
-            [['act_createtime', 'act_data'], 'safe'],
+            [['act_id', 'act_us_id', 'act_type', 'act_table_pk'], 'integer'],
+            [['act_createtime', 'act_data', 'act_table'], 'safe'],
         ];
     }
 
@@ -60,9 +60,11 @@ class ActionSearch extends Action
             'act_us_id' => $this->act_us_id,
             'act_type' => $this->act_type,
             'act_createtime' => $this->act_createtime,
+            'act_table_pk' => $this->act_table_pk,
         ]);
 
-        $query->andFilterWhere(['like', 'act_data', $this->act_data]);
+        $query->andFilterWhere(['like', 'act_data', $this->act_data])
+            ->andFilterWhere(['like', 'act_table', $this->act_table]);
 
         return $dataProvider;
     }

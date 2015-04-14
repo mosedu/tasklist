@@ -120,7 +120,9 @@ class DefaultController extends Controller
         $model = $this->findModel($id);
         $oUser = Yii::$app->user->identity;
 //        $bDeny = ($model->task_dep_id != $oUser->us_dep_id) && ($oUser->us_dep_id != 1);
-        $bDeny = ($model->task_dep_id != $oUser->us_dep_id) && ($oUser->department->dep_user_roles != User::ROLE_CONTROL);
+        $bDeny = ($model->task_dep_id != $oUser->us_dep_id)
+              && ( !Yii::$app->user->can(User::ROLE_ADMIN) )
+              && ($oUser->department->dep_user_roles != User::ROLE_CONTROL);
         if( $bDeny ) {
             throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
         }

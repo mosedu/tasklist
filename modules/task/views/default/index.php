@@ -112,7 +112,24 @@ $aColumns = [
         'filter' => false,
         'content' => function ($model, $key, $index, $column) {
             // $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime($model->task_actualtime));
-            return date('d.m.Y', strtotime($model->task_actualtime)) . (($model->task_numchanges > 0) ? (' <b>[' . $model->task_numchanges . ']</b>') : '');
+            $sNumChanges = '';
+            if( $model->task_numchanges > 0 ) {
+                $sTip = array_reduce(
+                    explode("\n", $model->task_reasonchanges),
+                    function($carry, $item) {
+                        $item = trim($item);
+                        if( $item !== '' ) {
+                            $a = explode("\t", $item);
+                            $carry .= (($carry !== '') ? "<br />\n" : "") . Html::encode($a[0]) . ' ' . Html::encode($a[1]);
+                        }
+                        return $carry;
+                    },
+                    ''
+                );
+                $sNumChanges = ' <a href="#" data-toggle="tooltip" data-placement="top" data-html="true" title="'.$sTip.'"><b>[' . $model->task_numchanges . ']</b></a>';
+            }
+
+            return date('d.m.Y', strtotime($model->task_actualtime)) . $sNumChanges;
         },
         'contentOptions' => function ($model, $key, $index, $column) {
             $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime($model->task_actualtime));
@@ -252,6 +269,12 @@ oLink.on(
     "click",
     function(event){ event.preventDefault(); toggleSearchPanel(); return false; }
 );
+
+EOT;
+
+$sJs .=  <<<EOT
+
+jQuery('[data-toggle="tooltip"]').tooltip();
 
 EOT;
 $this->registerJs($sJs, View::POS_READY , 'togglesearchpanel');

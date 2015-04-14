@@ -14,6 +14,7 @@ use yii\db\Query;
 
 use app\components\AttributewalkBehavior;
 use app\modules\user\models\Department;
+use app\modules\task\models\Action;
 
 /**
  * This is the model class for table "{{%tasklist}}".
@@ -142,16 +143,48 @@ class Tasklist extends \yii\db\ActiveRecord
                                 else {
                                     Yii::info('ERROR: not found date in aChanged[task_actualtime]: ' . print_r($aChanged['task_actualtime'], true));
                                 }
-                                $model->task_reasonchanges .= "{$aChanged['task_actualtime']['old']} -> {$aChanged['task_actualtime']['new']}\t" . $model->reasonchange . "\t" . Yii::$app->user->getId() . "\n";
+                                $model->task_reasonchanges .= "{$aChanged['task_actualtime']['old']} -> {$aChanged['task_actualtime']['new']}\t" . $model->reasonchange . "\n"; // "\t" . Yii::$app->user->getId() .
                             }
                             if (isset($aChanged['task_progress']) && ($aChanged['task_progress']['new'] == Tasklist::PROGRESS_FINISH) ) {
                                 $this->task_actualtime = date('Y-m-d 00:00:00');
                             }
-                            if( count($aChanged) > 0 ) {
-                                // TODO: тут поставить логирование кто и что изменил
-                            }
                             return $model->_oldAttributes;
                     }
+                },
+            ],
+
+            // логируем данные
+            [
+                'class' =>  AttributewalkBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_AFTER_UPDATE => ['_oldAttributes',],
+                    ActiveRecord::EVENT_AFTER_INSERT => ['_oldAttributes',],
+                    ActiveRecord::EVENT_AFTER_DELETE => ['_oldAttributes',],
+                ],
+                'value' => function ($event, $attribute) {
+                    /** @var Event $event */
+                    /** @var Tasklist $model */
+                    $model = $event->sender;
+                    $data = [
+                        'id' => $model->task_id,
+                        'table' => $model->tableName(),
+                    ];
+
+                    if( $event->name == ActiveRecord::EVENT_AFTER_INSERT ) {
+                        Action::appendCreation($data);
+                    }
+                    else if( $event->name == ActiveRecord::EVENT_AFTER_UPDATE ) {
+                        $aChanged = $model->getChangeattibutes();
+                        if( count($aChanged) > 0 ) {
+                            if( isset($aChanged['task_active']) ) {
+                                Action::appendDelete($data);
+                            }
+                            else {
+                                Action::appendUpdate(array_merge($data, $aChanged));
+                            }
+                        }
+                    }
+                    return $model->_oldAttributes;
                 },
             ],
         ];
@@ -173,6 +206,7 @@ class Tasklist extends \yii\db\ActiveRecord
         $aRules = [
             [['task_type', 'task_progress', 'task_active', ], 'filter', 'filter' => 'intval'],
             [['task_dep_id', 'task_name', 'task_direct', 'task_actualtime', 'task_type', 'task_progress', ], 'required'],
+            [['task_dep_id', 'task_type', 'task_progress', ], 'filter', 'filter'=>'intval'],
             [['task_summary', ], 'required',
                 'when' => function($model) { return $model->task_progress == Tasklist::PROGRESS_FINISH; },
                 'whenClient' => "function (attribute, value) { return jQuery('#".Html::getInputId($this, 'task_summary')."').attr('data-req') == 1; }",
@@ -367,7 +401,10 @@ class Tasklist extends \yii\db\ActiveRecord
      * @return array
      */
     public function getTaskattibutes() {
-        return $this->attributes;
+        $a = $this->attributes;
+        unset($a['task_numchanges']);
+        unset($a['task_reasonchanges']);
+        return $a;
     }
 
     /**

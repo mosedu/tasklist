@@ -20,6 +20,10 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'act_data')->textarea(['rows' => 6]) ?>
 
+    <?= $form->field($model, 'act_table')->textInput(['maxlength' => 255]) ?>
+
+    <?= $form->field($model, 'act_table_pk')->textInput(['maxlength' => 20]) ?>
+
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
