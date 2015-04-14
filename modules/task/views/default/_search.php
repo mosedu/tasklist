@@ -147,10 +147,8 @@ if( $model->actdatefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model
     $sVal = Json::encode([Tasklist::PROGRESS_STOP, Tasklist::PROGRESS_WAIT, Tasklist::PROGRESS_WORK]);
     //    console.log(jQuery("#{$sIdProgressList} :selected"));
     $sJs = <<<EOT
-jQuery("#setfilter7day").on("click", function(event){
     var aClear = {$sClearText},
         aUnset = {$sUnset},
-        dCur = new Date(),
         formatDate = function(date) {
             var d = "" + date.getDate(),
                 m = "" + (date.getMonth() + 1),
@@ -160,17 +158,35 @@ jQuery("#setfilter7day").on("click", function(event){
                  + ((m.length < 2) ? ("0" + m) : m)
                  + "."
                  + y;
+        },
+        clearFields = function() {
+            for(var i in aClear) {
+                jQuery("#" + aClear[i]).val("");
+            }
+            for(var i in aUnset) {
+                jQuery("#" + aUnset[i] + " option").prop("selected", false);
+            }
         };
+
+jQuery("#setfilter7day").on("click", function(event){
+    var dCur = new Date();
     event.preventDefault();
+    clearFields();
     jQuery("#{$sIdProgressList}").select2("val", $sVal);
-    for(var i in aClear) {
-        jQuery("#" + aClear[i]).val("");
-    }
-    for(var i in aUnset) {
-        jQuery("#" + aUnset[i] + " option").prop("selected", false);
-    }
+
     jQuery("#{$sStartDate}").val(formatDate(dCur));
     dCur.setDate(dCur.getDate() + 8);
+    jQuery("#{$sFinishDate}").val(formatDate(dCur));
+    return false;
+});
+
+jQuery("#setfilterover").on("click", function(event){
+    var dCur = new Date();
+    event.preventDefault();
+    clearFields();
+    jQuery("#{$sIdProgressList}").select2("val", $sVal);
+
+    jQuery("#{$sStartDate}").val("");
     jQuery("#{$sFinishDate}").val(formatDate(dCur));
     return false;
 });
@@ -259,11 +275,17 @@ EOT;
     <div class="col-sm-2">
     </div>
 
-    <div class="col-sm-1">
-        <a href="#" class="btn btn-warning" id="setfilter7day">Прибл.</a>
-    </div>
-
-    <div class="col-sm-1">
+    <div class="col-sm-2">
+        <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                Фильтры<span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="#" class="" id="setfilterover">Просроченные</a></li>
+                <li><a href="#" class="" id="setfilter7day">Приближающиеся</a></li>
+                <!-- li class="divider"></li -->
+            </ul>
+        </div>
     </div>
 
     <div class="clearfix"></div>
