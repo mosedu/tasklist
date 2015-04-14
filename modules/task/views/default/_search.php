@@ -128,6 +128,15 @@ if( $model->actdatefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model
 //        'template' => "<div class=\"col-sm-4\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
         'template' => "<div class=\"checkbox col-sm-4\">\n{beginLabel}\n{input}\n{labelTitle}\n{endLabel}\n<div class=\"col-sm-12\">{error}</div>\n{hint}\n</div>",
     ];
+
+    $sJs = <<<EOT
+jQuery("#setfilter7day").on("click", function(event){
+    event.preventdefault();
+    return false;
+});
+EOT;
+    $this->registerJs($sJs);
+
     ?>
 
     <?php //echo $form->field($model, 'task_id') ?>
@@ -205,6 +214,16 @@ if( $model->actdatefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model
                     }',
                 ],
             ]) ?>
+    </div>
+
+    <div class="col-sm-2">
+    </div>
+
+    <div class="col-sm-1">
+        <!-- a href="#" class="btn btn-warning" id="setfilter7day">Прибл.</a -->
+    </div>
+
+    <div class="col-sm-1">
     </div>
 
     <div class="clearfix"></div>

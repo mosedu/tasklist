@@ -125,12 +125,12 @@ $aField = [
         'val' => function($model) { return date('d.m.Y', strtotime($model->task_createtime)); },
     ],
     [
-        'w' => 30,
-        'attribute' => 'task_name',
-    ],
-    [
         'attribute' => 'task_direct',
         'w' => 30,
+    ],
+    [
+        'w' => 30,
+        'attribute' => 'task_name',
     ],
     [
         'attribute' => 'task_finaltime',

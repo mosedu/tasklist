@@ -406,7 +406,7 @@ class Tasklist extends \yii\db\ActiveRecord
      *
      * @return array
      */
-    public static function getStatdata() {
+    public static function getStatdata($dep_id = null) {
         $nRole = Yii::$app->user->identity->department ? Yii::$app->user->identity->department->dep_user_roles : User::ROLE_ADMIN;
         // $aStat = [];
         /** @var Query $query */
@@ -423,6 +423,9 @@ class Tasklist extends \yii\db\ActiveRecord
 
         if( $nRole == User::ROLE_DEPARTMENT ) {
             $query->andFilterWhere(['task_dep_id' => Yii::$app->user->identity->department->dep_id]);
+        }
+        else if( $dep_id > 0 ) {
+            $query->andFilterWhere(['task_dep_id' => $dep_id]);
         }
 
         $aStat = $query->createCommand()->queryOne();

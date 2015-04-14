@@ -187,7 +187,7 @@ $aColumns = array_merge(
 );
 
 
-$aStat = Tasklist::getStatdata();
+$aStat = Tasklist::getStatdata(empty($searchModel->task_dep_id) ? null : $searchModel->task_dep_id);
 // $sDop = print_r($aStat, true);
 
 $sDop = 'Задачи: активные: ' . $aStat['active']
