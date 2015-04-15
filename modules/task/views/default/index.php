@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\web\View;
 use yii\helpers\Url;
+use yii\bootstrap\Modal;
 
 use app\assets\GriddataAsset;
 use app\modules\task\models\Tasklist;
@@ -44,7 +45,9 @@ $aColumns = [
                 '<span class="inline"><span style="font-size: 1.25em;"> ' . Html::a(
                     $model->department->dep_num . '.' . $model->task_num,
                 ['default/update', 'id'=>$model->task_id],
-                ['title' => "Задача " . $model->getTaskType() . ', редактировать']
+                [
+                    'title' => "Резактировать задачу: " . Html::encode($model->getTaskType()), // "Задача " . $model->getTaskType() . ', редактировать',
+                ]
             ) . '</span></span>';
         },
         'contentOptions' => [
@@ -60,7 +63,15 @@ $aColumns = [
         'filter' => false,
         'content' => function ($model, $key, $index, $column) {
             // $sGlyth = $model->task_type == Tasklist::TYPE_PLAN ? 'calendar' : 'flash';
-            return Html::a(Html::encode($model->task_name), ['update', 'id'=>$model->task_id]) . '<span>' . $model->task_direct . '</span>'; //  . $model->getTaskType() . ', '
+            return Html::a(
+                Html::encode($model->task_name),
+                ['view', 'id'=>$model->task_id], // update
+                [
+                    'class' => 'showinmodal',
+                    'title' => Html::encode($model->task_name),
+                ]
+            )
+            . '<span>' . $model->task_direct . '</span>'; //  . $model->getTaskType() . ', '
         },
         'contentOptions' => [
             'class' => 'griddate',
@@ -303,3 +314,35 @@ Yii::$app->params['panelcheckbox'] = array_merge(
     ]); ?>
 
 </div>
+
+<?php
+// Окно для вывода
+
+Modal::begin([
+    'header' => '<span></span>',
+    'id' => 'messagedata',
+    'size' => Modal::SIZE_LARGE,
+]);
+Modal::end();
+
+$sJs =  <<<EOT
+var params = {};
+params[$('meta[name=csrf-param]').prop('content')] = $('meta[name=csrf-token]').prop('content');
+
+jQuery('.showinmodal').on("click", function (event){
+    event.preventDefault();
+
+    var ob = jQuery('#messagedata'),
+        oBody = ob.find('.modal-body'),
+        oLink = $(this);
+
+    oBody.text("");
+    oBody.load(oLink.attr('href'), params);
+    ob.find('.modal-header span').text(oLink.attr('title'));
+    ob.modal('show');
+    return false;
+});
+
+EOT;
+$this->registerJs($sJs, View::POS_READY, 'showmodalmessage');
+?>

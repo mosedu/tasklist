@@ -25,34 +25,65 @@ $this->params['breadcrumbs'][] = $this->title;
         ]) ?>
     </p>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
+    <?php
+    $aAttributes = [
 //            'task_id',
-            [
-                'attribute' => 'task_dep_id',
-                'value' => $model->department->dep_name,
-            ],
-            'task_num',
-            'task_direct:ntext',
-            'task_name:ntext',
+        'task_num',
 //            'task_type',
-            [
-                'attribute' => 'task_type',
-                'value' => $model->getTaskType(),
-            ],
-            'task_createtime',
-            'task_finaltime',
-            'task_actualtime',
-            'task_numchanges',
-            'task_reasonchanges:ntext',
-//            'task_progress',
-            [
-                'attribute' => 'task_progress',
-                'value' => $model->getTaskProgress(),
-            ],
-            'task_summary:ntext',
+        [
+            'attribute' => 'task_type',
+            'value' => $model->getTaskType() . ' / ' . $model->getTaskProgress(),
         ],
+        [
+            'attribute' => 'task_dep_id',
+            'value' => $model->department->dep_name,
+        ],
+        'task_direct:ntext',
+        'task_name:ntext',
+        [
+            'attribute' => 'task_createtime',
+            'value' => date('d.m.Y', strtotime($model->task_createtime)),
+        ],
+        [
+            'attribute' => 'task_finaltime',
+            'value' => date('d.m.Y', strtotime($model->task_finaltime)) . ' / ' . $model->task_actualtime,
+            'label' => 'Базовый / Реальный сроки',
+        ],
+//            'task_createtime',
+//            'task_finaltime',
+//            'task_actualtime',
+//        'task_numchanges',
+//        'task_reasonchanges:ntext',
+//            'task_progress',
+//            [
+//                'attribute' => 'task_progress',
+//                'value' => $model->getTaskProgress(),
+//            ],
+//            'task_summary:ntext',
+    ];
+
+    if( strlen($model->task_summary) > 0 ) {
+        $aAttributes = array_merge(
+            $aAttributes,
+            [
+                'task_summary:ntext',
+            ]
+        );
+    }
+
+    if( $model->task_numchanges > 0 ) {
+        $aAttributes = array_merge(
+            $aAttributes,
+            [
+                'task_numchanges',
+                'task_reasonchanges:ntext',
+            ]
+        );
+    }
+
+    echo DetailView::widget([
+        'model' => $model,
+        'attributes' => $aAttributes,
     ]) ?>
 
 </div>

@@ -36,7 +36,7 @@ Yii::info('Grid: ' . print_r(User::getUserRoles(), true));
                 'attribute' => 'dep_num',
                 'content' => function ($model, $key, $index, $column) {
                     /** @var  Department $model */
-                    return '<div class="left_operate_block"><a href="#'.$model->dep_id.'_'.$model->dep_num.'" class="move_department move_up"><span class="glyphicon glyphicon-arrow-up"></span></a><a href="#'.$model->dep_id.'_'.$model->dep_num.'" class="move_department move_down"><span class="glyphicon glyphicon-arrow-down"></span></a></div>'
+                    return '' //'<div class="left_operate_block"><a href="#'.$model->dep_id.'_'.$model->dep_num.'" class="move_department move_up"><span class="glyphicon glyphicon-arrow-up"></span></a><a href="#'.$model->dep_id.'_'.$model->dep_num.'" class="move_department move_down"><span class="glyphicon glyphicon-arrow-down"></span></a></div>'
                          . $model->dep_num;
                 }
             ],
