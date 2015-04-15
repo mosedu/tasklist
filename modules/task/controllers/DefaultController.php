@@ -25,12 +25,12 @@ class DefaultController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['view', 'delete', ],
+                        'actions' => ['delete', ],
                         'allow' => true,
                         'roles' => ['createUser'],
                     ],
                     [
-                        'actions' => ['index', 'create', 'update', 'export', ],
+                        'actions' => ['view', 'index', 'create', 'update', 'export', ],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -84,14 +84,24 @@ class DefaultController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        $oUser = Yii::$app->user->identity;
+//        $bDeny = ($model->task_dep_id != $oUser->us_dep_id) && ($oUser->us_dep_id != 1);
+        $bDeny = ($model->task_dep_id != $oUser->us_dep_id)
+            && ( !Yii::$app->user->can(User::ROLE_ADMIN) )
+            && ($oUser->department->dep_user_roles != User::ROLE_CONTROL);
+        if( $bDeny ) {
+            throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
+        }
+
         if( Yii::$app->request->isAjax ) {
             return $this->renderPartial('view', [
-                'model' => $this->findModel($id),
+                'model' => $model,
             ]);
         }
 
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
         ]);
     }
 
