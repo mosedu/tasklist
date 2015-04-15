@@ -5,6 +5,9 @@ use yii\grid\GridView;
 use app\modules\task\models\Tasklist;
 use app\modules\task\models\Action;
 use kartik\date\DatePicker;
+use yii\bootstrap\Modal;
+use yii\web\View;
+
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\modules\task\models\ActionSearch */
@@ -67,7 +70,15 @@ $this->title = 'Лог задач';
                 'filter' => false,
                 'content' => function ($model, $key, $index, $column) {
                     $sData = empty($model->act_data) ? '' : Tasklist::getChangesLogText(unserialize($model->act_data));
-                    return Html::a(Html::encode($model->task->task_name), $model->task->getUrl())
+                    $sTaskTitle = Html::encode($model->task->task_name);
+                    return Html::a(
+                            $sTaskTitle,
+                            $model->task->getUrl(),
+                            [
+                                'class' => 'showinmodal',
+                                'title' => $sTaskTitle,
+                            ]
+                        )
                          . ' ('
                          . Html::encode($model->task->department->dep_name)
                          . ') '
@@ -98,3 +109,34 @@ EOT;
     ?>
 
 </div>
+<?php
+// Окно для вывода
+
+Modal::begin([
+    'header' => '<span></span>',
+    'id' => 'messagedata',
+    'size' => Modal::SIZE_LARGE,
+]);
+Modal::end();
+
+$sJs =  <<<EOT
+var params = {};
+params[$('meta[name=csrf-param]').prop('content')] = $('meta[name=csrf-token]').prop('content');
+
+jQuery('.showinmodal').on("click", function (event){
+    event.preventDefault();
+
+    var ob = jQuery('#messagedata'),
+        oBody = ob.find('.modal-body'),
+        oLink = $(this);
+
+    oBody.text("");
+    oBody.load(oLink.attr('href'), params);
+    ob.find('.modal-header span').text(oLink.attr('title'));
+    ob.modal('show');
+    return false;
+});
+
+EOT;
+$this->registerJs($sJs, View::POS_READY, 'showmodalmessage');
+?>

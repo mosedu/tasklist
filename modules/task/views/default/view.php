@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Изменить', ['update', 'id' => $model->task_id], ['class' => 'btn btn-primary']) ?>
+        <?= Yii::$app->request->isAjax ? '' : Html::a('Изменить', ['update', 'id' => $model->task_id], ['class' => 'btn btn-primary']) ?>
         <?= true ? '' : Html::a('Delete', ['delete', 'id' => $model->task_id], [
             'class' => 'btn btn-danger',
             'data' => [
