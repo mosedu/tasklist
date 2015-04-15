@@ -42,7 +42,7 @@ $aColumns = [
             return
                 '<span class="inline glyphicon glyphicon-'.$sGlyth.'" style="float: right; display: block; font-size: 1.25em; text-align: right;"><br />' . $model->getTaskType() . '</span>' .
                 '<span class="inline"><span style="font-size: 1.25em;"> ' . Html::a(
-                $model->task_num,
+                    $model->department->dep_num . '.' . $model->task_num,
                 ['default/update', 'id'=>$model->task_id],
                 ['title' => "Задача " . $model->getTaskType() . ', редактировать']
             ) . '</span></span>';

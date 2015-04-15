@@ -18,7 +18,7 @@ class DepartmentSearch extends Department
     public function rules()
     {
         return [
-            [['dep_id', 'dep_active'], 'integer'],
+            [['dep_id', 'dep_active', 'dep_num'], 'integer'],
             [['dep_name', 'dep_shortname'], 'safe'],
             [['dep_user_roles'], 'string', 'max' => 255],
             [['dep_user_roles'], 'in', 'range' => array_keys(User::getUserRoles())],
@@ -47,6 +47,12 @@ class DepartmentSearch extends Department
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort'=> [
+                'defaultOrder' => [
+                    'dep_num' => SORT_ASC
+                ],
+            ],
+
         ]);
 
         $this->load($params);
@@ -60,6 +66,7 @@ class DepartmentSearch extends Department
         $query->andFilterWhere([
             'dep_id' => $this->dep_id,
             'dep_active' => $this->dep_active,
+            'dep_num' => $this->dep_num,
             'dep_user_roles' => $this->dep_user_roles,
         ]);
 

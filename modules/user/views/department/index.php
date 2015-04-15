@@ -28,9 +28,18 @@ Yii::info('Grid: ' . print_r(User::getUserRoles(), true));
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+//            ['class' => 'yii\grid\SerialColumn'],
 
 //            'dep_id',
+            [
+                'class' => 'yii\grid\DataColumn',
+                'attribute' => 'dep_num',
+                'content' => function ($model, $key, $index, $column) {
+                    /** @var  Department $model */
+                    return '<div class="left_operate_block"><a href="#'.$model->dep_id.'_'.$model->dep_num.'" class="move_department move_up"><span class="glyphicon glyphicon-arrow-up"></span></a><a href="#'.$model->dep_id.'_'.$model->dep_num.'" class="move_department move_down"><span class="glyphicon glyphicon-arrow-down"></span></a></div>'
+                         . $model->dep_num;
+                }
+            ],
             'dep_name',
             'dep_shortname',
 //            'dep_active',
@@ -52,8 +61,60 @@ Yii::info('Grid: ' . print_r(User::getUserRoles(), true));
                 },
             ],
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template'=>'{update}',
+                'contentOptions' => [
+                    'class' => 'commandcell',
+                ],
+            ],
         ],
-    ]); ?>
+    ]);
 
+    $sUrl = \yii\helpers\Url::to(['changenum']);
+    $sJs = <<<EOT
+var oLinks = jQuery(".move_department");
+oLinks.on("click", function(event){
+    event.preventDefault();
+    var oLink = jQuery(this),
+        url = oLink.attr('href'),
+        aPart = url.split("#")[1].split("_"),
+        id = aPart[0],
+        num = aPart[1],
+        bUp = oLink.hasClass('move_up');
+    jQuery.ajax({
+        type: "POST",
+        url: "{$sUrl}",
+        data: {id: id, num: num, up: bUp ? 1 : 0},
+        success: function(data, textStatus, jqXHR){
+            if( ("update" in data) && (data.update > 0) ) {
+                document.location.reload(true);
+            }
+            console.log("success: ", data);
+        },
+        error: function(jqXHR, textStatus, errorThrown){
+            console.log("error: ", textStatus, jqXHR);
+        },
+        dataType: "json"
+    });
+    console.log(url + " " + (bUp ? "up" : "down") + " [" + aPart.join("; ") + "]");
+    return false;
+});
+EOT;
+
+    $sCss = <<<EOT
+.left_operate_block {
+    display: block;
+    float: right;
+    padding: 0;
+    margin: 0;
+}
+
+.left_operate_block .move_department {
+    display: block;
+}
+EOT;
+    $this->registerCss($sCss);
+    $this->registerJs($sJs);
+    ?>
 </div>

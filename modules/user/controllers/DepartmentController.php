@@ -23,7 +23,7 @@ class DepartmentController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['create', 'view', 'delete', 'index', 'update'],
+                        'actions' => ['create', 'view', 'delete', 'index', 'update', 'changenum', ],
                         'allow' => true,
                         'roles' => ['createUser'],
                     ],
@@ -33,6 +33,7 @@ class DepartmentController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['post'],
+                    'changenum' => ['post'],
                 ],
             ],
         ];
@@ -121,6 +122,66 @@ class DepartmentController extends Controller
         }
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * Меняем dep_num у 2 отделов
+     * @return mixed
+     */
+    public function actionChangenum()
+    {
+        $request = Yii::$app->request;
+        $id = $request->post('id', 0);
+        $num = $request->post('num', 0);
+        $up = $request->post('up', 0);
+        $err = null;
+        try{
+            $model = $this->findModel($id);
+        }
+        catch(Exception $e) {
+            $err = "Error: " . Exception;
+            $model = null;
+        }
+
+        if( $model !== null ) {
+            if( $up == 1 ) {
+                $prevId = $model->getPrevByNum();
+                $otherModel = Department::findOne($prevId);
+            }
+            else {
+                $nextId = $model->getNextByNum();
+                $otherModel = Department::findOne($nextId);
+            }
+            $nUpd = 0;
+            if( $otherModel !== null ) {
+                $sSql = 'Update ' . Department::tableName()
+                      . ' Set dep_num = IF(dep_id = :id, :other_num, :num)'
+                      . ' Where dep_id In (:id, :other_id)';
+
+                $nUpd = Yii::$app->db->createCommand(
+                    $sSql,
+                    [
+                        ':id' => $model->dep_id,
+                        ':num' => $model->dep_num,
+                        ':other_id' => $otherModel->dep_id,
+                        ':other_num' => $otherModel->dep_num,
+                    ]
+                )
+                ->execute();
+            }
+            else {
+                $err = 'Not found other department: ' . (isset($prevId) ? " prev: {$prevId}" : '') . (isset($nextId) ? " next: {$nextId}" : '');
+            }
+        }
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        return [
+            'id' => $id,
+//            'num' => $num,
+            'up' => $up,
+            'err' => $err,
+            'update' => $nUpd,
+        ];
     }
 
     /**

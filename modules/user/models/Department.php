@@ -4,6 +4,10 @@ namespace app\modules\user\models;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\db\ActiveRecord;
+use yii\base\Event;
+
+use app\components\AttributewalkBehavior;
 
 /**
  * This is the model class for table "{{%department}}".
@@ -13,6 +17,7 @@ use yii\helpers\ArrayHelper;
  * @property string $dep_shortname
  * @property string $dep_user_roles
  * @property integer $dep_active
+ * @property integer $dep_num
  */
 class Department extends \yii\db\ActiveRecord
 {
@@ -21,6 +26,27 @@ class Department extends \yii\db\ActiveRecord
 
     const STATUS_TEXT_DELETED = 'Удален';
     const STATUS_TEXT_ACTIVE = 'Активен';
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' =>  AttributewalkBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['dep_num', ],
+                ],
+                /** @var Event $event */
+                'value' => function ($event, $attribute) {
+                    /** @var Department $model */
+                    $model = $event->sender;
+                    switch($attribute) {
+                        case 'dep_num':
+                            return Department::getMaxnum() + 1;
+                    }
+                },
+            ],
+        ];
+    }
 
     /**
      * @inheritdoc
@@ -37,7 +63,7 @@ class Department extends \yii\db\ActiveRecord
     {
         return [
             [['dep_name'], 'required'],
-            [['dep_active'], 'integer'],
+            [['dep_active', 'dep_num', ], 'integer'],
             [['dep_name', 'dep_shortname', 'dep_user_roles'], 'string', 'max' => 255],
 //            [['dep_user_roles'], 'in', 'range' => array_keys(User::getUserRoles())],
         ];
@@ -51,6 +77,7 @@ class Department extends \yii\db\ActiveRecord
         return [
             'dep_id' => 'id',
             'dep_name' => 'Полное наименование',
+            'dep_num' => 'Номер',
             'dep_shortname' => 'Краткое наименование',
             'dep_active' => 'Статус',
             'dep_user_roles' => 'Права пользователей отдела',
@@ -111,6 +138,50 @@ class Department extends \yii\db\ActiveRecord
         ];
 
         return isset($a[$this->dep_active]) ? $a[$this->dep_active] : '~';
+    }
+
+    /**
+     *
+     * Подсчет максимального номера отдела
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public static function getMaxnum() {
+        return self::find()->max('dep_num');
+    }
+
+    /**
+     *
+     * Получение id преыдущей записи по dep_num
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPrevByNum() {
+        $sTable = self::tableName();
+        return Yii::$app->db->createCommand(
+            'Select dep_id'
+            . ' From ' . $sTable
+            . ' Where dep_num In ( Select MAX(dep_num) From ' . $sTable . ' Where dep_num < :num)',
+            [':num' => $this->dep_num]
+        )
+        ->queryScalar();
+    }
+
+    /**
+     *
+     * Получение id следующей записи по dep_num
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getNextByNum() {
+        $sTable = self::tableName();
+        return Yii::$app->db->createCommand(
+            'Select dep_id'
+            . ' From ' . $sTable
+            . ' Where dep_num In ( Select MIN(dep_num) From ' . $sTable . ' Where dep_num > :num)',
+            [':num' => $this->dep_num]
+        )
+        ->queryScalar();
     }
 
 }
