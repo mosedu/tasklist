@@ -63,13 +63,17 @@ if( !Yii::$app->user->can('createUser') ) {
                 'hint' => 'col-sm-9 col-sm-offset-3',
             ],
         ],
-    ]); ?>
+    ]);
+
+    $bFinished = ($model->task_progress == Tasklist::PROGRESS_FINISH);
+    $bEditDates = !$bFinished || Yii::$app->user->can('createUser');
+
+    ?>
 
     <div class="col-sm-8">
-        <?= $form->field($model, 'task_direct', $aTextParam)->textarea(['rows' => 2]) ?>
-        <?= $form->field($model, 'task_name', $aTextParam)->textarea(['rows' => 2]) ?>
+        <?= $form->field($model, 'task_direct', $aTextParam)->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable)) ?>
+        <?= $form->field($model, 'task_name', $aTextParam)->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable)) ?>
         <?php
-        $bFinished = ($model->task_progress == Tasklist::PROGRESS_FINISH);
         if( !$model->isNewRecord ) {
             ?>
                 <?= $form->field($model, 'task_summary', $aTextParam)->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0]) ?>
@@ -99,9 +103,6 @@ EOT;
     </div>
 
     <div class="col-sm-4">
-        <?php
-            $bEditDates = !$bFinished || Yii::$app->user->can('createUser');
-            ?>
                 <?= $form->field($model, 'task_dep_id')->dropDownList(Department::getList(false), $aDisable) ?>
                 <?= $form->field($model, 'task_type')->dropDownList(Tasklist::getAllTypes(), $bEditDates ? [] : $aDisable) ?>
                 <?= $form->field($model, 'task_progress')->dropDownList(Tasklist::getAllProgresses(), $bEditDates ? [] : $aDisable) ?>
