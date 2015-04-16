@@ -136,6 +136,8 @@ $aColumns = [
     [
         'class' => 'yii\grid\DataColumn',
         'attribute' => 'task_actualtime',
+        'label' => "Новый срок<br />Реальный срок",
+        'encodeLabel' => false,
         'filter' => false,
         'content' => function ($model, $key, $index, $column) {
             // $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime($model->task_actualtime));
@@ -325,7 +327,8 @@ Yii::$app->params['panelcheckbox'] = array_merge(
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
+        'filterModel' => null, // $searchModel,
+        'headerRowOptions' => ['class' => 'center-top'],
         'columns' => $aColumns,
     ]); ?>
 
@@ -360,5 +363,14 @@ jQuery('.showinmodal').on("click", function (event){
 });
 
 EOT;
+
+$sCss =  <<<EOT
+.table > thead > tr.center-top > th {
+    text-align: center;
+    vertical-align: middle;
+}
+EOT;
+
 $this->registerJs($sJs, View::POS_READY, 'showmodalmessage');
+$this->registerCss($sCss);
 ?>

@@ -242,7 +242,7 @@ EOT;
         <?= $form->field($model, 'task_num', $aNumParam) ?>
     </div>
 
-    <div class="col-sm-2">
+    <div class="col-sm-4">
         <?php echo $form->field($model, 'task_type')->dropDownList(array_merge(['' => ''], Tasklist::getAllTypes())) ?>
     </div>
 

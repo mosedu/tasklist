@@ -241,7 +241,7 @@ class Tasklist extends \yii\db\ActiveRecord
             'task_num' => 'Номер',
             'task_direct' => 'Направление',
             'task_name' => 'Наименование',
-            'task_type' => 'Тип',
+            'task_type' => 'Свойство',
             'task_createtime' => 'Создана',
             'task_finaltime' => 'Базовый срок',
             'task_actualtime' => 'Реальный срок',

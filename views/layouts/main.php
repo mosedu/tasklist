@@ -132,7 +132,7 @@ EOT;
             }
             if( count($aLists) > 0 ) {
                 $aItems[] = [
-                    'label' => 'Доролнительно',
+                    'label' => 'Дополнительно',
                     'items' => $aLists,
                 ];
             }
