@@ -125,6 +125,7 @@ $aColumns = [
             // $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime($model->task_actualtime));
             $sNumChanges = '';
             if( $model->task_numchanges > 0 ) {
+                Yii::info('task ['.$model->task_id.'] = ' . $model->task_numchanges . ' = ' . $model->task_reasonchanges);
                 $sTip = array_reduce(
                     explode("\n", $model->task_reasonchanges),
                     function($carry, $item) {
