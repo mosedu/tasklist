@@ -156,12 +156,14 @@ $aField = [
     ],
     [
         'attribute' => 'task_numchanges',
+        'val' => function($model) { return count($model->changes); },
         'w' => 14,
     ],
     [
         'attribute' => 'task_reasonchanges',
         'w' => 20,
-        'val' => function($model) { return str_replace("\n", "\r\n", str_replace("\\n", "\n", $model->task_reasonchanges)); },
+        'val' => function($model) { return array_reduce($model->changes, function($carry, $item) { return $carry . (($carry !== '') ? "\r\n" : "") . $item->ch_data . ' ' . $item->ch_text; }, ''); },
+//        'val' => function($model) { return str_replace("\n", "\r\n", str_replace("\\n", "\n", $model->task_reasonchanges)); },
     ],
     [
         'attribute' => 'task_summary',
@@ -212,7 +214,7 @@ $nRow = $nStartRow;
 $oSheet->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(1, $nRow-1);
 
 for($page = 0; $page < $nPageCount; $page++) {
-    Yii::info('Export page: ' . $page);
+//    Yii::info('Export page: ' . $page);
     $dataProvider->pagination->setPage($page);
     $dataProvider->refresh();
 

@@ -15,6 +15,7 @@ use yii\db\Query;
 use app\components\AttributewalkBehavior;
 use app\modules\user\models\Department;
 use app\modules\task\models\Action;
+use app\modules\task\models\Changes;
 
 /**
  * This is the model class for table "{{%tasklist}}".
@@ -183,6 +184,10 @@ class Tasklist extends \yii\db\ActiveRecord
                             }
                             else {
                                 Action::appendUpdate(array_merge($data, $aChanged));
+                                if (isset($aChanged['task_actualtime'])) {
+                                    Changes::addChange($model);
+                                    // $model->task_reasonchanges .= "{$aChanged['task_actualtime']['old']} -> {$aChanged['task_actualtime']['new']}\t" . str_replace("\n", '\\n', $model->reasonchange) . "\n"; // "\t" . Yii::$app->user->getId() .
+                                }
                             }
                         }
                     }
@@ -344,6 +349,16 @@ class Tasklist extends \yii\db\ActiveRecord
 
     /**
      *
+     * Отношение задачи к смене даты
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getChanges() {
+        return $this->hasMany(Changes::className(), ['ch_task_id' => 'task_id']);
+    }
+
+    /**
+     *
      * Подсчет задач отдела
      *
      * @return \yii\db\ActiveQuery
@@ -437,9 +452,9 @@ class Tasklist extends \yii\db\ActiveRecord
                 }
             }
         }
-        if( count($aChanged) > 0 ) {
-            Yii::info('getChangeattibutes(): ' . print_r($aChanged, true));
-        }
+//        if( count($aChanged) > 0 ) {
+//            Yii::info('getChangeattibutes(): ' . print_r($aChanged, true));
+//        }
 
         return $aChanged;
     }

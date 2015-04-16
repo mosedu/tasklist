@@ -83,6 +83,7 @@ class TasklistSearch extends Tasklist
     public function search($params)
     {
         $query = Tasklist::find();
+        $query->with('changes');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,

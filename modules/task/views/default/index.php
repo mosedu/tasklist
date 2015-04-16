@@ -142,20 +142,24 @@ $aColumns = [
         'content' => function ($model, $key, $index, $column) {
             // $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime($model->task_actualtime));
             $sNumChanges = '';
-            if( $model->task_numchanges > 0 ) {
+            $nChanges = count($model->changes);
+            if( $nChanges > 0 ) {
+//            if( $model->task_numchanges > 0 ) {
                 $sTip = array_reduce(
-                    explode("\n", $model->task_reasonchanges),
+                    // explode("\n", $model->task_reasonchanges),
+                    $model->changes,
                     function($carry, $item) {
-                        $item = trim($item);
-                        if( $item !== '' ) {
-                            $a = explode("\t", $item);
-                            $carry .= (($carry !== '') ? "<br />\n" : "") . Html::encode($a[0]) . ' ' . str_replace('\\n', ' ', Html::encode($a[1]));
-                        }
+                        // $item = trim($item);
+                        // if( $item !== '' ) {
+                            // $a = explode("\t", $item);
+                            // $carry .= (($carry !== '') ? "<br />\n" : "") . Html::encode($a[0]) . ' ' . str_replace('\\n', ' ', Html::encode($a[1]));
+                            $carry .= (($carry !== '') ? "<br />" : "") . Html::encode($item->ch_data) . ' ' . str_replace(["\r", "\n"], ['', ' '], Html::encode($item->ch_text));
+                        // }
                         return $carry;
                     },
                     ''
                 );
-                $sNumChanges = ' <a href="#" data-toggle="tooltip" data-placement="top" data-html="true" title="'.$sTip.'"><b>[' . $model->task_numchanges . ']</b></a>';
+                $sNumChanges = ' <a href="#" data-toggle="tooltip" data-placement="top" data-html="true" title="'.$sTip.'"><b>[' . $nChanges . ']</b></a>';
             }
 
             return date('d.m.Y', strtotime($model->task_actualtime)) . $sNumChanges;
