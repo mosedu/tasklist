@@ -40,8 +40,10 @@ $aColumns = [
             }
 //                        color: '.$model->.';
             // <span class="inline glyphicon glyphicon-'.$sGlyth.'" style=" color: ' . $sColor . '; font-size: 1.25em;">
+//            $sNumChanges = ' <b>[' . $model->task_numchanges . ']</b></a>';
+
             return
-                '<span class="inline glyphicon glyphicon-'.$sGlyth.'" style="float: right; display: block; font-size: 1.25em; text-align: right;"><br />' . $model->getTaskType() . '</span>' .
+                '<a href="#" data-toggle="tooltip" data-placement="top" data-html="false" title="' . $model->getTaskType() . '" style="float: right; display: block; text-align: right; text-decoration: none;"><span class="inline glyphicon glyphicon-'.$sGlyth.'" style="font-size: 1.25em;"></span></a>' .
                 '<span class="inline"><span style="font-size: 1.25em;"> ' . Html::a(
                     $model->department->dep_num . '.' . $model->task_num,
                 ['default/update', 'id'=>$model->task_id],
@@ -217,8 +219,8 @@ $aStat = Tasklist::getStatdata(empty($searchModel->task_dep_id) ? null : $search
 // $sDop = print_r($aStat, true);
 
 $sDop = 'Задачи: активные: ' . $aStat['active']
-      . ' просроченные: ' . $aStat['defect']
-      . ' отложенные: ' . $aStat['wait'];
+      . ', просроченные: ' . $aStat['defect']
+      . ', отложенные: ' . $aStat['wait'] . '.';
 
 ?>
 
