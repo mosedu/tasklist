@@ -106,7 +106,15 @@ EOT;
                 <?= $form->field($model, 'task_dep_id')->dropDownList(Department::getList(false), $aDisable) ?>
                 <?= $form->field($model, 'task_type')->dropDownList(Tasklist::getAllTypes(), $bEditDates ? [] : $aDisable) ?>
                 <?= $form->field($model, 'task_progress')->dropDownList(Tasklist::getAllProgresses(), $bEditDates ? [] : $aDisable) ?>
-                <?= $form->field($model, 'task_actualtime')->widget(
+                <?= $form->field(
+                    $model,
+                    'task_actualtime',
+                    [
+                        'labelOptions'=>[
+                            'label'=>$model->getAttributeLabel($model->isNewRecord ? 'task_finaltime' : 'task_actualtime'),
+                        ],
+                    ]
+                )->widget(
                     DatePicker::className(),
                     [
                         'model' => $model,

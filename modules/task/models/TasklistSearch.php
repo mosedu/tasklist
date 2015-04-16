@@ -18,6 +18,9 @@ class TasklistSearch extends Tasklist
     public $actdatestart;
     public $actdatefinish;
 
+    public $numchangesstart;
+    public $numchangesfinish;
+
     public $showFilterForm = 0; // показывать/скрывать форму фильтрации
     public $showFinishedTask = 0; // показывать/скрывать завершенные задачи
     public $showTaskSummary = 0; // показывать/скрывать поле отчет о выполнении
@@ -30,6 +33,7 @@ class TasklistSearch extends Tasklist
         return [
             [['datestart', 'datefinish', 'actdatestart', 'actdatefinish'], 'filter', 'filter' => function($val) { if( $val && preg_match('|^(\\d{2})\\.(\\d{2})\\.(\\d{4})$|', $val, $a) ) { $val = "{$a[3]}-{$a[2]}-{$a[1]}"; } return $val; }],
             [['task_id', 'task_dep_id', 'task_num', 'task_type', 'task_numchanges', ], 'integer'],
+            [['numchangesstart', 'numchangesfinish', ], 'integer'],
             [['task_progress'], 'in', 'range'=>array_keys(Tasklist::getAllProgresses()), 'allowArray' => true, ],
             [['datestart', 'datefinish', 'task_direct', 'task_name', 'task_createtime', 'task_finaltime', 'task_actualtime', 'task_reasonchanges', 'task_summary'], 'safe'],
             [['task_dep_id'], 'filter', 'filter' => function($val){ return ( $val <=0 ) ? null : $val; }, ],
@@ -53,6 +57,8 @@ class TasklistSearch extends Tasklist
                 'showFilterForm' => 'Форма',
                 'showFinishedTask' => 'Завершенные',
                 'showTaskSummary' => 'Отчет',
+                'numchangesstart' => 'Кол-во изм. от',
+                'numchangesfinish' => 'до',
             ]
         );
 
@@ -93,6 +99,14 @@ class TasklistSearch extends Tasklist
 
         if( !Yii::$app->user->can('createUser') ) {
             $this->task_dep_id = Yii::$app->user->getIdentity()->us_dep_id;
+        }
+
+        if( $this->numchangesstart > 0 ) {
+            $query->andFilterWhere(['>=', 'task_numchanges', $this->numchangesstart]);
+        }
+
+        if( $this->numchangesfinish > 0 ) {
+            $query->andFilterWhere(['<', 'task_numchanges', $this->numchangesfinish]);
         }
 
         if( $this->datestart ) {

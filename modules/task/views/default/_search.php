@@ -265,9 +265,9 @@ EOT;
         <?php // echo $form->field($model, 'task_progress')->dropDownList(array_merge(['' => ''], Tasklist::getAllProgresses())) ?>
     </div>
 
-    <!-- div class="col-sm-4">
-        <?= $form->field($model, 'task_direct', $aNumParam) ?>
-    </div -->
+    <div class="col-sm-12">
+        <?= $form->field($model, 'task_direct', $aSubjectParam) ?>
+    </div>
 
     <div class="col-sm-12">
         <?= $form->field($model, 'task_name', $aSubjectParam) ?>
@@ -369,6 +369,21 @@ EOT;
                     }',
                 ],
             ]) ?>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <div class="col-sm-4">
+        <?= $form->field(
+            $model,
+            'numchangesstart',
+            $aNumParam
+        )
+        ->input('text', ['placeholder' => 'от'])?>
+    </div>
+
+    <div class="col-sm-4">
+        <?= $form->field($model, 'numchangesfinish', $aDateParam)->input('text', ['placeholder' => 'до']) ?>
     </div>
 
     <?php // echo $form->field($model, 'task_createtime') ?>

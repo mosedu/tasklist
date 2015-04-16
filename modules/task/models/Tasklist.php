@@ -244,7 +244,7 @@ class Tasklist extends \yii\db\ActiveRecord
             'task_type' => 'Свойство',
             'task_createtime' => 'Создана',
             'task_finaltime' => 'Базовый срок',
-            'task_actualtime' => 'Реальный срок',
+            'task_actualtime' => $this->task_progress == self::PROGRESS_FINISH ? 'Реальный срок' : 'Новый срок',
             'task_numchanges' => 'Переносы',
             'task_reasonchanges' => 'Причина',
             'reasonchange' => 'Причина переноса',
