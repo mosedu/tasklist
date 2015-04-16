@@ -145,7 +145,7 @@ class Tasklist extends \yii\db\ActiveRecord
                                 else {
                                     Yii::info('ERROR: not found date in aChanged[task_actualtime]: ' . print_r($aChanged['task_actualtime'], true));
                                 }
-                                $model->task_reasonchanges .= "{$aChanged['task_actualtime']['old']} -> {$aChanged['task_actualtime']['new']}\t" . $model->reasonchange . "\n"; // "\t" . Yii::$app->user->getId() .
+                                $model->task_reasonchanges .= "{$aChanged['task_actualtime']['old']} -> {$aChanged['task_actualtime']['new']}\t" . str_replace("\n", '\\n', $model->reasonchange) . "\n"; // "\t" . Yii::$app->user->getId() .
                             }
                             if (isset($aChanged['task_progress']) && ($aChanged['task_progress']['new'] == Tasklist::PROGRESS_FINISH) ) {
                                 $this->task_actualtime = date('Y-m-d 00:00:00');
