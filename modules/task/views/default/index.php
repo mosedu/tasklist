@@ -129,8 +129,10 @@ $aColumns = [
                     explode("\n", $model->task_reasonchanges),
                     function($carry, $item) {
                         $item = trim($item);
+                        Yii::info('task : "'.$item.'"');
                         if( $item !== '' ) {
                             $a = explode("\t", $item);
+                            Yii::info('a : ['.implode(',', $a).']');
                             $carry .= (($carry !== '') ? "<br />\n" : "") . Html::encode($a[0]) . ' ' . Html::encode($a[1]);
                         }
                         return $carry;
