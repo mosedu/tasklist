@@ -60,6 +60,20 @@ $aColumns = [
 //            'task_name:ntext',
     [
         'class' => 'yii\grid\DataColumn',
+        'attribute' => 'task_direct',
+//                'filter' => Tasklist::getAllTypes(),
+        'filter' => false,
+        'content' => function ($model, $key, $index, $column) {
+            // $sGlyth = $model->task_type == Tasklist::TYPE_PLAN ? 'calendar' : 'flash';
+            return Html::encode($model->task_direct); //  . $model->getTaskType() . ', '
+        },
+        'contentOptions' => [
+            'class' => 'griddate',
+        ],
+    ],
+
+    [
+        'class' => 'yii\grid\DataColumn',
         'attribute' => 'task_name',
 //                'filter' => Tasklist::getAllTypes(),
         'filter' => false,
@@ -73,7 +87,7 @@ $aColumns = [
                     'title' => Html::encode($model->task_name),
                 ]
             )
-            . '<span>' . $model->task_direct . '</span>'; //  . $model->getTaskType() . ', '
+            /*. '<span>' . $model->task_direct . '</span>' */; //  . $model->getTaskType() . ', '
         },
         'contentOptions' => [
             'class' => 'griddate',
