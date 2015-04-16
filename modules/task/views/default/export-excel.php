@@ -161,7 +161,7 @@ $aField = [
     [
         'attribute' => 'task_reasonchanges',
         'w' => 20,
-        'val' => function($model) { return str_replace("\n", "\r\n", $model->task_reasonchanges); },
+        'val' => function($model) { return str_replace("\n", "\r\n", str_replace("\\n", "\n", $model->task_reasonchanges)); },
     ],
     [
         'attribute' => 'task_summary',
