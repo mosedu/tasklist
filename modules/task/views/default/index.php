@@ -43,7 +43,7 @@ $aColumns = [
 //            $sNumChanges = ' <b>[' . $model->task_numchanges . ']</b></a>';
 
             return
-                '<a href="#" data-toggle="tooltip" data-placement="top" data-html="false" title="' . $model->getTaskType() . '" style="float: right; display: block; text-align: right; text-decoration: none;"><span class="inline glyphicon glyphicon-'.$sGlyth.'" style="font-size: 1.25em;"></span></a>' .
+//                '<a href="#" data-toggle="tooltip" data-placement="top" data-html="false" title="' . $model->getTaskType() . '" style="float: right; display: block; text-align: right; text-decoration: none;"><span class="inline glyphicon glyphicon-'.$sGlyth.'" style="font-size: 1.25em;"></span></a>' .
                 '<span class="inline"><span style="font-size: 1.25em;"> ' . Html::a(
                     $model->department->dep_num . '.' . $model->task_num,
                 ['default/update', 'id'=>$model->task_id],
@@ -78,8 +78,10 @@ $aColumns = [
 //                'filter' => Tasklist::getAllTypes(),
         'filter' => false,
         'content' => function ($model, $key, $index, $column) {
-            // $sGlyth = $model->task_type == Tasklist::TYPE_PLAN ? 'calendar' : 'flash';
-            return Html::a(
+            $sGlyth = $model->task_type == Tasklist::TYPE_PLAN ? 'calendar' : 'flash';
+            return
+            '<a href="#" data-toggle="tooltip" data-placement="top" data-html="false" title="' . $model->getTaskType() . '"><span class="inline glyphicon glyphicon-'.$sGlyth.'" style="font-size: 1.25em;"></span></a> ' . //  style="float: right; display: block; text-align: right; text-decoration: none;"
+            Html::a(
                 Html::encode($model->task_name),
                 ['view', 'id'=>$model->task_id], // update
                 [
