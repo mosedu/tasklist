@@ -80,7 +80,7 @@ $aColumns = [
         'content' => function ($model, $key, $index, $column) {
             $sGlyth = $model->task_type == Tasklist::TYPE_PLAN ? 'calendar' : 'flash';
             return
-            '<a href="#" data-toggle="tooltip" data-placement="top" data-html="false" title="' . $model->getTaskType() . '"><span class="inline glyphicon glyphicon-'.$sGlyth.'" style="font-size: 1.25em;"></span></a> ' . //  style="float: right; display: block; text-align: right; text-decoration: none;"
+            '<a href="#" data-toggle="tooltip" data-placement="top" data-html="false" title="' . $model->getTaskType() . '" style="float: right; display: block; text-align: right; text-decoration: none;"><span class="inline glyphicon glyphicon-'.$sGlyth.'" style="font-size: 1.25em;"></span></a> ' . //  style="float: right; display: block; text-align: right; text-decoration: none;"
             Html::a(
                 Html::encode($model->task_name),
                 ['view', 'id'=>$model->task_id], // update
