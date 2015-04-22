@@ -46,4 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php ActiveForm::end(); ?>
 
+    <div class="col-lg-offset-1" style="color:#999; margin-bottom: 3em; margin-top: 2em;">
+        <strong><?php echo Html::a("Установить новый пароль", ['requestpasswordreset']); ?></strong>
+    </div>
 </div>

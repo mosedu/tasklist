@@ -7,6 +7,7 @@ use app\modules\task\models\Action;
 use kartik\date\DatePicker;
 use yii\bootstrap\Modal;
 use yii\web\View;
+use app\modules\user\models\Department;
 
 
 /* @var $this yii\web\View */
@@ -42,7 +43,7 @@ $this->title = 'Лог задач';
                         'trash',
                     ];
 
-                    return '<span class="glyphicon glyphicon-'.$a[$model->act_type].'"></span>'; // $model->getTypeText($model->act_type);
+                    return '<span class="glyphicon glyphicon-'.$a[$model->act_type].'"></span><br />' . "\n<span style=\"color: #777777;\">" . $model->getTypeText($model->act_type) . '</span>'; // $model->getTypeText($model->act_type);
                 },
             ],
             // 'act_createtime',
@@ -67,7 +68,7 @@ $this->title = 'Лог задач';
             [
                 'class' => 'yii\grid\DataColumn',
                 'attribute' => 'act_data',
-                'filter' => false,
+                'filter' => Department::getList(false),
                 'content' => function ($model, $key, $index, $column) {
                     $sData = empty($model->act_data) ? '' : Tasklist::getChangesLogText(unserialize($model->act_data));
                     $sTaskTitle = Html::encode($model->task->task_name);

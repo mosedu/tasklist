@@ -38,14 +38,15 @@ $aColumns = [
                     $sColor = '#ff0000';
                 }
             }
+
 //                        color: '.$model->.';
             // <span class="inline glyphicon glyphicon-'.$sGlyth.'" style=" color: ' . $sColor . '; font-size: 1.25em;">
 //            $sNumChanges = ' <b>[' . $model->task_numchanges . ']</b></a>';
 
             return
 //                '<a href="#" data-toggle="tooltip" data-placement="top" data-html="false" title="' . $model->getTaskType() . '" style="float: right; display: block; text-align: right; text-decoration: none;"><span class="inline glyphicon glyphicon-'.$sGlyth.'" style="font-size: 1.25em;"></span></a>' .
-                '<span class="inline"><span style="font-size: 1.25em;"> ' . Html::a(
-                    $model->department->dep_num . '.' . $model->task_num,
+                '<span class="inline glyphicon glyphicon-'.$sGlyth.'"  style="float: right; display: block; text-align: right; text-decoration: none; font-size: 1.25em;"></span><span class="inline"><span style="font-size: 1.25em;"> ' . Html::a(
+                    $model->getTasknum(), //department->dep_num . '.' . $model->task_num,
                 ['default/update', 'id'=>$model->task_id],
                 [
                     'title' => "Резактировать задачу: " . Html::encode($model->getTaskType()), // "Задача " . $model->getTaskType() . ', редактировать',
@@ -80,7 +81,7 @@ $aColumns = [
         'content' => function ($model, $key, $index, $column) {
             $sGlyth = $model->task_type == Tasklist::TYPE_PLAN ? 'calendar' : 'flash';
             return
-            '<a href="#" data-toggle="tooltip" data-placement="top" data-html="false" title="' . $model->getTaskType() . '" style="float: right; display: block; text-align: right; text-decoration: none;"><span class="inline glyphicon glyphicon-'.$sGlyth.'" style="font-size: 1.25em;"></span></a> ' . //  style="float: right; display: block; text-align: right; text-decoration: none;"
+            '<a href="#" data-toggle="tooltip" data-placement="top" data-html="false" title="' . $model->getTaskType() . '" style="float: right; display: block; text-align: right; text-decoration: none;"></a> ' . //  style="float: right; display: block; text-align: right; text-decoration: none;"
             Html::a(
                 Html::encode($model->task_name),
                 ['view', 'id'=>$model->task_id], // update
@@ -142,11 +143,14 @@ $aColumns = [
         'encodeLabel' => false,
         'filter' => false,
         'content' => function ($model, $key, $index, $column) {
-            // $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime($model->task_actualtime));
+            $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime($model->task_actualtime));
+            if( $diff == 0 ) {
+                return '';
+            }
             $sNumChanges = '';
             $nChanges = count($model->changes);
-            if( $nChanges > 0 ) {
-//            if( $model->task_numchanges > 0 ) {
+//            if( $nChanges > 0 ) {
+            if( $model->task_numchanges > 0 ) {
                 $sTip = array_reduce(
                     // explode("\n", $model->task_reasonchanges),
                     $model->changes,
@@ -155,12 +159,15 @@ $aColumns = [
                         // if( $item !== '' ) {
                             // $a = explode("\t", $item);
                             // $carry .= (($carry !== '') ? "<br />\n" : "") . Html::encode($a[0]) . ' ' . str_replace('\\n', ' ', Html::encode($a[1]));
-                            $carry .= (($carry !== '') ? "<br />" : "") . Html::encode($item->ch_data) . ' ' . str_replace(["\r", "\n"], ['', ' '], Html::encode($item->ch_text));
+                            // $carry .= (($carry !== '') ? "<br />" : "") . Html::encode($item->ch_data) . ' ' . str_replace(["\r", "\n"], ['', ' '], Html::encode($item->ch_text));
+                            $carry .= (($carry !== '') ? "<br />" : "") . Html::encode($item->ch_data);
                         // }
                         return $carry;
                     },
                     ''
                 );
+                $sTip .= "<br />\n" . str_replace(["\r", "\n"], ['', "<br />\n"], Html::encode($model->task_reasonchanges));
+                $nChanges = $model->task_numchanges;
                 $sNumChanges = ' <a href="#" data-toggle="tooltip" data-placement="top" data-html="true" title="'.$sTip.'"><b>[' . $nChanges . ']</b></a>';
             }
 

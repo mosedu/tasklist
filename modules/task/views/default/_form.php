@@ -75,7 +75,7 @@ if( !Yii::$app->user->can('createUser') ) {
         <?= $form->field($model, 'task_name', $aTextParam)->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable)) ?>
         <?php
         if( !$model->isNewRecord ) {
-            ?>
+        ?>
                 <?= $form->field($model, 'task_summary', $aTextParam)->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0]) ?>
         <?php
         }
@@ -100,6 +100,12 @@ EOT;
         $this->registerJs($sJs, View::POS_READY, 'changeprogress');
 
         ?>
+
+        <?= $form->field(
+            $model,
+            'task_reasonchanges',
+            array_merge($aTextParam, ['options' => ['style' => '/*display: none;*/', 'class' => "form-group field-tasklist-reasonchange"]])
+        )->textarea(array_merge(['rows' => 3, 'data-old'=>$model->isNewRecord ? '' : $model->_oldAttributes['task_actualtime'],], $bEditDates ? [] : $aDisable)) ?>
     </div>
 
     <div class="col-sm-4">
@@ -143,20 +149,21 @@ EOT;
                      s += ((n < 10) ? '0' : '') + n + '.';
                      s += dt.getFullYear()
 //                     console.log(s);
-                     jQuery('#" . Html::getInputId($model, 'reasonchange') . "').attr('data-old', s);
+//                     jQuery('#" . Html::getInputId($model, 'reasonchange') . "').attr('data-old', s);
+                     jQuery('#" . Html::getInputId($model, 'task_reasonchanges') . "').attr('data-old', s);
                      if( s != '" . $model->task_actualtime . "' && ".($model->isNewRecord ? 'false' : 'true')." ) {
-                        ob.show();
+//                        ob.show();
 //                        console.log('need show');
                      }
                      else {
-                        ob.hide();
+//                        ob.hide();
 //                        console.log('need hide');
                      }
                      }",
                         ]
                     ]
                     ) ?>
-                <?= $form->field($model, 'reasonchange', ['options' => ['style' => 'display: none;', 'class' => "form-group field-tasklist-reasonchange"]])->textarea(['rows' => 2, 'data-old'=>$model->isNewRecord ? '' : $model->_oldAttributes['task_actualtime'], ]) ?>
+                <?= '' // $form->field($model, 'reasonchange', ['options' => ['style' => 'display: none;', 'class' => "form-group field-tasklist-reasonchange"]])->textarea(['rows' => 2, 'data-old'=>$model->isNewRecord ? '' : $model->_oldAttributes['task_actualtime'], ]) ?>
     </div>
 
     <div class="clearfix"></div>

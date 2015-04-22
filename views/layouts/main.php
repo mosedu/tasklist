@@ -5,6 +5,7 @@ use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
 use app\modules\user\models\User;
+use app\components\widgets\Alert;
 
 use yii\helpers\Json;
 
@@ -154,6 +155,7 @@ EOT;
             <?= '' /*Breadcrumbs::widget([
                 'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
             ]) */ ?>
+            <?= Alert::widget(); ?>
             <?= $content ?>
         </div>
     </div>

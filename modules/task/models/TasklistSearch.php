@@ -128,7 +128,7 @@ class TasklistSearch extends Tasklist
         }
 
         if( $this->numchangesfinish > 0 ) {
-            $query->andFilterWhere(['<', 'task_numchanges', $this->numchangesfinish]);
+            $query->andFilterWhere(['<' . ($this->numchangesstart == $this->numchangesfinish ? '=' : ''), 'task_numchanges', $this->numchangesfinish]);
         }
 
         if( $this->datestart ) {
@@ -136,6 +136,9 @@ class TasklistSearch extends Tasklist
         }
 
         if( $this->datefinish ) {
+            if( $this->datestart == $this->datefinish ) {
+                $this->datefinish = date('Y-m-d', strtotime($this->datefinish) + 24 * 3600);
+            }
             $query->andFilterWhere(['<', 'task_finaltime', $this->datefinish]);
         }
 
@@ -144,6 +147,9 @@ class TasklistSearch extends Tasklist
         }
 
         if( $this->actdatefinish ) {
+            if( $this->actdatestart == $this->actdatefinish ) {
+                $this->actdatefinish = date('Y-m-d', strtotime($this->actdatefinish) + 24 * 3600);
+            }
             $query->andFilterWhere(['<', 'task_actualtime', $this->actdatefinish]);
         }
 

@@ -28,8 +28,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php
     $aAttributes = [
 //            'task_id',
-        'task_num',
+//        'task_num',
 //            'task_type',
+        [
+            'attribute' => 'task_num',
+            'value' => $model->getTasknum(),
+        ],
         [
             'attribute' => 'task_type',
             'value' => $model->getTaskType() . ' / ' . $model->getTaskProgress(),

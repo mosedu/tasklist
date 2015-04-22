@@ -11,6 +11,8 @@ use yii\web\NotFoundHttpException;
 use app\modules\user\models\LoginForm;
 use app\modules\user\models\User;
 use app\modules\user\models\UserSearch;
+use app\modules\user\models\PasswordResetRequestForm;
+use app\modules\user\models\ResetPasswordForm;
 
 class DefaultController extends Controller
 {
@@ -165,6 +167,56 @@ class DefaultController extends Controller
         }
 
         return $this->redirect(['index']);
+    }
+
+    /*
+ * Форма сброса пароля
+ *
+ */
+    public function actionRequestpasswordreset()
+    {
+        $model = new PasswordResetRequestForm();
+        if ( $model->load(Yii::$app->request->post()) ) {
+//            $this->DoDelay('restoreform.delay.time');
+
+            if( $model->validate() ) {
+                if ($model->sendEmail()) {
+                    Yii::$app->getSession()->setFlash('success', 'Спасибо! На ваш Email было отправлено письмо со ссылкой на восстановление пароля.');
+                    return $this->goHome();
+                } else {
+                    Yii::$app->getSession()->setFlash('error', 'Извините. У нас возникли проблемы с отправкой письма восстановления пароля. Повторите попытку попозже.');
+                }
+            }
+        }
+
+        return $this->render('requestPasswordResetToken', [
+            'model' => $model,
+        ]);
+    }
+
+    /*
+     * Сброс пароля
+     *
+     * @param string $token
+     *
+     *
+     */
+    public function actionResetpassword($token)
+    {
+        try {
+            $model = new ResetPasswordForm($token);
+        } catch (InvalidParamException $e) {
+            throw new BadRequestHttpException($e->getMessage());
+        }
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->resetPassword()) {
+            Yii::$app->getSession()->setFlash('success', 'Ваш пароль успешно изменен');
+            return $this->goHome();
+        }
+
+        return $this->render('resetPassword', [
+            'model' => $model,
+        ]);
     }
 
 }

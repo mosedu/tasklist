@@ -53,18 +53,19 @@ class LoginForm extends Model
      */
     public function validatePassword($attribute, $params)
     {
+        $sErr = 'Проверьте правильность заполнения полей';
         if (!$this->hasErrors()) {
             $user = $this->getUser();
 //            Yii::info( $user ? ("login user = " . print_r($user->attributes, true)) : 'login no user');
             if( !$user ) {
-                $this->addError($attribute, 'Incorrect username or password.');
+                $this->addError($attribute, $sErr);
             }
             else {
 //                $user->setPassword('1111');
 
-//                if (!$user || !$user->validatePassword($this->password)) {
-//                    $this->addError($attribute, 'Incorrect username or password.');
-//                }
+                if (!$user || !$user->validatePassword($this->password)) {
+                    $this->addError($attribute, $sErr);
+                }
             }
         }
     }
@@ -96,5 +97,6 @@ class LoginForm extends Model
 
         return $this->_user;
     }
+
 
 }

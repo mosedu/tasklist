@@ -117,6 +117,7 @@ $aField = [
     [
         'w' => 16,
         'attribute' => 'task_num',
+        'val' => function($model) { return $model->getTasknum(); },
     ],
     [
         'attribute' => 'task_createtime',

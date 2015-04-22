@@ -44,6 +44,7 @@ class ActionSearch extends Action
         $query = Action::find();
 
         $query->with(['task', 'task.department', 'user']);
+        $query->joinWith(['task']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -55,6 +56,14 @@ class ActionSearch extends Action
         ]);
 
         $this->load($params);
+
+        if( !empty($this->act_data) ) {
+            $depid = intval($this->act_data);
+//            $this->act_data = '';
+            if( $depid > 0 ) {
+                $query->andFilterWhere(['task_dep_id' => $depid, ]);
+            }
+        }
 
         $dStart = null;
         $dFinish = null;
@@ -81,7 +90,7 @@ class ActionSearch extends Action
             $query->AndWhere(['between', 'act_createtime', $dStart, $dFinish]);
         }
 
-        $query->andFilterWhere(['like', 'act_data', $this->act_data])
+        $query // ->andFilterWhere(['like', 'act_data', $this->act_data])
             ->andFilterWhere(['like', 'act_table', $this->act_table]);
 
         return $dataProvider;

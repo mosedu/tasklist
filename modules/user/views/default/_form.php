@@ -42,15 +42,15 @@ use app\modules\user\models\Department;
     ?>
 
     <div class="col-sm-4">
+        <?= $form->field($model, 'us_lastname')->textInput(['maxlength' => 255]) ?>
+    </div>
+
+    <div class="col-sm-4">
         <?= $form->field($model, 'us_name')->textInput(['maxlength' => 255]) ?>
     </div>
 
     <div class="col-sm-4">
         <?= $form->field($model, 'us_secondname')->textInput(['maxlength' => 255]) ?>
-    </div>
-
-    <div class="col-sm-4">
-        <?= $form->field($model, 'us_lastname')->textInput(['maxlength' => 255]) ?>
     </div>
 
     <div class="clearfix"></div>

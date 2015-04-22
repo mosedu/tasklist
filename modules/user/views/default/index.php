@@ -61,15 +61,18 @@ $this->params['breadcrumbs'][] = $this->title;
                     return Html::encode(User::getRoleTitle($model->us_role_name));
                 },
             ],
+            /** @var User $model */
+/*
             [
                 'class' => 'yii\grid\DataColumn',
                 'attribute' => 'us_active',
                 'filter' => User::getUserStatuses(),
                 'content' => function ($model, $key, $index, $column) {
-                    /** @var User $model */
                     return Html::encode($model->getUserStatus());
                 },
             ],
+*/
+
             // 'us_login',
             // 'us_logintime',
             // 'us_createtime',

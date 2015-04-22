@@ -135,21 +135,32 @@ class Tasklist extends \yii\db\ActiveRecord
                         case '_oldAttributes':
                             $aChanged = $model->getChangeattibutes();
                             if (isset($aChanged['task_actualtime'])) {
-//                                Yii::info('task_actualtime CHANGED: ' . $aChanged['task_actualtime']['old'] . ' -> ' . $aChanged['task_actualtime']['new']);
+                                Yii::info('task_actualtime CHANGED: ' . $aChanged['task_actualtime']['old'] . ' -> ' . $aChanged['task_actualtime']['new']);
                                 if( preg_match('|^(\\d+)\\.(\\d+)\\.(\\d+)$|', $aChanged['task_actualtime']['old'], $aOld)
                                  && preg_match('|^(\\d+)\\.(\\d+)\\.(\\d+)$|', $aChanged['task_actualtime']['new'], $aNew)) {
                                     // меняем счетчик только при изменении в сторону увеличения
                                     if( $aNew[3] . $aNew[2] . $aNew[1] > $aOld[3] . $aOld[2] . $aOld[1] ) {
-                                        $model->task_numchanges++;
+                                        if( $aChanged['task_progress']['new'] != Tasklist::PROGRESS_FINISH ) {
+                                            $model->task_numchanges++;
+                                        }
                                     }
                                 }
                                 else {
                                     Yii::info('ERROR: not found date in aChanged[task_actualtime]: ' . print_r($aChanged['task_actualtime'], true));
                                 }
-                                $model->task_reasonchanges .= "{$aChanged['task_actualtime']['old']} -> {$aChanged['task_actualtime']['new']}\t" . str_replace("\n", '\\n', $model->reasonchange) . "\n"; // "\t" . Yii::$app->user->getId() .
+                                // $model->task_reasonchanges .= "{$aChanged['task_actualtime']['old']} -> {$aChanged['task_actualtime']['new']}\t" . str_replace("\n", '\\n', $model->reasonchange) . "\n"; // "\t" . Yii::$app->user->getId() .
                             }
-                            if (isset($aChanged['task_progress']) && ($aChanged['task_progress']['new'] == Tasklist::PROGRESS_FINISH) ) {
-                                $this->task_actualtime = date('Y-m-d 00:00:00');
+                            else {
+//                                $model->task_reasonchanges = $model->_oldAttributes['task_reasonchanges'];
+                            }
+                            if( isset($aChanged['task_progress']) ) {
+                                if( $aChanged['task_progress']['new'] == Tasklist::PROGRESS_FINISH ) {
+                                    $this->task_actualtime = date('Y-m-d 00:00:00');
+                                }
+                                if( $aChanged['task_progress']['old'] == Tasklist::PROGRESS_FINISH ) {
+                                    // это опять возобновили законченную задачу - нужно вернуть дату завершения
+                                    // $this->task_actualtime = date('Y-m-d 00:00:00');
+                                }
                             }
                             return $model->_oldAttributes;
                     }
@@ -185,7 +196,9 @@ class Tasklist extends \yii\db\ActiveRecord
                             else {
                                 Action::appendUpdate(array_merge($data, $aChanged));
                                 if (isset($aChanged['task_actualtime'])) {
-                                    Changes::addChange($model);
+                                    if( $model->task_progress != Tasklist::PROGRESS_FINISH ) {
+                                        Changes::addChange($model);
+                                    }
                                     // $model->task_reasonchanges .= "{$aChanged['task_actualtime']['old']} -> {$aChanged['task_actualtime']['new']}\t" . str_replace("\n", '\\n', $model->reasonchange) . "\n"; // "\t" . Yii::$app->user->getId() .
                                 }
                             }
@@ -220,18 +233,28 @@ class Tasklist extends \yii\db\ActiveRecord
                 'whenClient' => "function (attribute, value) { return jQuery('#".Html::getInputId($this, 'task_summary')."').attr('data-req') == 1; }",
             ],
             [['task_dep_id', 'task_num', 'task_type', 'task_numchanges', 'task_progress', 'task_active', ], 'integer'],
-            [['task_direct', 'task_name', 'task_reasonchanges', 'task_summary', 'reasonchange'], 'string'],
+            [['task_direct', 'task_name', 'task_reasonchanges', 'task_summary', ], 'string'], // 'reasonchange'
             [['task_createtime', 'task_finaltime', 'task_actualtime'], 'safe']
         ];
+
         if( !$this->isNewRecord ) {
             $aRules[] =
+            [['task_reasonchanges', ], 'required',
+                'when' => function($model) { return $model->task_actualtime != $model->_oldAttributes['task_actualtime']; },
+                'whenClient' => "function (attribute, value) {
+                 console.log(jQuery('#".Html::getInputId($this, 'task_reasonchanges')."').attr('data-old') + ' ? ' + '".$this->_oldAttributes['task_actualtime']."');
+                return jQuery('#".Html::getInputId($this, 'task_reasonchanges')."').attr('data-old') != '".$this->_oldAttributes['task_actualtime']."'; }",
+            ];
+/*
             [['reasonchange', ], 'required',
                 'when' => function($model) { return $model->task_actualtime != $model->_oldAttributes['task_actualtime']; },
                 'whenClient' => "function (attribute, value) {
                  console.log(jQuery('#".Html::getInputId($this, 'reasonchange')."').attr('data-old') + ' ? ' + '".$this->_oldAttributes['task_actualtime']."');
                 return jQuery('#".Html::getInputId($this, 'reasonchange')."').attr('data-old') != '".$this->_oldAttributes['task_actualtime']."'; }",
             ];
+*/
         }
+
         return $aRules;
     }
 
@@ -249,10 +272,10 @@ class Tasklist extends \yii\db\ActiveRecord
             'task_type' => 'Свойство',
             'task_createtime' => 'Создана',
             'task_finaltime' => 'Базовый срок',
-            'task_actualtime' => $this->task_progress == self::PROGRESS_FINISH ? 'Реальный срок' : 'Новый срок',
+            'task_actualtime' => $this->isNewRecord ? 'Базовый срок' : ($this->task_progress == self::PROGRESS_FINISH ? 'Реальный срок' : 'Новый срок'),
             'task_numchanges' => 'Переносы',
-            'task_reasonchanges' => 'Причина',
-            'reasonchange' => 'Причина переноса',
+            'task_reasonchanges' => 'Причина переноса',
+//            'reasonchange' => 'Причина переноса',
             'task_progress' => 'Статус',
             'task_summary' => 'Отчет',
             'task_active' => 'Удалена',
@@ -421,7 +444,7 @@ class Tasklist extends \yii\db\ActiveRecord
     public function getTaskattibutes() {
         $a = $this->attributes;
         unset($a['task_numchanges']);
-        unset($a['task_reasonchanges']);
+//        unset($a['task_reasonchanges']);
         return $a;
     }
 
@@ -525,6 +548,15 @@ class Tasklist extends \yii\db\ActiveRecord
      */
     public function getUrl() {
         return '/task/default/'.$this->task_id;
+    }
+
+    /**
+     * Получение num
+     *
+     * @return string
+     */
+    public function getTasknum() {
+        return $this->department->dep_num . '.' . $this->task_num;
     }
 
 
