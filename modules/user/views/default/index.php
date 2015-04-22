@@ -2,6 +2,9 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use yii\bootstrap\Modal;
+use yii\web\View;
+
 use app\modules\user\models\User;
 use app\modules\user\models\Department;
 
@@ -81,8 +84,74 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'us_email_confirm_token:email',
             // 'us_password_reset_token',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'contentOptions' => [
+                    'class' => 'commandcell',
+                ],
+                'buttons'=>[
+                    'view'=>function ($url, $model) {
+                        return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $url,
+                            ['title' => 'Просмотр', 'class'=>'showinmodal']); // , 'data-pjax' => '0'
+//                            ['title' => Yii::t('yii', 'View'), 'class'=>'showinmodal']); // , 'data-pjax' => '0'
+                    },
+                    'update'=>function ($url, $model) {
+                            return Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $url, ['title' => 'Изменить']);
+                    },
+                    'delete' => function ($url, $model, $key) {
+                        return
+                            Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, [
+                                'title' => Yii::t('yii', 'Delete'),
+                                'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+                                'data-method' => 'post',
+                                'data-pjax' => '0',
+                            ]);
+                    }
+                ],
+            ],
         ],
     ]); ?>
 
 </div>
+
+
+<?php
+// Окно для вывода
+
+Modal::begin([
+    'header' => '<span></span>',
+    'id' => 'messagedata',
+    'size' => Modal::SIZE_LARGE,
+]);
+Modal::end();
+
+$sJs =  <<<EOT
+var params = {};
+params[$('meta[name=csrf-param]').prop('content')] = $('meta[name=csrf-token]').prop('content');
+
+jQuery('.showinmodal').on("click", function (event){
+    event.preventDefault();
+
+    var ob = jQuery('#messagedata'),
+        oBody = ob.find('.modal-body'),
+        oLink = $(this);
+
+    oBody.text("");
+    oBody.load(oLink.attr('href'), params);
+    ob.find('.modal-header span').text(oLink.attr('title'));
+    ob.modal('show');
+    return false;
+});
+
+EOT;
+
+$sCss =  <<<EOT
+.table > thead > tr.center-top > th {
+    text-align: center;
+    vertical-align: middle;
+}
+EOT;
+
+$this->registerJs($sJs, View::POS_READY, 'showmodalmessage');
+$this->registerCss($sCss);
+?>
