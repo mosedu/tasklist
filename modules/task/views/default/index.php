@@ -144,7 +144,7 @@ $aColumns = [
         'filter' => false,
         'content' => function ($model, $key, $index, $column) {
             $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime($model->task_actualtime));
-            if( $diff == 0 ) {
+            if( ($diff == 0) && ($model->task_numchanges == 0) && ($model->task_progress != Tasklist::PROGRESS_FINISH) ) {
                 return '';
             }
             $sNumChanges = '';
