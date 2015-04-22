@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-
+use app\modules\task\models\Tasklist;
 /* @var $this yii\web\View */
 /* @var $model app\modules\task\models\Tasklist */
 
@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
         [
             'attribute' => 'task_finaltime',
             'value' => date('d.m.Y', strtotime($model->task_finaltime)) . ' / ' . $model->task_actualtime,
-            'label' => 'Базовый / Реальный сроки',
+            'label' => 'Базовый / ' . ($model->task_progress == Tasklist::PROGRESS_FINISH ? 'Реальный' : 'Новый') . ' сроки',
         ],
 //            'task_createtime',
 //            'task_finaltime',

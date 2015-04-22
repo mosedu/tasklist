@@ -32,7 +32,8 @@ class TasklistSearch extends Tasklist
     {
         return [
             [['datestart', 'datefinish', 'actdatestart', 'actdatefinish'], 'filter', 'filter' => function($val) { if( $val && preg_match('|^(\\d{2})\\.(\\d{2})\\.(\\d{4})$|', $val, $a) ) { $val = "{$a[3]}-{$a[2]}-{$a[1]}"; } return $val; }],
-            [['task_id', 'task_dep_id', 'task_num', 'task_type', 'task_numchanges', ], 'integer'],
+            [['task_id', 'task_dep_id', 'task_type', 'task_numchanges', ], 'integer'], // 'task_num',
+            [['task_num', ], 'match', 'pattern' => '|^\\d+[\\d.]*$|', 'message'=>'Нужно циферки ввести в формате 1.3 или 2', ],
             [['numchangesstart', 'numchangesfinish', ], 'integer'],
             [['task_progress'], 'in', 'range'=>array_keys(Tasklist::getAllProgresses()), 'allowArray' => true, ],
             [['datestart', 'datefinish', 'task_direct', 'task_name', 'task_createtime', 'task_finaltime', 'task_actualtime', 'task_reasonchanges', 'task_summary'], 'safe'],
@@ -83,7 +84,8 @@ class TasklistSearch extends Tasklist
     public function search($params)
     {
         $query = Tasklist::find();
-        $query->with('changes');
+        $query->with(['changes', 'department']);
+        $query->joinWith(['department']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -92,14 +94,33 @@ class TasklistSearch extends Tasklist
         $this->load($params);
         $this->setCookie($params);
 
+        $dataProvider->sort->attributes['task_num'] = [
+            'asc' => ['dep_num' => SORT_ASC, 'task_num' => SORT_ASC],
+            'desc' => ['dep_num' => SORT_DESC, 'task_num' => SORT_DESC],
+        ];
+
         if (!$this->validate()) {
             // uncomment the following line if you do not want to any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
         }
 
+
+        $a = explode('.', $this->task_num);
+        $tasknum = '';
+        if( count($a) > 1 ) {
+            $tasknum = $a[1];
+        }
+
         if( !Yii::$app->user->can('createUser') ) {
             $this->task_dep_id = Yii::$app->user->getIdentity()->us_dep_id;
+            $tasknum = ( count($a) > 1 ) ? $a[1] : $a[0];
+        }
+        else {
+            if( !empty($this->task_num) ) {
+                $this->task_dep_id = $a[0];
+                $tasknum = (count($a) > 1) ? $a[1] : '';
+            }
         }
 
         if( $this->numchangesstart > 0 ) {
@@ -133,7 +154,7 @@ class TasklistSearch extends Tasklist
         $query->andFilterWhere([
             'task_id' => $this->task_id,
             'task_dep_id' => $this->task_dep_id,
-            'task_num' => $this->task_num,
+            'task_num' => $tasknum,
             'task_type' => $this->task_type,
             'task_active' => Tasklist::STATUS_ACTIVE,
 //            'task_createtime' => $this->task_createtime,
