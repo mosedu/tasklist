@@ -143,8 +143,10 @@ $aColumns = [
         'encodeLabel' => false,
         'filter' => false,
         'content' => function ($model, $key, $index, $column) {
-            $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime($model->task_actualtime));
-            if( ($diff == 0) && ($model->task_numchanges == 0) && ($model->task_progress != Tasklist::PROGRESS_FINISH) ) {
+            $bFinish = ($model->task_progress == Tasklist::PROGRESS_FINISH);
+            $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime( !$bFinish ? $model->task_actualtime : $model->task_finishtime ));
+
+            if( ($diff == 0) && ($model->task_numchanges == 0) && (!$bFinish) ) {
                 return '';
             }
             $sNumChanges = '';
@@ -171,12 +173,13 @@ $aColumns = [
                 $sNumChanges = ' <a href="#" data-toggle="tooltip" data-placement="top" data-html="true" title="'.$sTip.'"><b>[' . $nChanges . ']</b></a>';
             }
 
-            return date('d.m.Y', strtotime($model->task_actualtime)) . $sNumChanges;
+            return date('d.m.Y', strtotime(!$bFinish ? $model->task_actualtime : $model->task_finishtime)) . $sNumChanges;
         },
         'contentOptions' => function ($model, $key, $index, $column) {
-            $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime($model->task_actualtime));
+            $bFinish = ($model->task_progress == Tasklist::PROGRESS_FINISH);
+            $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime(!$bFinish ? $model->task_actualtime : $model->task_finishtime));
             return [
-                'class' => 'griddate' . (($model->task_progress == Tasklist::PROGRESS_FINISH) ? (( $diff < 0 ) ? ' colorcell_red' : (( $diff > 0 ) ? ' colorcell_green' : '')) : ''),
+                'class' => 'griddate' . ($bFinish ? (( $diff < 0 ) ? ' colorcell_red' : (( $diff > 0 ) ? ' colorcell_green' : '')) : ''),
             ];
         },
     ],

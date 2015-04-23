@@ -29,6 +29,7 @@ use app\modules\task\models\Changes;
  * @property string $task_createtime
  * @property string $task_finaltime
  * @property string $task_actualtime
+ * @property string $task_finishtime
  * @property integer $task_numchanges
  * @property string $task_reasonchanges
  * @property integer $task_progress
@@ -140,7 +141,7 @@ class Tasklist extends \yii\db\ActiveRecord
                                  && preg_match('|^(\\d+)\\.(\\d+)\\.(\\d+)$|', $aChanged['task_actualtime']['new'], $aNew)) {
                                     // меняем счетчик только при изменении в сторону увеличения
                                     if( $aNew[3] . $aNew[2] . $aNew[1] > $aOld[3] . $aOld[2] . $aOld[1] ) {
-                                        if( $aChanged['task_progress']['new'] != Tasklist::PROGRESS_FINISH ) {
+                                        if( $model->task_progress != Tasklist::PROGRESS_FINISH ) {
                                             $model->task_numchanges++;
                                         }
                                     }
@@ -155,11 +156,13 @@ class Tasklist extends \yii\db\ActiveRecord
                             }
                             if( isset($aChanged['task_progress']) ) {
                                 if( $aChanged['task_progress']['new'] == Tasklist::PROGRESS_FINISH ) {
-                                    $this->task_actualtime = date('Y-m-d 00:00:00');
+                                    // завершили задачу - устанавливаем task_finishtime
+                                    // $this->task_actualtime = date('Y-m-d 00:00:00');
+                                    $this->task_finishtime = date('Y-m-d 00:00:00');
                                 }
                                 if( $aChanged['task_progress']['old'] == Tasklist::PROGRESS_FINISH ) {
                                     // это опять возобновили законченную задачу - нужно вернуть дату завершения
-                                    // $this->task_actualtime = date('Y-m-d 00:00:00');
+                                    $this->task_finishtime = null;
                                 }
                             }
                             return $model->_oldAttributes;
@@ -271,6 +274,7 @@ class Tasklist extends \yii\db\ActiveRecord
             'task_name' => 'Наименование',
             'task_type' => 'Свойство',
             'task_createtime' => 'Создана',
+            'task_finishtime' => 'Дата завершения',
             'task_finaltime' => 'Базовый срок',
             'task_actualtime' => $this->isNewRecord ? 'Базовый срок' : ($this->task_progress == self::PROGRESS_FINISH ? 'Реальный срок' : 'Новый срок'),
             'task_numchanges' => 'Переносы',
