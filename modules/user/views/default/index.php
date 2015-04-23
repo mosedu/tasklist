@@ -14,6 +14,95 @@ use app\modules\user\models\Department;
 
 $this->title = 'Пользователи';
 $this->params['breadcrumbs'][] = $this->title;
+$aColumns = [
+//            ['class' => 'yii\grid\SerialColumn'],
+
+//            'us_id',
+//            'us_active',
+    [
+        'class' => 'yii\grid\DataColumn',
+        'attribute' => 'us_dep_id',
+        'filter' => Department::getList(false),
+        'content' => function ($model, $key, $index, $column) {
+            /** @var User $model */
+
+            return ($model->department !== null) ? Html::encode($model->department->dep_shortname) : '';
+        },
+    ],
+    [
+        'class' => 'yii\grid\DataColumn',
+        'attribute' => 'fname',
+        'content' => function ($model, $key, $index, $column) {
+            /** @var User $model */
+            return Html::encode($model->getFullName());
+        },
+    ],
+    'us_email:email',
+//            'us_password_hash',
+//            'us_name',
+    // 'us_secondname',
+    // 'us_lastname',
+    [
+        'class' => 'yii\grid\DataColumn',
+        'attribute' => 'us_role_name',
+        'filter' => User::getUserRoles(),
+        'content' => function ($model, $key, $index, $column) {
+            /** @var User $model */
+            return Html::encode(User::getRoleTitle($model->us_role_name));
+        },
+    ],
+    /** @var User $model */
+    /*
+
+    */
+
+    // 'us_login',
+    // 'us_logintime',
+    // 'us_createtime',
+    // 'us_workposition',
+    // 'us_auth_key',
+    // 'us_email_confirm_token:email',
+    // 'us_password_reset_token',
+
+];
+
+if( Yii::$app->user->can('admin') ) {
+    $aColumns[] = [
+        'class' => 'yii\grid\DataColumn',
+        'attribute' => 'us_active',
+        'filter' => User::getUserStatuses(),
+        'content' => function ($model, $key, $index, $column) {
+            return Html::encode($model->getUserStatus());
+        },
+    ];
+}
+
+$aColumns[] = [
+    'class' => 'yii\grid\ActionColumn',
+    'contentOptions' => [
+        'class' => 'commandcell',
+    ],
+    'buttons'=>[
+        'view'=>function ($url, $model) {
+            return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $url,
+                ['title' => 'Просмотр', 'class'=>'showinmodal']); // , 'data-pjax' => '0'
+//                            ['title' => Yii::t('yii', 'View'), 'class'=>'showinmodal']); // , 'data-pjax' => '0'
+        },
+        'update'=>function ($url, $model) {
+            return Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $url, ['title' => 'Изменить']);
+        },
+        'delete' => function ($url, $model, $key) {
+            return
+                Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, [
+                    'title' => Yii::t('yii', 'Delete'),
+                    'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+                    'data-method' => 'post',
+                    'data-pjax' => '0',
+                ]);
+        }
+    ],
+];
+
 ?>
 <div class="user-index">
 
@@ -27,90 +116,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
-        'columns' => [
-//            ['class' => 'yii\grid\SerialColumn'],
+        'columns' => $aColumns,
+    ]);
 
-//            'us_id',
-//            'us_active',
-            [
-                'class' => 'yii\grid\DataColumn',
-                'attribute' => 'us_dep_id',
-                'filter' => Department::getList(false),
-                'content' => function ($model, $key, $index, $column) {
-                    /** @var User $model */
 
-                    return ($model->department !== null) ? Html::encode($model->department->dep_shortname) : '';
-                },
-            ],
-            [
-                'class' => 'yii\grid\DataColumn',
-                'attribute' => 'fname',
-                'content' => function ($model, $key, $index, $column) {
-                    /** @var User $model */
-                    return Html::encode($model->getFullName());
-                },
-            ],
-            'us_email:email',
-//            'us_password_hash',
-//            'us_name',
-            // 'us_secondname',
-            // 'us_lastname',
-            [
-                'class' => 'yii\grid\DataColumn',
-                'attribute' => 'us_role_name',
-                'filter' => User::getUserRoles(),
-                'content' => function ($model, $key, $index, $column) {
-                    /** @var User $model */
-                    return Html::encode(User::getRoleTitle($model->us_role_name));
-                },
-            ],
-            /** @var User $model */
-/*
-            [
-                'class' => 'yii\grid\DataColumn',
-                'attribute' => 'us_active',
-                'filter' => User::getUserStatuses(),
-                'content' => function ($model, $key, $index, $column) {
-                    return Html::encode($model->getUserStatus());
-                },
-            ],
-*/
-
-            // 'us_login',
-            // 'us_logintime',
-            // 'us_createtime',
-            // 'us_workposition',
-            // 'us_auth_key',
-            // 'us_email_confirm_token:email',
-            // 'us_password_reset_token',
-
-            [
-                'class' => 'yii\grid\ActionColumn',
-                'contentOptions' => [
-                    'class' => 'commandcell',
-                ],
-                'buttons'=>[
-                    'view'=>function ($url, $model) {
-                        return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $url,
-                            ['title' => 'Просмотр', 'class'=>'showinmodal']); // , 'data-pjax' => '0'
-//                            ['title' => Yii::t('yii', 'View'), 'class'=>'showinmodal']); // , 'data-pjax' => '0'
-                    },
-                    'update'=>function ($url, $model) {
-                            return Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $url, ['title' => 'Изменить']);
-                    },
-                    'delete' => function ($url, $model, $key) {
-                        return
-                            Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, [
-                                'title' => Yii::t('yii', 'Delete'),
-                                'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
-                                'data-method' => 'post',
-                                'data-pjax' => '0',
-                            ]);
-                    }
-                ],
-            ],
-        ],
-    ]); ?>
+    ?>
 
 </div>
 

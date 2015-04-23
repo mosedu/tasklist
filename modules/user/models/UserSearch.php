@@ -62,6 +62,9 @@ class UserSearch extends User
         ]);
 
         $this->load($params);
+        if( !Yii::$app->user->can('admin') ) {
+            $this->us_active = User::STATUS_ACTIVE;
+        }
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to any records when validation fails

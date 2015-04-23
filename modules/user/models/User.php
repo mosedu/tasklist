@@ -106,8 +106,32 @@ class User extends ActiveRecord implements IdentityInterface
                     if( !empty($model->us_dep_id) ) {
                         /** @var Role $role */
                         $role = Department::getDepartmentrole($model->us_dep_id);
-                        Yii::info($event->name . ': ' . $model->us_dep_id . ' -> ' . (($role !== null) ? $role->name : 'null'));
+                        Yii::info($event->name . ' [insert]: ' . $model->us_dep_id . ' -> ' . (($role !== null) ? $role->name : 'null'));
                         if( $role !== null ) {
+                            $auth->assign($role, $model->us_id);
+                            Yii::info($event->name . ': assign ' . $role->name . ' to ' . $model->us_id);
+                        }
+                    }
+                    return $model->us_dep_id;
+                },
+            ],
+
+            // добавляем роль пользователю после сохранения
+            [
+                'class' =>  AttributewalkBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_AFTER_UPDATE => ['us_dep_id'],
+                ],
+                'value' => function ($event, $attribute) {
+                    /** @var User $model */
+                    $model = $event->sender;
+                    $auth = Yii::$app->authManager;
+                    if( !empty($model->us_dep_id) ) {
+                        /** @var Role $role */
+                        $role = Department::getDepartmentrole($model->us_dep_id);
+                        Yii::info($event->name . ' [update]: ' . $model->us_dep_id . ' -> ' . (($role !== null) ? $role->name : 'null'));
+                        if( $role !== null ) {
+                            $auth->revokeAll($model->us_id);
                             $auth->assign($role, $model->us_id);
                             Yii::info($event->name . ': assign ' . $role->name . ' to ' . $model->us_id);
                         }

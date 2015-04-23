@@ -21,7 +21,7 @@ class DefaultController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout', 'create', 'view', 'delete', 'index'],
+                'only' => ['logout', 'create', 'view', 'update', 'delete', 'index'],
                 'rules' => [
                     [
                         'actions' => ['logout'],
@@ -29,7 +29,7 @@ class DefaultController extends Controller
                         'roles' => ['@'],
                     ],
                     [
-                        'actions' => ['create', 'view', 'delete', 'index'],
+                        'actions' => ['create', 'update', 'view', 'delete', 'index'],
                         'allow' => true,
                         'roles' => ['createUser'],
                     ],
@@ -138,6 +138,25 @@ class DefaultController extends Controller
     }
 
     /**
+     * Updates an existing User model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        } else {
+            return $this->render('update', [
+                'model' => $model,
+            ]);
+        }
+    }
+
+    /**
      * Finds the User model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
@@ -146,11 +165,15 @@ class DefaultController extends Controller
      */
     protected function findModel($id)
     {
+        $aWhere = [
+            'us_id' => $id,
+        ];
+        if( !Yii::$app->user->can('admin') ) {
+            $aWhere['us_active'] = User::STATUS_ACTIVE;
+        }
+
         $model = User::find()
-            ->where([
-                'us_id' => $id,
-                'us_active' => User::STATUS_ACTIVE,
-            ])
+            ->where($aWhere)
             ->with('department')
             ->one();
         if ( $model !== null) {
@@ -170,7 +193,10 @@ class DefaultController extends Controller
     {
         $model = $this->findModel($id); // ->delete();
         if( $model !== null ) {
-            $model->us_active = User::STATUS_DELETED;
+            $model->us_active = ($model->us_active == User::STATUS_DELETED) ? User::STATUS_ACTIVE : User::STATUS_DELETED;
+            if( !$model->save() ) {
+                Yii::error('Error delete ( save ) User: ' . print_r($model->getErrors(), true));
+            }
         }
 
         return $this->redirect(['index']);
