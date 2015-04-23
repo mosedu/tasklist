@@ -2,6 +2,7 @@
 
 namespace app\modules\task\models;
 
+use app\modules\user\models\Department;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -118,7 +119,8 @@ class TasklistSearch extends Tasklist
         }
         else {
             if( !empty($this->task_num) ) {
-                $this->task_dep_id = $a[0];
+                $query->andFilterWhere(['=', Department::tableName() . '.dep_num', $a[0]]);
+                // $this->task_dep_id = $a[0];
                 $tasknum = (count($a) > 1) ? $a[1] : '';
             }
         }
@@ -231,6 +233,29 @@ class TasklistSearch extends Tasklist
         }
 
         return $aRet;
+    }
+
+    /**
+     * Форма пустая или нет
+     *
+     * @return boolean
+     */
+    public function isEmpty() {
+        $params = Yii::$app->request->queryParams;
+        $aAttr = $this->safeAttributes();
+        $sFormName = $this->formName();
+        $a = [];
+        if( isset($params[$sFormName]) ) {
+            $a = $params[$sFormName];
+        }
+        $bEmpty = true;
+        foreach($aAttr As $v) {
+            if( isset($a[$v]) && !empty($a[$v]) ) {
+                $bEmpty = false;
+                break;
+            }
+        }
+        return $bEmpty;
     }
 
 }
