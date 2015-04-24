@@ -52,6 +52,7 @@ Yii::info('Grid: ' . print_r(User::getUserRoles(), true));
                     return Html::encode(User::getRoleTitle($model->dep_user_roles));
                 },
             ],
+
             [
                 'class' => 'yii\grid\DataColumn',
                 'attribute' => 'dep_active',
@@ -59,11 +60,21 @@ Yii::info('Grid: ' . print_r(User::getUserRoles(), true));
                 'content' => function ($model, $key, $index, $column) {
                     return Html::encode($model->getDepStatus());
                 },
+                'visible' => false,
+//                'visible' => ( Yii::$app->user->can(User::ROLE_ADMIN) ) ? true : false,
+/*
+                'contentOptions' => function ($model, $key, $index, $column) {
+                    return [
+                        'class' => 'griddate' . (($model->task_progress != Tasklist::PROGRESS_FINISH) ? (( $diff < 0 ) ? ' colorcell_red' : (( $diff < 24 * 3600 * 7 ) ? ' colorcell_yellow' : '')) : ''),
+                    ];
+                },
+*/
+
             ],
 
             [
                 'class' => 'yii\grid\ActionColumn',
-                'template'=>'{update}',
+                'template'=>'{update} {delete}',
                 'contentOptions' => [
                     'class' => 'commandcell',
                 ],

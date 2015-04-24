@@ -65,7 +65,7 @@ class DepartmentSearch extends Department
 
         $query->andFilterWhere([
             'dep_id' => $this->dep_id,
-            'dep_active' => $this->dep_active,
+            'dep_active' => (empty($this->dep_active) ? Department::STATUS_ACTIVE : $this->dep_active),
             'dep_num' => $this->dep_num,
             'dep_user_roles' => $this->dep_user_roles,
         ]);
