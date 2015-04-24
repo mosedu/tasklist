@@ -43,7 +43,19 @@ $this->title = 'Лог задач';
                         'trash',
                     ];
 
-                    return '<span class="glyphicon glyphicon-'.$a[$model->act_type].'"></span><br />' . "\n<span style=\"color: #777777;\">" . $model->getTypeText($model->act_type) . '</span>'; // $model->getTypeText($model->act_type);
+                    return Html::a(
+                        '<span class="inline glyphicon glyphicon-'.$a[$model->act_type].'"></span>',
+                        '', // ['default/view', 'id'=>$model->task_id],
+                        [
+                            'title' => Html::encode($model->getTypeText($model->act_type)),
+                            'data-toggle' => "tooltip",
+                            'data-placement' => "top",
+                            'data-html' => "false",
+                            'class' => 'noanyaction',
+                            'style' => "float: right; display: block; text-align: right; text-decoration: none; color: #777777;"
+                        ]
+                    );
+//                    return '<span class="glyphicon glyphicon-'.$a[$model->act_type].'"></span><br />' . "\n<span style=\"color: #777777;\">" . $model->getTypeText($model->act_type) . '</span>'; // $model->getTypeText($model->act_type);
                 },
             ],
             // 'act_createtime',
@@ -77,7 +89,7 @@ $this->title = 'Лог задач';
                             $model->task->getUrl(),
                             [
                                 'class' => 'showinmodal',
-                                'title' => $sTaskTitle,
+                                'title' => Html::encode(mb_substr($model->task->task_name, 0, 48)),
                             ]
                         )
                          . ' ('
@@ -124,6 +136,13 @@ $sJs =  <<<EOT
 var params = {};
 params[$('meta[name=csrf-param]').prop('content')] = $('meta[name=csrf-token]').prop('content');
 
+jQuery('[data-toggle="tooltip"]').tooltip();
+
+jQuery('.noanyaction').on("click", function (event){
+    event.preventDefault();
+    return false;
+});
+
 jQuery('.showinmodal').on("click", function (event){
     event.preventDefault();
 
@@ -140,4 +159,5 @@ jQuery('.showinmodal').on("click", function (event){
 
 EOT;
 $this->registerJs($sJs, View::POS_READY, 'showmodalmessage');
+
 ?>

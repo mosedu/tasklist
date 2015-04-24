@@ -12,18 +12,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="tasklist-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>
-        <?= Yii::$app->request->isAjax ? '' : Html::a('Изменить', ['update', 'id' => $model->task_id], ['class' => 'btn btn-primary']) ?>
-        <?= true ? '' : Html::a('Delete', ['delete', 'id' => $model->task_id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
+    <h1><?= Html::encode(Yii::$app->request->isAjax && (mb_strlen($model->task_name, 'UTF-8') > 48) ? mb_substr($model->task_name, 0, 48, 'UTF-8') : $this->title) ?></h1>
 
     <?php
     $aAttributes = [
@@ -40,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         [
             'attribute' => 'task_dep_id',
-            'value' => $model->department->dep_name,
+            'value' => $model->department->dep_name . ' ('.$model->department->dep_shortname.')',
         ],
         'task_direct:ntext',
         'task_name:ntext',
@@ -88,6 +77,20 @@ $this->params['breadcrumbs'][] = $this->title;
     echo DetailView::widget([
         'model' => $model,
         'attributes' => $aAttributes,
-    ]) ?>
+    ]);
+
+//    Yii::$app->request->isAjax ? '' :
+    ?>
+
+    <p>
+        <?= Html::a('Изменить', ['update', 'id' => $model->task_id], ['class' => 'btn btn-primary']) ?>
+        <?= true ? '' : Html::a('Delete', ['delete', 'id' => $model->task_id], [
+            'class' => 'btn btn-danger',
+            'data' => [
+                'confirm' => 'Are you sure you want to delete this item?',
+                'method' => 'post',
+            ],
+        ]) ?>
+    </p>
 
 </div>
