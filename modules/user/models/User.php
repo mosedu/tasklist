@@ -164,6 +164,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['us_email', 'us_name'], 'required'],
             [['us_logintime', 'us_createtime'], 'safe'],
             [['us_email', ], 'email', ],
+            [['us_login', 'us_email'], 'unique', ],
             [['us_email', 'us_password_hash', 'us_name', 'us_secondname', 'us_lastname', 'us_login', 'us_workposition', 'us_email_confirm_token', 'us_password_reset_token'], 'string', 'max' => 255],
             [['us_auth_key', 'us_role_name'], 'string', 'max' => 32]
         ];

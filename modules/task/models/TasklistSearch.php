@@ -100,6 +100,11 @@ class TasklistSearch extends Tasklist
             'desc' => ['dep_num' => SORT_DESC, 'task_num' => SORT_DESC],
         ];
 
+        $dataProvider->sort->attributes['task_dep_id'] = [
+            'asc' => ['dep_shortname' => SORT_ASC],
+            'desc' => ['dep_shortname' => SORT_DESC],
+        ];
+
         if (!$this->validate()) {
             // uncomment the following line if you do not want to any records when validation fails
             // $query->where('0=1');

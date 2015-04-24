@@ -85,7 +85,7 @@ $aColumns[] = [
     'buttons'=>[
         'view'=>function ($url, $model) {
             return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $url,
-                ['title' => 'Просмотр', 'class'=>'showinmodal']); // , 'data-pjax' => '0'
+                ['title' => Html::encode($model->getFullName()), 'class'=>'showinmodal']); // , 'data-pjax' => '0'
 //                            ['title' => Yii::t('yii', 'View'), 'class'=>'showinmodal']); // , 'data-pjax' => '0'
         },
         'update'=>function ($url, $model) {

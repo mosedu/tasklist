@@ -230,7 +230,7 @@ class Tasklist extends \yii\db\ActiveRecord
             [['task_dep_id', 'task_type', 'task_progress', 'task_active', ], 'filter', 'filter' => 'intval'],
             [['task_summary', ], 'filter', 'filter'=>'trim'],
 
-            [['task_dep_id', 'task_name', 'task_direct', 'task_actualtime', 'task_type', 'task_progress', ], 'required'],
+            [['task_dep_id', 'task_name', 'task_actualtime', 'task_type', 'task_progress', ], 'required'], // 'task_direct',
             [['task_summary', ], 'required',
                 'when' => function($model) { return $model->task_progress == Tasklist::PROGRESS_FINISH; },
                 'whenClient' => "function (attribute, value) { return jQuery('#".Html::getInputId($this, 'task_summary')."').attr('data-req') == 1; }",
@@ -241,6 +241,8 @@ class Tasklist extends \yii\db\ActiveRecord
         ];
 
         if( !$this->isNewRecord ) {
+            $aRules[] = [['task_direct', ], 'required'];
+
             $aRules[] =
             [['task_reasonchanges', ], 'required',
                 'when' => function($model) { return $model->task_actualtime != $model->_oldAttributes['task_actualtime']; },

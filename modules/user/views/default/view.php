@@ -32,10 +32,19 @@ $this->params['breadcrumbs'][] = $this->title;
 //            'us_active',
             'us_email:email',
 //            'us_password_hash',
-            'us_lastname',
-            'us_name',
-            'us_secondname',
-            'us_login',
+//            'us_lastname',
+//            'us_name',
+//            'us_secondname',
+            [
+                'label' => 'ФИО',
+                'value' => $model->getFullName(),
+            ],
+            [
+                'label' => 'Отдел',
+                'value' => $model->department->dep_name . ' (' . $model->department->dep_shortname . ')',
+            ],
+
+//            'us_login',
 //            'us_logintime',
 //            'us_createtime',
             'us_workposition',

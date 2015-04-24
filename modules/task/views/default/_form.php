@@ -104,7 +104,7 @@ EOT;
         <?= $form->field(
             $model,
             'task_reasonchanges',
-            array_merge($aTextParam, ['options' => ['style' => '/*display: none;*/', 'class' => "form-group field-tasklist-reasonchange"]])
+            array_merge($aTextParam, ['options' => ['style' => (strlen($model->task_reasonchanges) > 0 ? '' : 'display: none;'), 'class' => "form-group field-tasklist-reasonchange"]])
         )->textarea(array_merge(['rows' => 3, 'data-old'=>$model->isNewRecord ? '' : $model->_oldAttributes['task_actualtime'],], $bEditDates ? [] : $aDisable)) ?>
     </div>
 
@@ -141,22 +141,27 @@ EOT;
 //                    console.log(e);
                      var dt = new Date(e.date),
                          s = '',
+                         sCompare = dt.getFullYear() + '',
                          n = dt.getDate(),
                          ob = jQuery('.field-tasklist-reasonchange');
 //                     console.log('ob = ', ob);
                      s += ((n < 10) ? '0' : '') + n + '.';
                      n = dt.getMonth() + 1;
                      s += ((n < 10) ? '0' : '') + n + '.';
+                     sCompare += ((n < 10) ? '0' : '') + n;
                      s += dt.getFullYear()
+                     n = dt.getDate();
+                     sCompare += ((n < 10) ? '0' : '') + n;
 //                     console.log(s);
 //                     jQuery('#" . Html::getInputId($model, 'reasonchange') . "').attr('data-old', s);
                      jQuery('#" . Html::getInputId($model, 'task_reasonchanges') . "').attr('data-old', s);
-                     if( s != '" . $model->task_actualtime . "' && ".($model->isNewRecord ? 'false' : 'true')." ) {
-//                        ob.show();
+//                     if( (s != '" . $model->task_actualtime . "' && ".($model->isNewRecord ? 'false' : 'true').") || ".(strlen($model->task_reasonchanges) > 0 ? 'true' : 'false')." ) {
+                     if( (sCompare > '" . preg_replace('|(\\d+)\\.(\\d+)\\.(\\d+)|', '${3}${2}${1}', $model->task_actualtime) . "' && ".($model->isNewRecord ? 'false' : 'true').") || ".(strlen($model->task_reasonchanges) > 0 ? 'true' : 'false')." ) {
+                        ob.show();
 //                        console.log('need show');
                      }
                      else {
-//                        ob.hide();
+                        ob.hide();
 //                        console.log('need hide');
                      }
                      }",

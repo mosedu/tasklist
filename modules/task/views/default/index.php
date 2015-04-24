@@ -45,11 +45,25 @@ $aColumns = [
 
             return
 //                '<a href="#" data-toggle="tooltip" data-placement="top" data-html="false" title="' . $model->getTaskType() . '" style="float: right; display: block; text-align: right; text-decoration: none;"><span class="inline glyphicon glyphicon-'.$sGlyth.'" style="font-size: 1.25em;"></span></a>' .
-                '<span class="inline glyphicon glyphicon-'.$sGlyth.'"  style="float: right; display: block; text-align: right; text-decoration: none; font-size: 1.25em;"></span><span class="inline"><span style="font-size: 1.25em;"> ' . Html::a(
+            // '<a href="#" data-toggle="tooltip" data-placement="top" data-html="false" title="' . $model->getTaskType() . '" style="float: right; display: block; text-align: right; text-decoration: none;"></a> '
+                Html::a(
+                    '<span class="inline glyphicon glyphicon-'.$sGlyth.'"  style="font-size: 1.25em;"></span>',
+                    '', // ['default/view', 'id'=>$model->task_id],
+                    [
+                        'title' => "Задача " . Html::encode($model->getTaskType()),
+                        'data-toggle' => "tooltip",
+                        'data-placement' => "top",
+                        'data-html' => "false",
+                        'class' => 'noanyaction',
+                        'style' => "float: right; display: block; text-align: right; text-decoration: none;"
+                    ]
+                )
+              . ' <span class="inline"><span style="font-size: 1.25em;">'
+              . Html::a(
                     $model->getTasknum(), //department->dep_num . '.' . $model->task_num,
                 ['default/update', 'id'=>$model->task_id],
                 [
-                    'title' => "Резактировать задачу: " . Html::encode($model->getTaskType()), // "Задача " . $model->getTaskType() . ', редактировать',
+                    'title' => "Редактировать задачу: " . Html::encode($model->getTaskType()), // "Задача " . $model->getTaskType() . ', редактировать',
                 ]
             ) . '</span></span>';
         },
@@ -168,7 +182,7 @@ $aColumns = [
                     },
                     ''
                 );
-                $sTip .= "<br />\n" . str_replace(["\r", "\n"], ['', "<br />\n"], Html::encode($model->task_reasonchanges));
+                $sTip .= "<br />\n<span style='text-align: left;'>" . str_replace(["\r", "\n"], ['', "<br />\n"], Html::encode($model->task_reasonchanges)) . "</span>";
                 $nChanges = $model->task_numchanges;
                 $sNumChanges = ' <a href="#" data-toggle="tooltip" data-placement="top" data-html="true" title="'.$sTip.'"><b>[' . $nChanges . ']</b></a>';
             }
@@ -363,6 +377,11 @@ Modal::end();
 $sJs =  <<<EOT
 var params = {};
 params[$('meta[name=csrf-param]').prop('content')] = $('meta[name=csrf-token]').prop('content');
+
+jQuery('.noanyaction').on("click", function (event){
+    event.preventDefault();
+    return false;
+});
 
 jQuery('.showinmodal').on("click", function (event){
     event.preventDefault();

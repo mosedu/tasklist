@@ -140,7 +140,7 @@ EOT;
 
             $aItems[] = Yii::$app->user->isGuest ?
                 ['label' => 'Вход', 'url' => ['/user/default/login']] :
-                ['label' => 'Выход (' . Yii::$app->user->identity->username . ')',
+                ['label' => 'Выход (' . Yii::$app->user->identity->us_email . ')', // username
                     'url' => ['/user/default/logout'],
                     'linkOptions' => ['data-method' => 'post']];
 
