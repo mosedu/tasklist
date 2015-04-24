@@ -32,8 +32,12 @@ if( !function_exists('formatVal') ) {
 
 $sDop = '';
 foreach($data As $k=>$v) {
+    $sTitle = $title[$k];
+    if( $k == 'task_actualtime' ) {
+        $sTitle = "Новый срок";
+    }
 //    echo '<p>' . Html::encode($title[$k]) . ' ' . formatVal($k, $v['old']) . ' -> ' . formatVal($k, $v['new']) . '</p>';
-    echo $sDop . Html::encode($title[$k]) . ': ' . ($v['old'] !== '' ? (formatVal($model, $k, $v['old']) . ' -> ') : '') . formatVal($model, $k, $v['new']);
+    echo $sDop . Html::encode() . ': ' . ($v['old'] !== '' ? (formatVal($model, $k, $v['old']) . ' -> ') : '') . formatVal($model, $k, $v['new']);
     $sDop = "<br />\n";
 }
 
