@@ -98,7 +98,7 @@ $styleColTitle = array(
     ),
 );
 
-$styleSell = array(
+$styleCell = array(
     'font' => array(
         'bold' => false,
         'size' => 10,
@@ -224,6 +224,7 @@ for($page = 0; $page < $nPageCount; $page++) {
         $aData = [];
         foreach($aField As $k=>$v) {
             $val = '';
+            $sCurCol = chr(ord('A') + $k);
             if( isset($v['val']) && ($v['val'] instanceof Closure) ) {
                 $val = call_user_func($v['val'], $model);
             }
@@ -233,22 +234,37 @@ for($page = 0; $page < $nPageCount; $page++) {
 
             }
             $aData[] = $val;
+            $oSheet->setCellValueExplicit($sCurCol . $nRow, $val);
         }
 
+/*
         $oSheet->fromArray(
             $aData,
             null,
             'A' . $nRow
         );
+*/
         $cou++;
         $nRow++;
     }
 }
 
 $oStyle = $oSheet->getStyle('A'.$nStartRow.':' . $sLastCol . ($nRow-1));
-$oStyle->applyFromArray($styleSell);
+$oStyle->applyFromArray($styleCell);
 $oStyle->getAlignment()->setWrapText(true);
 $oStyle->getAlignment()->setIndent(1);
+
+// $objPHPExcel->getActiveSheet()->getStyle('B3:B7')->
+// $objPHPExcel->getActiveSheet()->getCell('A1')->setValueExplicit('25', PHPExcel_Cell_DataType::TYPE_NUMERIC);
+
+//$oSheet->getStyle('B'.$nStartRow.':B' . ($nRow-1))
+//    ->getNumberFormat()
+//    ->setFormatCode(PHPExcel_Cell_DataType::TYPE_STRING2);
+
+$oSheet
+    ->getStyle('B'.$nStartRow.':B' . ($nRow-1))
+    ->getNumberFormat()
+    ->setFormatCode('0.0');
 
 $styleBorders = [
     'borders' => [
