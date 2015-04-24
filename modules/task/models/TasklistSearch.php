@@ -52,10 +52,10 @@ class TasklistSearch extends Tasklist
         return array_merge(
             parent::attributeLabels(),
             [
-                'datestart' => 'Базовый срок от',
-                'datefinish' => 'до',
-                'actdatestart' => 'Актуальный срок от',
-                'actdatefinish' => 'до',
+                'datestart' => 'Базовый срок от (≥)',
+                'datefinish' => 'до (<)',
+                'actdatestart' => 'Актуальный срок от (≥)',
+                'actdatefinish' => 'до (<)',
                 'showFilterForm' => 'Форма',
                 'showFinishedTask' => 'Завершенные',
                 'showTaskSummary' => 'Отчет',
@@ -254,7 +254,11 @@ class TasklistSearch extends Tasklist
             $a = $params[$sFormName];
         }
         $bEmpty = true;
+        $aDel = ['showFilterForm', 'showFinishedTask', 'showTaskSummary'];
         foreach($aAttr As $v) {
+            if( in_array($v, $aDel) ) {
+                continue;
+            }
             if( isset($a[$v]) && !empty($a[$v]) ) {
                 $bEmpty = false;
                 break;

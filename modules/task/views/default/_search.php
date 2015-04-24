@@ -136,6 +136,25 @@ if( $model->actdatefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model
     $sStartActDate = Html::getInputId($model, 'actdatestart');
     $sFinishActDate = Html::getInputId($model, 'actdatefinish');
 
+    $aAttr = $model->safeAttributes();
+    $aDel = ['showFilterForm', 'showFinishedTask', 'showTaskSummary'];
+    $a = array_flip($aAttr);
+//    echo print_r($a, true);
+    foreach($aDel As $sd) {
+        if( isset($a[$sd]) ) {
+            unset($a[$sd]);
+        }
+    }
+//    echo print_r($a, true);
+    $aAttr = array_keys($a);
+//    echo print_r($aAttr, true);
+
+    $aTestId = [];
+    foreach($aAttr As $v) {
+        $aTestId[] = Html::getInputId($model, $v);
+    }
+    $sTestId = Json::encode($aTestId);
+
     $sClearText = Json::encode([
         Html::getInputId($model, 'task_num'),
         Html::getInputId($model, 'task_direct'),
@@ -251,7 +270,7 @@ EOT;
         ?>
 
         <div class="col-sm-4">
-            <?= $form->field($model, 'task_dep_id')->dropDownList(array_merge(['0' => ''], Department::getList(false))) ?>
+            <?= $form->field($model, 'task_dep_id')->dropDownList(array_merge(['' => ''], Department::getList(false))) ?>
         </div>
 
     <?php
@@ -277,7 +296,7 @@ EOT;
         <?= $form->field($model, 'datestart', $aNumParam)->widget(
             DatePicker::className(),
             [
-            'options' => ['placeholder' => 'от'],
+            'options' => ['placeholder' => 'от (≥)'],
             'type' => DatePicker::TYPE_INPUT,
             'pluginOptions' => [
                 'format' => 'dd.mm.yyyy',
@@ -297,7 +316,7 @@ EOT;
         <?= $form->field($model, 'datefinish', $aDateParam)->widget(
             DatePicker::className(),
             [
-                'options' => ['placeholder' => 'до'],
+                'options' => ['placeholder' => 'до (<)'],
                 'type' => DatePicker::TYPE_INPUT,
                 'pluginOptions' => [
                     'format' => 'dd.mm.yyyy',
@@ -335,7 +354,7 @@ EOT;
         <?= $form->field($model, 'actdatestart', $aNumParam)->widget(
             DatePicker::className(),
             [
-                'options' => ['placeholder' => 'от'],
+                'options' => ['placeholder' => 'от (≥)'],
                 'type' => DatePicker::TYPE_INPUT,
                 'pluginOptions' => [
                     'format' => 'dd.mm.yyyy',
@@ -355,7 +374,7 @@ EOT;
         <?= $form->field($model, 'actdatefinish', $aDateParam)->widget(
             DatePicker::className(),
             [
-                'options' => ['placeholder' => 'до'],
+                'options' => ['placeholder' => 'до (<)'],
                 'type' => DatePicker::TYPE_INPUT,
                 'pluginOptions' => [
                     'format' => 'dd.mm.yyyy',
@@ -415,14 +434,44 @@ EOT;
                         'title' => Html::encode('Показать/скрыть панель фильтрации'),
                         'callback' => "
                             // oButton - function parametr
-                            var oPanel = jQuery(\"#{$idserchblock}\");
+                            var oPanel = jQuery(\"#{$idserchblock}\"),
+                                isFormEmpty = function() {
+                                    var aTestId = {$sTestId},
+                                        isEmpty = true;
+                                    for(var i in aTestId) {
+                                        var ob = jQuery(\"#\" + aTestId[i]);
+                                        if( ob && (ob.val() !== undefined) && (ob.val() != '') && (ob.val() !== null) ) {
+                                            isEmpty = false;
+                                            break;
+                                        }
+                                    }
+                                    return isEmpty;
+                                },
+                                showSearchIndicator = function(bShow) {
+                                    var ob = jQuery(\"#id_empty_search\");
+                                    if( !bShow ) {
+                                        ob.hide();
+                                        return;
+                                    }
+                                    if( isFormEmpty() ) {
+                                        // hide indicator
+                                        ob.hide();
+                                    }
+                                    else {
+                                        // show indicator
+                                        ob.show();
+                                    }
+                                };
+
                             if( oPanel.is(\":hidden\") ) {
                                 oPanel.show();
+                                showSearchIndicator(false);
                                 oButton.addClass(\"panelcb-on\");
                                 oButton.removeClass(\"panelcb-of\");
                             }
                             else {
                                 oPanel.hide();
+                                showSearchIndicator(true);
                                 oButton.removeClass(\"panelcb-on\");
                                 oButton.addClass(\"panelcb-of\");
                             }

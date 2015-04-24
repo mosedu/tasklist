@@ -273,7 +273,7 @@ $sDop = 'Задачи: активные: ' . $aStat['active']
 <div>
 
     <div class="col-sm-12">
-        <h1><?= (!$searchModel->showFilterForm && !$searchModel->isEmpty() ? '<span class="glyphicon glyphicon-search" style="font-size: 0.7em; color: #ff8888;"></span> ' : '') . Html::encode($this->title) ?></h1>
+        <h1><?= '<span id="id_empty_search" class="glyphicon glyphicon-search" style="font-size: 0.7em; color: #ff8888; '.((!$searchModel->showFilterForm && !$searchModel->isEmpty()) ? '' : 'display: none;').'"></span> ' . Html::encode($this->title) ?></h1>
     </div>
 
     <?php echo ''; /* $this->render('_search', ['model' => $searchModel]); */ ?>
