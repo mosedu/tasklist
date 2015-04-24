@@ -30,7 +30,7 @@ AppAsset::register($this);
     <div class="wrap">
         <?php
             NavBar::begin([
-                'brandLabel' => 'Задачи ГАУ ТемоЦентр',
+                'brandLabel' => str_replace("\n", "<br />\n", Html::encode("Система мониторинга текущих задач\nструктурных подразделений\nГАУ «ТемоЦентр»")), // 'Задачи ГАУ ТемоЦентр',
                 'brandUrl' => Yii::$app->homeUrl,
                 'options' => [
                     'class' => 'navbar-inverse navbar-fixed-top',
@@ -112,6 +112,11 @@ EOT;
 }
 .navbar-inverse .navbar-nav > li > a.panelcb-on:hover {
     color: #ffffff;
+}
+.navbar-brand {
+    font-size: 12px;
+    line-height: 14px;
+    padding: 5px 15px;
 }
 EOT;
 
