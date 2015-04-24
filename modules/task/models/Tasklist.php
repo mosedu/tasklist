@@ -304,7 +304,7 @@ class Tasklist extends \yii\db\ActiveRecord
      * Получение статуса
      * @return string
      */
-    public function getTaskStatus()
+    public function getTaskStatus($id = null)
     {
         $a = [
             self::STATUS_ACTIVE => self::STATUS_TEXT_ACTIVE,
@@ -316,7 +316,11 @@ class Tasklist extends \yii\db\ActiveRecord
             self::STATUS_DELETED => '-',
         ];
 */
-        return isset($a[$this->us_active]) ? $a[$this->us_active] : '~';
+        if( $id === null ) {
+            $id = $this->us_active;
+        }
+        return isset($a[$id]) ? $a[$id] : '';
+//        return isset($a[$this->us_active]) ? $a[$this->us_active] : '~';
     }
 
     /**
@@ -336,9 +340,12 @@ class Tasklist extends \yii\db\ActiveRecord
      *
      * @return string
      */
-    public function getTaskType() {
+    public function getTaskType($id = null) {
         $a = self::getAllTypes();
-        return isset($a[$this->task_type]) ? $a[$this->task_type] : '';
+        if( $id === null ) {
+            $id = $this->task_type;
+        }
+        return isset($a[$id]) ? $a[$id] : '';
     }
 
 
@@ -361,9 +368,12 @@ class Tasklist extends \yii\db\ActiveRecord
      *
      * @return string
      */
-    public function getTaskProgress() {
+    public function getTaskProgress($id = null) {
         $a = self::getAllProgresses();
-        return isset($a[$this->task_progress]) ? $a[$this->task_progress] : '';
+        if( $id === null ) {
+            $id = $this->task_progress;
+        }
+        return isset($a[$id]) ? $a[$id] : '';
     }
 
     /**
@@ -455,6 +465,21 @@ class Tasklist extends \yii\db\ActiveRecord
     }
 
     /**
+     * Форматирование аттрибутов
+     *
+     * @return array
+     */
+    public function formatTaskattibutes($attribute, $value) {
+        if( ($value === '') || ($value === null) ) {
+            return '';
+        }
+        if( $attribute == 'task_finishtime' ) {
+            $value = date('d.m.Y', strtotime($value));
+        }
+        return $value;
+    }
+
+    /**
      * Получение измененных аттрибутов модели
      *
      * @return array
@@ -475,8 +500,8 @@ class Tasklist extends \yii\db\ActiveRecord
                 }
                 if( $this->_oldAttributes[$k] !== $v ) {
                     $aChanged[$k] = [
-                        'old' => $this->_oldAttributes[$k],
-                        'new' => $v,
+                        'old' => $this->formatTaskattibutes($k, $this->_oldAttributes[$k]), // $this->_oldAttributes[$k],
+                        'new' => $this->formatTaskattibutes($k, $v), // $v,
                     ];
                 }
             }
@@ -524,13 +549,21 @@ class Tasklist extends \yii\db\ActiveRecord
      * @param array $aData
      * @return string
      */
-    public static function getChangesLogText($aData)
+    public function getChangesLogText($aData)
     {
-        if( self::$_tmpModel === null ) {
-            self::$_tmpModel = new Tasklist();
-        }
 
-        $aTitle = self::$_tmpModel->attributeLabels();
+        $aTitle = $this->attributeLabels();
+        return Yii::$app->getView()->renderFile(
+            '@app/modules/task/views/default/changes.php',
+            [
+                'model' => $this,
+                'data' => $aData,
+                'title' => $aTitle,
+            ],
+            null
+        );
+//        return $this->getView()->render('@app/modules/task/views/default/changes', ['model' => $this, 'data' => $aData], null);
+/*
         $s = '';
         // TODO: сделать в отдельной View ????
         foreach($aData As $k=>$v) {
@@ -545,6 +578,7 @@ class Tasklist extends \yii\db\ActiveRecord
             $s .= ($s !== '' ? "\n" : '') . $sDop;
         }
         return $s;
+*/
     }
 
     /**

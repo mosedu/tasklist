@@ -27,6 +27,8 @@ class Department extends \yii\db\ActiveRecord
     const STATUS_TEXT_DELETED = 'Удален';
     const STATUS_TEXT_ACTIVE = 'Активен';
 
+    public static $_map = null;
+
     public function behaviors()
     {
         return [
@@ -182,6 +184,17 @@ class Department extends \yii\db\ActiveRecord
             [':num' => $this->dep_num]
         )
         ->queryScalar();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getDepartmentName($id)
+    {
+        if( self::$_map === null ) {
+            self::$_map = ArrayHelper::map(self::find()->all(), 'dep_id', 'dep_name');
+        }
+        return isset(self::$_map[$id]) ? self::$_map[$id] : '??';
     }
 
 }

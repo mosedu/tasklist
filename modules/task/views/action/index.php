@@ -76,13 +76,16 @@ $this->title = 'Лог задач';
                 'content' => function ($model, $key, $index, $column) {
                     return date('d.m.Y H:i', strtotime($model->act_createtime));
                 },
+                'contentOptions' => [
+                    'class' => 'commandcell',
+                ],
             ],
             [
                 'class' => 'yii\grid\DataColumn',
                 'attribute' => 'act_data',
                 'filter' => Department::getList(false),
                 'content' => function ($model, $key, $index, $column) {
-                    $sData = empty($model->act_data) ? '' : Tasklist::getChangesLogText(unserialize($model->act_data));
+                    $sData = empty($model->act_data) ? '' : $model->task->getChangesLogText(unserialize($model->act_data));
                     $sTaskTitle = Html::encode($model->task->task_name);
                     return Html::a(
                             $sTaskTitle,
@@ -96,7 +99,7 @@ $this->title = 'Лог задач';
                          . Html::encode($model->task->department->dep_name)
                          . ') '
                          . '<br />'
-                         . Html::encode($model->user->getFullName())
+                         . '<strong>' . Html::encode($model->user->getFullName()) . '</strong>'
                          . ($sData != '' ? ('<br />' . $sData) : '') ;
                 },
 //                'contentOptions' => function ($model, $key, $index, $column) {
