@@ -92,7 +92,8 @@ class UserController extends Controller
 
         if ($model->load(Yii::$app->request->post())) {
             if( $model->save() ) {
-                return $this->redirect(['view', 'id' => $model->us_id]);
+//                return $this->redirect(['view', 'id' => $model->us_id]);
+                return $this->redirect(['index', ]);
             }
             else {
                 Yii::info("On update save: " . print_r($model->getErrors(), true));

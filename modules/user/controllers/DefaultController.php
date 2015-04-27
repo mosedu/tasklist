@@ -147,6 +147,23 @@ class DefaultController extends Controller
     {
         $model = $this->findModel($id);
 
+        if ($model->load(Yii::$app->request->post())) {
+            if( $model->save() ) {
+//                return $this->redirect(['view', 'id' => $model->us_id]);
+                return $this->redirect(['index', ]);
+            }
+            else {
+                Yii::info("On update save: " . print_r($model->getErrors(), true));
+            }
+        }
+        else {
+            Yii::info("On update load: " . print_r($model->getErrors(), true));
+        }
+
+        return $this->render('update', [
+            'model' => $model,
+        ]);
+/*
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);
         } else {
@@ -154,6 +171,7 @@ class DefaultController extends Controller
                 'model' => $model,
             ]);
         }
+*/
     }
 
     /**
