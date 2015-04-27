@@ -267,11 +267,16 @@ EOT;
 
     <?php
     if( Yii::$app->user->can('createUser') ) {
-        Yii::warning(print_r(Department::getList(false), true));
+        $aTmp = Department::getList(false);
+        Yii::warning(print_r($aTmp, true));
+        $aDep = ['' => ''];
+        foreach($aTmp As $k=>$v) {
+            $aDep[$k] = $v;
+        }
         ?>
 
         <div class="col-sm-4">
-            <?= $form->field($model, 'task_dep_id')->dropDownList(array_merge(['' => ''], Department::getList(false))) ?>
+            <?= $form->field($model, 'task_dep_id')->dropDownList($aDep) ?>
         </div>
 
     <?php
