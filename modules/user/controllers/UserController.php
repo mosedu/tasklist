@@ -89,16 +89,22 @@ class UserController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->us_id]);
-        } else {
-            if( Yii::$app->request->isPost ) {
-                Yii::warning('ERROR save user: ' . print_r($model->getErrors(), true));
+
+        if ($model->load(Yii::$app->request->post())) {
+            if( $model->save() ) {
+                return $this->redirect(['view', 'id' => $model->us_id]);
             }
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            else {
+                Yii::info("On update save: " . print_r($model->getErrors(), true));
+            }
         }
+        else {
+            Yii::info("On update load: " . print_r($model->getErrors(), true));
+        }
+
+        return $this->render('update', [
+            'model' => $model,
+        ]);
     }
 
     /**
