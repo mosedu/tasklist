@@ -267,6 +267,7 @@ EOT;
 
     <?php
     if( Yii::$app->user->can('createUser') ) {
+        Yii::warning(print_r(Department::getList(false), true));
         ?>
 
         <div class="col-sm-4">
