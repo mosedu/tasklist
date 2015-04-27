@@ -106,7 +106,10 @@ for(var i in oButton) {
     prepareButton(i, oButton[i]);
 }
 EOT;
-                $sCss = <<<EOT
+                $this->registerJs($sJs);
+            }
+
+        $sCss = <<<EOT
 .navbar-inverse .navbar-nav > li > a.panelcb-on {
     color: #33ff33;
 }
@@ -119,12 +122,9 @@ EOT;
     padding: 5px 15px;
 }
 EOT;
+        $this->registerCss($sCss);
 
-                $this->registerJs($sJs);
-                $this->registerCss($sCss);
-            }
-
-            $aItems[] = ['label' => 'Задачи', 'url' => ['/']];
+        $aItems[] = ['label' => 'Задачи', 'url' => ['/']];
 
             if( Yii::$app->user->can('createUser') ) {
                 $aLists = array_merge(
