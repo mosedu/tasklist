@@ -148,6 +148,8 @@ class DefaultController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post())) {
+            $model->us_login = preg_replace('/\\W/', '', $model->us_email);
+
             if( $model->save() ) {
 //                return $this->redirect(['view', 'id' => $model->us_id]);
                 return $this->redirect(['index', ]);
