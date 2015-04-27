@@ -268,7 +268,6 @@ EOT;
     <?php
     if( Yii::$app->user->can('createUser') ) {
         $aTmp = Department::getList(false);
-        Yii::warning(print_r($aTmp, true));
         $aDep = ['' => ''];
         foreach($aTmp As $k=>$v) {
             $aDep[$k] = $v;
