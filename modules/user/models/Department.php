@@ -35,7 +35,7 @@ class Department extends \yii\db\ActiveRecord
             [
                 'class' =>  AttributewalkBehavior::className(),
                 'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => ['dep_num', ],
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['dep_num', 'dep_active'],
                 ],
                 /** @var Event $event */
                 'value' => function ($event, $attribute) {
@@ -44,6 +44,8 @@ class Department extends \yii\db\ActiveRecord
                     switch($attribute) {
                         case 'dep_num':
                             return Department::getMaxnum() + 1;
+                        case 'dep_active':
+                            return self::STATUS_ACTIVE;
                     }
                 },
             ],

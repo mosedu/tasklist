@@ -241,7 +241,7 @@ class Tasklist extends \yii\db\ActiveRecord
         ];
 
         if( !$this->isNewRecord ) {
-            $aRules[] = [['task_direct', ], 'required'];
+//            $aRules[] = [['task_direct', ], 'required'];
 
             $aRules[] =
             [['task_reasonchanges', ], 'required',

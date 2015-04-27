@@ -50,7 +50,7 @@ $aColumns = [
                     '<span class="inline glyphicon glyphicon-'.$sGlyth.'"  style="font-size: 1.25em;"></span>',
                     '', // ['default/view', 'id'=>$model->task_id],
                     [
-                        'title' => "Задача " . Html::encode($model->getTaskType()),
+                        'title' => Html::encode($model->getTaskType()),
                         'data-toggle' => "tooltip",
                         'data-placement' => "top",
                         'data-html' => "false",

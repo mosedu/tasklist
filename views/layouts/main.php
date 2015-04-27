@@ -31,7 +31,7 @@ AppAsset::register($this);
         <?php
             NavBar::begin([
                 'brandLabel' => str_replace("\n", "<br />\n", Html::encode("Система мониторинга текущих задач\nструктурных подразделений\nГАУ «ТемоЦентр»")), // 'Задачи ГАУ ТемоЦентр',
-                'brandUrl' => Yii::$app->homeUrl,
+                'brandUrl' => false, // Yii::$app->homeUrl,
                 'options' => [
                     'class' => 'navbar-inverse navbar-fixed-top',
                 ],
@@ -121,10 +121,25 @@ EOT;
     line-height: 14px;
     padding: 5px 15px;
 }
+
+.navbar-header {
+    color: #ffffff;
+    font-size: 12px;
+    line-height: 14px;
+    padding: 5px 15px;
+}
 EOT;
         $this->registerCss($sCss);
+        $sJs = <<<EOT
+var oToplink = jQuery("a.navbar-brand");
+oToplink.replaceWith(oToplink.html());
+EOT;
 
-        $aItems[] = ['label' => 'Задачи', 'url' => ['/']];
+        $this->registerJs($sJs);
+
+        if( !Yii::$app->user->isGuest ) {
+            $aItems[] = ['label' => 'Задачи', 'url' => ['/']];
+        }
 
             if( Yii::$app->user->can('createUser') ) {
                 $aLists = array_merge(

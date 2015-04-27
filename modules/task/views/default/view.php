@@ -9,10 +9,11 @@ use app\modules\task\models\Tasklist;
 $this->title = $model->task_name;
 //$this->params['breadcrumbs'][] = ['label' => 'Tasklists', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+/* <h1><?= Html::encode(Yii::$app->request->isAjax && (mb_strlen($model->task_name, 'UTF-8') > 48) ? mb_substr($model->task_name, 0, 48, 'UTF-8') : $this->title) ?></h1> */
+
+
 ?>
 <div class="tasklist-view">
-
-    <h1><?= Html::encode(Yii::$app->request->isAjax && (mb_strlen($model->task_name, 'UTF-8') > 48) ? mb_substr($model->task_name, 0, 48, 'UTF-8') : $this->title) ?></h1>
 
     <?php
     $aAttributes = [

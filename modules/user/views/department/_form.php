@@ -27,24 +27,29 @@ use app\modules\user\models\Department;
                 'hint' => 'col-sm-6 col-sm-offset-6',
             ],
         ],
-    ]); ?>
+    ]);
+
+/*
+<div class="col-sm-6">
+    <?= $form->field($model, 'dep_active')->dropDownList(Department::getDepStatuses()) ?>
+</div>
+*/
+
+?>
 
     <div class="col-sm-6">
         <?= $form->field($model, 'dep_name')->textInput(['maxlength' => 255]) ?>
     </div>
+    <div class="clearfix"></div>
 
     <div class="col-sm-6">
         <?= $form->field($model, 'dep_shortname')->textInput(['maxlength' => 255]) ?>
     </div>
-
-    <div class="col-sm-6">
-        <?= $form->field($model, 'dep_active')->dropDownList(Department::getDepStatuses()) ?>
-    </div>
+    <div class="clearfix"></div>
 
     <div class="col-sm-6">
         <?= $form->field($model, 'dep_user_roles')->dropDownList(User::getUserRoles()) ?>
     </div>
-
     <div class="clearfix"></div>
 
     <div class="col-sm-6">

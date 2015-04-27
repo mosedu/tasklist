@@ -78,6 +78,28 @@ Yii::info('Grid: ' . print_r(User::getUserRoles(), true));
                 'contentOptions' => [
                     'class' => 'commandcell',
                 ],
+                'buttons'=>[
+                    'view'=>function ($url, $model) {
+                        return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $url,
+                            ['title' => 'Отдел ' . $model->dep_shortname, 'class'=>'showinmodal']); // , 'data-pjax' => '0'
+//                            ['title' => Yii::t('yii', 'View'), 'class'=>'showinmodal']); // , 'data-pjax' => '0'
+                    },
+                    'update'=>function ($url, $model) {
+                        return
+                            Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $url, ['title' => 'Изменить отдел ' . $model->dep_shortname])
+                            ;
+                    },
+                    'delete' => function ($url, $model, $key) {
+                        return $model->dep_id != 1 ?
+                            Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, [
+                                'title' => Yii::t('yii', 'Delete'),
+                                'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+                                'data-method' => 'post',
+                                'data-pjax' => '0',
+                            ]) :
+                            '';
+                    }
+                ],
             ],
         ],
     ]);
