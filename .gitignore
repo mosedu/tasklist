@@ -32,3 +32,4 @@ runtime
 /config/*-local.php
 /config/db*.php
 /web/upload
+*-local.php
