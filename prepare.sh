@@ -28,3 +28,8 @@ if [ ! -L ${www_dir} ]; then
     ln -s ${web_dir} ${www_dir}
     echo "make link ${web_dir} -> ${www_dir}"
 fi
+
+cd vendor
+if [ ! -L bower ]; then
+    ln -s bower-asset bower
+fi
