@@ -19,5 +19,9 @@ for sdir in "${runtime_dir} ${asset_dir} ${uploadf_dir}" ; do
 done
 
 if [! -L ${www_dir} ]; then
+    if [ -d ${www_dir} ]; then
+        rm -r ${www_dir}
+    fi
+    ln -s ${web_dir} ${www_dir}
     echo "make link ${web_dir} -> ${www_dir}"
 fi
