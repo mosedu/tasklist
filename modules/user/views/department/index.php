@@ -4,15 +4,18 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use app\modules\user\models\Department;
 use app\modules\user\models\User;
+use app\assets\GriddataAsset;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\modules\user\models\DepartmentSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+GriddataAsset::register($this);
+
 $this->title = 'Отделы';
 $this->params['breadcrumbs'][] = $this->title;
 
-Yii::info('Grid: ' . print_r(User::getUserRoles(), true));
+// Yii::info('Grid: ' . print_r(User::getUserRoles(), true));
 
 ?>
 <div class="department-index">
