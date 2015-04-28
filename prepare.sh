@@ -2,13 +2,13 @@
 
 curdir=`pwd`
 runtime_dir="${curdir}/runtime"
-asset_dir=="${curdir}/web/assets"
+asset_dir="${curdir}/web/assets"
 uploadf_dir="${curdir}/web/upload"
 
 make_dirs="${runtime_dir} ${asset_dir} ${uploadf_dir}"
 
-www_dir="${curdir}/www"
-web_dir="${curdir}/web"
+www_dir="www"
+web_dir="web"
 
 for sdir in $make_dirs ; do
     echo -n "${sdir} : "
