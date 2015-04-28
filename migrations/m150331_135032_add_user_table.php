@@ -97,9 +97,12 @@ class m150331_135032_add_user_table extends Migration
         // $this->execute($sSql, $aParam);
         $nEl = $this->db->createCommand($sSql)->bindValues($aParam)->execute();
         echo "\n-------------------------------------\nInsert {$nEl} users\n-------------------------------------\n";
+        $auth = Yii::$app->authManager;
+        $role = $auth->getRole(User::ROLE_ADMIN);
+        $auth->revokeAll(1);
+        $auth->assign($role, 1);
 
         $this->refreshCache();
-
     }
 
     public function down()
