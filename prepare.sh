@@ -9,7 +9,7 @@ web_dir="${curdir}/web"
 
 for sdir in "${runtime_dir} ${asset_dir} ${uploadf_dir}" ; do
     echo -n "${sdir} : "
-    if [! -d ${sdir} ]; then
+    if [ ! -d ${sdir} ]; then
         mkdir ${sdir}
         chmod 777 ${sdir}
         echo "make"
@@ -18,7 +18,7 @@ for sdir in "${runtime_dir} ${asset_dir} ${uploadf_dir}" ; do
     fi
 done
 
-if [! -L ${www_dir} ]; then
+if [ ! -L ${www_dir} ]; then
     if [ -d ${www_dir} ]; then
         rm -r ${www_dir}
     fi
