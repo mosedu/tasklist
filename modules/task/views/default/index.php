@@ -336,6 +336,7 @@ $sJs .=  <<<EOT
 jQuery('[data-toggle="tooltip"]').tooltip();
 
 EOT;
+
 $this->registerJs($sJs, View::POS_READY , 'togglesearchpanel');
 
 if( !isset(Yii::$app->params['panelcheckbox']) ) {

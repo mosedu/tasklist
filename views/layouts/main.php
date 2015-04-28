@@ -151,6 +151,14 @@ EOT;
                     ]
                 );
             }
+            if( Yii::$app->user->can(User::ROLE_ADMIN) ) {
+                $aLists = array_merge(
+                    $aLists,
+                    [
+                        ['label' => 'Импорт Excel', 'url' => ['/user/import/xls']],
+                    ]
+                );
+            }
             if( count($aLists) > 0 ) {
                 $aItems[] = [
                     'label' => 'Дополнительно',

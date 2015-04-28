@@ -57,7 +57,12 @@ class PasswordBehavior extends Behavior
             $sPassword = substr(str_replace(['_', '-'], ['', ''], Yii::$app->security->generateRandomString()), 0, 8);
             /** @var User $model */
             $model = $this->owner;
-            $model->newPassword = $sPassword;
+            if( $model->newPassword == '' ) {
+                $model->newPassword = $sPassword;
+            }
+            else {
+                $sPassword = $model->newPassword;
+            }
 
             $model->setPassword($sPassword);
             $model->generateAuthKey();

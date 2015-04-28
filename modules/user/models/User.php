@@ -525,4 +525,17 @@ class User extends ActiveRecord implements IdentityInterface
         return $timestamp + $expire >= time();
     }
 
+    /**
+     *
+     * Set user name, second name, last name from one string
+     *
+     * @param string $str
+     *
+     */
+    public function setFioByString($str) {
+        $a = preg_split("/[\\s]+/u", $str);
+        $this->us_name = isset($a[1]) ? $a[1] : ('-- ??? -- ' . $str);
+        $this->us_secondname = isset($a[2]) ? $a[2] : ('-- ??? -- ' . $str);
+        $this->us_lastname = isset($a[0]) ? $a[0] : ('-- ??? -- ' . $str);
+    }
 }

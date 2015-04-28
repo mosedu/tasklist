@@ -7,10 +7,13 @@ use yii\web\View;
 
 use app\modules\user\models\User;
 use app\modules\user\models\Department;
+use app\assets\GriddataAsset;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\modules\user\models\UserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+
+GriddataAsset::register($this);
 
 $this->title = 'Пользователи';
 $this->params['breadcrumbs'][] = $this->title;
@@ -82,6 +85,7 @@ $aColumns[] = [
     'contentOptions' => [
         'class' => 'commandcell',
     ],
+    'template' => '{view} {update} {delete} {unlink}',
     'buttons'=>[
         'view'=>function ($url, $model) {
             return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $url,
@@ -99,7 +103,21 @@ $aColumns[] = [
                     'data-method' => 'post',
                     'data-pjax' => '0',
                 ]);
-        }
+        },
+        'unlink' => function ($url, $model, $key) {
+            if( Yii::$app->user->can(User::ROLE_ADMIN) ) {
+                return
+                    Html::a('<span class="glyphicon glyphicon-erase"></span>', $url, [
+                        'title' => Yii::t('yii', 'unlink'),
+                        'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+                        'data-method' => 'post',
+                        'data-pjax' => '0',
+                    ]);
+            }
+            else {
+                return '';
+            }
+        },
     ],
 ];
 

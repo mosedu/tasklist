@@ -29,7 +29,9 @@ class m150331_135032_add_user_table extends Migration
             echo "\n" . $s1 . $s2;
             echo '*' . str_pad("RUN RBAC MIGRATION FIRST !", $n, " ", STR_PAD_BOTH) . "*\n";
             echo $s2;
-            echo '*' . str_pad("yii migrate --migrationPath=@yii/rbac/migrations/", $n, " ", STR_PAD_BOTH) . "*\n";
+            echo '*' . str_pad("php yii migrate --migrationPath=@yii/rbac/migrations/", $n, " ", STR_PAD_BOTH) . "*\n";
+            echo $s2 . $s1 . "\n";
+            echo '*' . str_pad("php yii rbac/create", $n, " ", STR_PAD_BOTH) . "*\n";
             echo $s2 . $s1 . "\n";
             return false;
         }

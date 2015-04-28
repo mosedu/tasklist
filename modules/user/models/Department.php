@@ -199,4 +199,25 @@ class Department extends \yii\db\ActiveRecord
         return isset(self::$_map[$id]) ? self::$_map[$id] : '??';
     }
 
+    /**
+     * @param string $sName
+     * @return integer
+     */
+    public static function getDepartmentIdByName($sName)
+    {
+        $ob = self::find()->where(['dep_name' => $sName])->one();
+        if( $ob === null ) {
+            $aAdmName = ['Отдел мониторинга и контроля'];
+            $ob = new Department();
+            $ob->dep_name = $sName;
+            $ob->dep_shortname = $sName;
+            $ob->dep_user_roles = in_array($sName, $aAdmName) ? User::ROLE_CONTROL : User::ROLE_DEPARTMENT;
+            if( !$ob->save() ) {
+                Yii::warning('getDepartmentIdByName('.$sName.') ERROR ADD NEW DEP: ' . print_r($ob->getErrors(), true));
+                $ob->dep_id = 0;
+            }
+        }
+        return $ob->dep_id;
+    }
+
 }

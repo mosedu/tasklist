@@ -2,6 +2,7 @@
 
 namespace app\modules\user\controllers;
 
+use app\modules\task\models\Action;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -21,7 +22,7 @@ class DefaultController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout', 'create', 'view', 'update', 'delete', 'index'],
+                'only' => ['logout', 'create', 'view', 'update', 'delete', 'index', 'unlink', 'unlinkall'],
                 'rules' => [
                     [
                         'actions' => ['logout'],
@@ -32,6 +33,11 @@ class DefaultController extends Controller
                         'actions' => ['create', 'update', 'view', 'delete', 'index'],
                         'allow' => true,
                         'roles' => ['createUser'],
+                    ],
+                    [
+                        'actions' => ['unlink', 'unlinkall', ],
+                        'allow' => true,
+                        'roles' => ['admin'],
                     ],
                 ],
             ],
@@ -222,10 +228,56 @@ class DefaultController extends Controller
         return $this->redirect(['index']);
     }
 
+    /**
+     * Deletes an existing User model and all his DATA.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionUnlink($id)
+    {
+
+        $model = $this->findModel($id);
+        if( $model !== null ) {
+            $auth = Yii::$app->authManager;
+            $auth->revokeAll($id);
+            $sSql = 'Delete From ' . Action::tableName() . ' Where act_us_id = ' . $id;
+            $nDel = Yii::$app->db->createCommand($sSql)->execute();
+            Yii::warning('actionUnlink('.$id.'): delete ' . $nDel . ' actions');
+            $model->delete();
+        }
+
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * Deletes all User model and all his DATA.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @return mixed
+     */
+    public function actionUnlinkall()
+    {
+
+        $aUsers = User::find()->all();
+        $auth = Yii::$app->authManager;
+        foreach($aUsers As $model) {
+            if( $model->us_id < 2 ) {
+                continue;
+            }
+            $auth->revokeAll($model->us_id);
+            $sSql = 'Delete From ' . Action::tableName() . ' Where act_us_id = ' . $model->us_id;
+            $nDel = Yii::$app->db->createCommand($sSql)->execute();
+            Yii::warning('actionUnlinkall('.$model->us_id.'): delete ' . $nDel . ' actions');
+            $model->delete();
+        }
+
+        return $this->redirect(['index']);
+    }
+
     /*
- * Форма сброса пароля
- *
- */
+     * Форма сброса пароля
+     *
+     */
     public function actionRequestpasswordreset()
     {
         $model = new PasswordResetRequestForm();
