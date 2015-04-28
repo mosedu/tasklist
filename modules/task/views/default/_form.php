@@ -34,6 +34,7 @@ $aDisable = [];
 if( !Yii::$app->user->can('createUser') ) {
     $aDisable = ['readonly' => true, 'disabled' => true];
 }
+$bCanChange = $model->canChangeDate();
 ?>
 
 <div class="tasklist-form">
@@ -156,13 +157,15 @@ EOT;
 //                     jQuery('#" . Html::getInputId($model, 'reasonchange') . "').attr('data-old', s);
                      jQuery('#" . Html::getInputId($model, 'task_reasonchanges') . "').attr('data-old', s);
 //                     if( (s != '" . $model->task_actualtime . "' && ".($model->isNewRecord ? 'false' : 'true').") || ".(strlen($model->task_reasonchanges) > 0 ? 'true' : 'false')." ) {
-                     if( (sCompare > '" . preg_replace('|(\\d+)\\.(\\d+)\\.(\\d+)|', '${3}${2}${1}', $model->task_actualtime) . "' && ".($model->isNewRecord ? 'false' : 'true').") || ".(strlen($model->task_reasonchanges) > 0 ? 'true' : 'false')." ) {
-                        ob.show();
-//                        console.log('need show');
-                     }
-                     else {
-                        ob.hide();
-//                        console.log('need hide');
+                     if( ".($bCanChange ? "false" : "true")." ) {
+                         if( (sCompare > '" . preg_replace('|(\\d+)\\.(\\d+)\\.(\\d+)|', '${3}${2}${1}', $model->task_actualtime) . "' && ".($model->isNewRecord ? 'false' : 'true').") || ".(strlen($model->task_reasonchanges) > 0 ? 'true' : 'false')." ) {
+                            ob.show();
+    //                        console.log('need show');
+                         }
+                         else {
+                            ob.hide();
+    //                        console.log('need hide');
+                         }
                      }
                      }",
                         ]

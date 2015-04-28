@@ -38,6 +38,8 @@ use app\modules\task\models\Changes;
  */
 class Tasklist extends \yii\db\ActiveRecord
 {
+    const DATE_CHANGE_INTERVAL = 86400;
+
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 1;
 
@@ -131,11 +133,15 @@ class Tasklist extends \yii\db\ActiveRecord
                     $model = $event->sender;
                     switch($attribute) {
                         case 'task_actualtime':
-                            return date('Y-m-d H:i:s', strtotime($model->task_actualtime) + 24 * 3600 - 1);
+                            $sDate = date('Y-m-d H:i:s', strtotime($model->task_actualtime) + 24 * 3600 - 1);
+                            if( $model->canChangeDate() ) {
+                                $model->task_finaltime = $sDate;
+                            }
+                            return $sDate;
 
                         case '_oldAttributes':
                             $aChanged = $model->getChangeattibutes();
-                            if (isset($aChanged['task_actualtime'])) {
+                            if ( !$model->canChangeDate() && isset($aChanged['task_actualtime'])) {
                                 Yii::info('task_actualtime CHANGED: ' . $aChanged['task_actualtime']['old'] . ' -> ' . $aChanged['task_actualtime']['new']);
                                 if( preg_match('|^(\\d+)\\.(\\d+)\\.(\\d+)$|', $aChanged['task_actualtime']['old'], $aOld)
                                  && preg_match('|^(\\d+)\\.(\\d+)\\.(\\d+)$|', $aChanged['task_actualtime']['new'], $aNew)) {
@@ -198,7 +204,7 @@ class Tasklist extends \yii\db\ActiveRecord
                             }
                             else {
                                 Action::appendUpdate(array_merge($data, $aChanged));
-                                if (isset($aChanged['task_actualtime'])) {
+                                if ( !$model->canChangeDate() && isset($aChanged['task_actualtime']) ) {
                                     if( $model->task_progress != Tasklist::PROGRESS_FINISH ) {
                                         Changes::addChange($model);
                                     }
@@ -240,7 +246,7 @@ class Tasklist extends \yii\db\ActiveRecord
             [['task_createtime', 'task_finaltime', 'task_actualtime'], 'safe']
         ];
 
-        if( !$this->isNewRecord ) {
+        if( !$this->canChangeDate() && !$this->isNewRecord ) {
 //            $aRules[] = [['task_direct', ], 'required'];
 
             $aRules[] =
@@ -597,6 +603,22 @@ class Tasklist extends \yii\db\ActiveRecord
      */
     public function getTasknum() {
         return $this->department->dep_num . '.' . $this->task_num;
+    }
+
+    /**
+     * Проверка на возможность изменения даты при ошибке
+     *
+     * @return boolean
+     */
+    public function canChangeDate() {
+        Yii::info('canChangeErrorDate(): ' . $this->task_createtime);
+        $bRet = false;
+        if( $this->task_createtime !== null ) {
+            if( time() - strtotime($this->task_createtime) <= self::DATE_CHANGE_INTERVAL ) {
+                $bRet = true;
+            }
+        }
+        return $bRet;
     }
 
 
