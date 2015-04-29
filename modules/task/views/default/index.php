@@ -205,7 +205,7 @@ $aColumns = [
             return $model->getTaskProgress();
         },
         'contentOptions' => [
-            'class' => 'griddate',
+            'class' => 'griddate commandcell',
         ],
     ],
     // 'task_numchanges',
