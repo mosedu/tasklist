@@ -30,7 +30,7 @@ class DefaultController extends Controller
                         'roles' => ['createUser'],
                     ],
                     [
-                        'actions' => ['view', 'index', 'create', 'update', 'export', ],
+                        'actions' => ['view', 'index', 'create', 'update', 'export', 'lastdirect'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -168,6 +168,21 @@ class DefaultController extends Controller
         }
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * @return \yii\web\Response
+     */
+    public function actionLastdirect()
+    {
+        $aData = Yii::$app
+            ->db
+            ->createCommand('SELECT Distinct task_direct FROM tlst_tasklist Where task_dep_id = :depid Order By task_id Desc', ['depid'=>Yii::$app->request->get('depid', 0)])
+            ->queryColumn();
+        $response = Yii::$app->response;
+        $response->format = \yii\web\Response::FORMAT_JSON;
+        $response->data = $aData;
+        return $response;
     }
 
     /**

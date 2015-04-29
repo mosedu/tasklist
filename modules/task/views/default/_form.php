@@ -3,11 +3,14 @@
 use yii\helpers\Html;
 // use yii\widgets\ActiveForm;
 use yii\bootstrap\ActiveForm;
+use yii\bootstrap\Modal;
 use yii\web\View;
+use yii\helpers\Url;
 
 use app\modules\user\models\Department;
 use app\modules\task\models\Tasklist;
 use kartik\date\DatePicker;
+use kartik\select2\Select2;
 use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
@@ -35,6 +38,22 @@ if( !Yii::$app->user->can('createUser') ) {
     $aDisable = ['readonly' => true, 'disabled' => true];
 }
 $bCanChange = $model->canChangeDate();
+
+$aDirect = []; // Tasklist::getAllStatuses();
+
+$aSetting = [
+    'data' => [], // $aDirect,
+    'language' => 'ru',
+    'name' => 'selectdirection',
+    'options' => [
+        'multiple' => false,
+        'placeholder' => 'Выберите из списка ...',
+    ],
+    'pluginOptions' => [
+        'allowClear' => true,
+    ],
+];
+
 ?>
 
 <div class="tasklist-form">
@@ -72,7 +91,9 @@ $bCanChange = $model->canChangeDate();
     ?>
 
     <div class="col-sm-8">
-        <?= $form->field($model, 'task_direct', $aTextParam)->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable)) ?>
+        <?= $form->field($model, 'task_direct', $aTextParam)
+            ->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable))
+            ->hint(Html::tag('div', Html::a('Выбрать направление', '', ['id'=>'idshowselectdirection',]), ['style'=>'text-align: right;'])) ?>
         <?= $form->field($model, 'task_name', $aTextParam)->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable)) ?>
         <?php
         if( !$model->isNewRecord ) {
@@ -80,6 +101,63 @@ $bCanChange = $model->canChangeDate();
                 <?= $form->field($model, 'task_summary', $aTextParam)->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0]) ?>
         <?php
         }
+        else { // new record
+            $this->registerJs('var aChache = {},
+            oSel = jQuery("#idselectdirectlist"),
+            setDirectList = function(data) {
+                oSel.find("option").remove();
+                for(var i in data) {
+                    oSel.append("<option value=\\""+i+"\\">"+data[i]+"</option>");
+                }
+            };
+            jQuery("#idshowselectdirection").on("click", function(event) {
+            var nDepId = jQuery("#'.Html::getInputId($model, 'task_dep_id').'").val();
+            event.preventDefault();
+            if( nDepId in aChache ) {
+                setDirectList(aChache[nDepId]);
+            }
+            else {
+                jQuery.ajax({url: "' . Url::to(['default/lastdirect']) . '", data: {depid: nDepId}, dataType: "json", success: function(data, textStatus, jqXHR){
+                    aChache[nDepId] = data;
+                    setDirectList(data);
+                }});
+            }
+            $("#selectmodal").modal("show");
+            return false; });',
+            View::POS_READY,
+            'showselectinstr');
+
+            Modal::begin([
+                'header' => 'Выбрать направление из списка',
+                'id' => 'selectmodal',
+                'footer' => '<button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button><button type="button" class="btn btn-primary" id="setselecteddata">Вставить</button>',
+            ]);
+
+            // echo Select2::widget($aSetting);
+            echo Html::listBox(
+                'selectdir',
+                '',
+                $aDirect,
+                ['id' => 'idselectdirectlist', 'class'=>'form-control', 'multiple' => true]
+            );
+
+            Modal::end();
+            $this->registerJs('jQuery("#setselecteddata")
+                .on("click", function(event) {
+                    var s = jQuery("#idselectdirectlist option:selected").text();
+                    // console.log("Selected data : " + s);
+                    event.preventDefault();
+                    if( s.length > 0 ) { jQuery("#'.Html::getInputId($model, 'task_direct').'").val(s); }
+                    jQuery("#selectmodal").modal("hide");
+                    return false;
+                });
+                jQuery("#idselectdirectlist").on("dblclick", function(event){
+                    jQuery("#setselecteddata").trigger("click");
+                });',
+                View::POS_READY,
+                'selectdirection');
+        }
+
         $sIdProgress = Html::getInputId($model, 'task_progress');
         $sIdSummary = Html::getInputId($model, 'task_summary');
         $nFinish = Tasklist::PROGRESS_FINISH;
