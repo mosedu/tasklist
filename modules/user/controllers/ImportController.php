@@ -21,7 +21,7 @@ class ImportController extends Controller
     }
 
     /**
-     * Lists all User models.
+     * Import User.
      * @return mixed
      */
     public function actionXls()
@@ -62,6 +62,36 @@ class ImportController extends Controller
             'model' => $model,
         ]);
 
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function actionMasssend()
+    {
+        $a = User::find()->where(['us_active' => 1, ])->all();
+        foreach($a As $ob) {
+            $ob->sendNotificate('user_change_link', 'Правильный адрес входа в Систему учета задач', []);
+        }
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function actionIndex()
+    {
+        return $this->redirect('/');
+    }
+
+    /**
+     *
+     * @return mixed
+     */
+    public function actionLogin()
+    {
+        return $this->redirect('/login');
     }
 
 }
