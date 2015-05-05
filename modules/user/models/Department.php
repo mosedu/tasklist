@@ -8,6 +8,7 @@ use yii\db\ActiveRecord;
 use yii\base\Event;
 
 use app\components\AttributewalkBehavior;
+use app\modules\user\models\User;
 
 /**
  * This is the model class for table "{{%department}}".
@@ -46,6 +47,26 @@ class Department extends \yii\db\ActiveRecord
                             return Department::getMaxnum() + 1;
                         case 'dep_active':
                             return self::STATUS_ACTIVE;
+                    }
+                },
+            ],
+            [
+                'class' =>  AttributewalkBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_AFTER_UPDATE => ['dep_user_roles'],
+                ],
+                /** @var Event $event */
+                'value' => function ($event, $attribute) {
+                    /** @var Department $model */
+                    $model = $event->sender;
+                    switch($attribute) {
+                        case 'dep_user_roles':
+                            $aUser = User::find()->where(['us_dep_id' => $model->dep_id])->all();
+                            foreach($aUser As $ob) {
+                                /** @var User $ob */
+                                $ob->save();
+                            }
+                            return $model->dep_user_roles;
                     }
                 },
             ],

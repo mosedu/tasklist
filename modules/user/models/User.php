@@ -27,6 +27,7 @@ use yii\rbac\Role;
  * @property string $us_createtime
  * @property string $us_workposition
  * @property string $us_auth_key
+ * @property string $us_role_name
  * @property string $us_email_confirm_token
  * @property string $us_password_reset_token
  */
