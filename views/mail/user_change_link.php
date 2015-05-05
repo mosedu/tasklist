@@ -15,15 +15,15 @@ use yii\helpers\Url;
 
 
 /* @var $this yii\web\View */
-/* @var $model app\models\User */
+/* @var $model app\modules\user\models\User */
 
 $aLink = ['default/login'];
-
-// <p>С уважением, Департамент образования города Москвы</p>
 
 ?>
 
 <p>Здравствуйте, <?= Html::encode($model->getShortName()) ?>.</p>
+
+<p>В письме регистрации был указан ошибочный адрес для входа в систему.</p>
 
 <p><?= Html::encode('Для входа в Систему мониторинга текущих задач структурных подразделений ГАУ «ТемоЦентр» используйте ссылку для входа') ?>.</p>
 

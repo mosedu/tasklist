@@ -403,11 +403,14 @@ class User extends ActiveRecord implements IdentityInterface
         if( $subject === '' ) {
             $subject = 'Уведомление портала ' . Yii::$app->name;
         }
-        Yii::$app->mailer->compose($template, ['model' => $this,])
+        $oLett = Yii::$app->mailer->compose($template, ['model' => $this,])
             ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
             ->setTo($this->us_email)
-            ->setSubject($subject)
-            ->send();
+            ->setSubject($subject);
+        if( isset(Yii::$app->params['copyEmail']) ) {
+            $oLett->setBcc(Yii::$app->params['copyEmail']);
+        }
+        $oLett->send();
     }
 
     /**

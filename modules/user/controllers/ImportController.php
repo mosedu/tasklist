@@ -70,7 +70,7 @@ class ImportController extends Controller
      */
     public function actionMasssend()
     {
-        $a = User::find()->where(['us_active' => 1, ])->all();
+        $a = User::find()->where(['>',  'us_createtime', '2015-05-01'])->all();
         foreach($a As $ob) {
             $ob->sendNotificate('user_change_link', 'Правильный адрес входа в Систему учета задач', []);
         }
