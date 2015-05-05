@@ -93,6 +93,23 @@ class User extends ActiveRecord implements IdentityInterface
                 },
             ],
 
+            // при изменении пользователя
+            [
+                'class' =>  AttributewalkBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_UPDATE => ['us_role_name'],
+                ],
+                'value' => function ($event, $attribute) {
+                    $model = $event->sender;
+                    if( $attribute === 'us_role_name' ) {
+                        $role = Department::getDepartmentrole($model->us_dep_id);
+                        return $role->name;
+                    }
+
+                    return null;
+                },
+            ],
+
             // добавляем роль пользователю после сохранения
             [
                 'class' =>  AttributewalkBehavior::className(),
