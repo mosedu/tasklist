@@ -34,6 +34,7 @@ use app\components\NotifyBehavior;
  * @property integer $task_numchanges
  * @property string $task_reasonchanges
  * @property integer $task_progress
+ * @property integer $task_worker_id
  * @property string $task_summary
  * @property integer $task_active
  */
@@ -248,7 +249,7 @@ class Tasklist extends \yii\db\ActiveRecord
                 'when' => function($model) { return $model->task_progress == Tasklist::PROGRESS_FINISH; },
                 'whenClient' => "function (attribute, value) { return jQuery('#".Html::getInputId($this, 'task_summary')."').attr('data-req') == 1; }",
             ],
-            [['task_dep_id', 'task_num', 'task_type', 'task_numchanges', 'task_progress', 'task_active', ], 'integer'],
+            [['task_dep_id', 'task_num', 'task_type', 'task_numchanges', 'task_progress', 'task_active', 'task_worker_id', ], 'integer'],
             [['task_direct', 'task_name', 'task_reasonchanges', 'task_summary', ], 'string'], // 'reasonchange'
             [['task_createtime', 'task_finaltime', 'task_actualtime'], 'safe']
         ];
@@ -298,6 +299,7 @@ class Tasklist extends \yii\db\ActiveRecord
             'task_progress' => 'Статус',
             'task_summary' => 'Отчет',
             'task_active' => 'Удалена',
+            'task_worker_id' => 'Сотрудник',
         ];
     }
 
@@ -397,6 +399,16 @@ class Tasklist extends \yii\db\ActiveRecord
      */
     public function getDepartment() {
         return $this->hasOne(Department::className(), ['dep_id' => 'task_dep_id']);
+    }
+
+    /**
+     *
+     * Отношение задачи к сотруднику
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWorker() {
+        return $this->hasOne(User::className(), ['us_id' => 'task_worker_id']);
     }
 
     /**
@@ -564,7 +576,6 @@ class Tasklist extends \yii\db\ActiveRecord
      */
     public function getChangesLogText($aData)
     {
-
         $aTitle = $this->attributeLabels();
         return Yii::$app->getView()->renderFile(
             '@app/modules/task/views/default/changes.php',

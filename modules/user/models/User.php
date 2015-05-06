@@ -44,11 +44,13 @@ class User extends ActiveRecord implements IdentityInterface
     const ROLE_GUEST = 'guest';
     const ROLE_DEPARTMENT = 'department';
     const ROLE_CONTROL = 'control';
+    const ROLE_WORKER = 'worker';
     const ROLE_ADMIN = 'admin';
 
     const ROLE_TEXT_GUEST = 'Гость';
     const ROLE_TEXT_DEPARTMENT = 'Обычный';
     const ROLE_TEXT_CONTROL = 'Контроль';
+    const ROLE_TEXT_WORKER = 'Сотрудник';
     const ROLE_TEXT_ADMIN = 'Админ';
 
     public $newPassword = '';
@@ -440,6 +442,7 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             self::ROLE_DEPARTMENT => self::ROLE_TEXT_DEPARTMENT,
             self::ROLE_CONTROL => self::ROLE_TEXT_CONTROL,
+            self::ROLE_WORKER => self::ROLE_TEXT_WORKER,
 //            self::ROLE_ADMIN => self::ROLE_TEXT_ADMIN,
 //            self::ROLE_TEXT_GUEST => self::ROLE_TEXT_GUEST,
         ];

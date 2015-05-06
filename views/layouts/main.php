@@ -141,6 +141,14 @@ EOT;
             $aItems[] = ['label' => 'Задачи', 'url' => ['/']];
         }
 
+            if( Yii::$app->user->can('createWorker') ) {
+                $aLists = array_merge(
+                    $aLists,
+                    [
+                        ['label' => 'Сотрудники', 'url' => ['/user/worker']],
+                    ]
+                );
+            }
             if( Yii::$app->user->can('createUser') ) {
                 $aLists = array_merge(
                     $aLists,
