@@ -241,4 +241,17 @@ class Department extends \yii\db\ActiveRecord
         return $ob->dep_id;
     }
 
+    public function getLeaders() {
+        $query = $this->hasMany(
+            User::className(),
+            [
+                'us_dep_id' => 'dep_id',
+            ]
+        );
+        $query->where([
+            'us_active' => User::STATUS_ACTIVE,
+            'us_role_name' => User::ROLE_DEPARTMENT,
+        ]);
+        return $query;
+    }
 }

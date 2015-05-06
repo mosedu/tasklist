@@ -26,6 +26,9 @@ if( !function_exists('formatVal') ) {
         else if ($key == 'task_type') {
             return $model->getTaskType($val);
         }
+        else if( preg_match('|[\\d]{4}-[\\d]{2}-[\\d]{2} [\\d]{2}:[\\d]{2}:[\\d]{2}|', $val) ) {
+            $val = date('d.m.Y', strtotime($val));
+        }
         return $val;
     }
 }

@@ -16,6 +16,7 @@ use app\components\AttributewalkBehavior;
 use app\modules\user\models\Department;
 use app\modules\task\models\Action;
 use app\modules\task\models\Changes;
+use app\components\NotifyBehavior;
 
 /**
  * This is the model class for table "{{%tasklist}}".
@@ -216,6 +217,12 @@ class Tasklist extends \yii\db\ActiveRecord
                     return $model->_oldAttributes;
                 },
             ],
+
+            // Отправка писем при создании задачи
+            [
+                'class' =>  NotifyBehavior::className(),
+            ],
+
         ];
     }
 
