@@ -103,4 +103,46 @@ class UserSearch extends User
 
         return $dataProvider;
     }
+
+    public function searchWorker($params) {
+        $query = User::find();
+        $query->with('department');
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        $this->load($params);
+        if( !Yii::$app->user->can('admin') ) {
+            $this->us_active = User::STATUS_ACTIVE;
+            $this->us_dep_id = Yii::$app->user->identity->us_dep_id;
+        }
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        $query->andFilterWhere([
+            'us_id' => $this->us_id,
+            'us_active' => $this->us_active,
+            'us_dep_id' => $this->us_dep_id,
+//            'us_logintime' => $this->us_logintime,
+//            'us_createtime' => $this->us_createtime,
+        ]);
+
+        $query->andFilterWhere(['like', 'us_email', $this->us_email])
+            ->andFilterWhere(['us_role_name' => User::ROLE_WORKER]);
+        if( !empty($this->fname) ) {
+            $query->andFilterWhere([
+                'or',
+                ['like', 'us_name', $this->fname],
+                ['like', 'us_secondname', $this->fname],
+                ['like', 'us_lastname', $this->fname]
+            ]);
+        }
+
+        return $dataProvider;
+    }
 }

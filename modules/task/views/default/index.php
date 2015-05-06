@@ -8,6 +8,7 @@ use yii\bootstrap\Modal;
 
 use app\assets\GriddataAsset;
 use app\modules\task\models\Tasklist;
+use app\modules\user\models\User;
 
 GriddataAsset::register($this);
 
@@ -59,13 +60,16 @@ $aColumns = [
                     ]
                 )
               . ' <span class="inline"><span style="font-size: 1.25em;">'
-              . Html::a(
-                    $model->getTasknum(), //department->dep_num . '.' . $model->task_num,
-                ['default/update', 'id'=>$model->task_id],
-                [
-                    'title' => "Редактировать задачу: " . Html::encode($model->getTaskType()), // "Задача " . $model->getTaskType() . ', редактировать',
-                ]
-            ) . '</span></span>';
+              . ($model->canEdit() ?
+                    Html::a(
+                        $model->getTasknum(), //department->dep_num . '.' . $model->task_num,
+                        ['default/update', 'id'=>$model->task_id],
+                        [
+                            'title' => "Редактировать задачу: " . Html::encode($model->getTaskType()), // "Задача " . $model->getTaskType() . ', редактировать',
+                        ]
+                    ) :
+                    $model->getTasknum()
+                ) . '</span></span>';
         },
         'contentOptions' => [
             'class' => 'griddate',
@@ -93,18 +97,40 @@ $aColumns = [
 //                'filter' => Tasklist::getAllTypes(),
         'filter' => false,
         'content' => function ($model, $key, $index, $column) {
-            $sGlyth = $model->task_type == Tasklist::TYPE_PLAN ? 'calendar' : 'flash';
+            // $sGlyth = $model->task_type == Tasklist::TYPE_PLAN ? 'calendar' : 'flash';
+//            $oUser = Yii::$app->user;
+//            $bEdit = $oUser->can(User::ROLE_CONTROL) || $oUser->can(User::ROLE_DEPARTMENT);
             return
-            '<a href="#" data-toggle="tooltip" data-placement="top" data-html="false" title="' . $model->getTaskType() . '" style="float: right; display: block; text-align: right; text-decoration: none;"></a> ' . //  style="float: right; display: block; text-align: right; text-decoration: none;"
-            Html::a(
-                Html::encode($model->task_name),
-                ['view', 'id'=>$model->task_id], // update
-                [
-                    'class' => 'showinmodal',
-                    'title' => Html::encode($model->task_name),
-                ]
-            )
-            /*. '<span>' . $model->task_direct . '</span>' */; //  . $model->getTaskType() . ', '
+                $model->canEdit() ?
+                    (
+                        Html::a(
+                            Html::encode($model->task_name),
+                            ['view', 'id'=>$model->task_id], // update
+                            [
+                                'class' => 'showinmodal',
+                                'title' => Html::encode($model->task_name),
+                            ]
+                        )
+                        . (( (count($model->allworker) > 0) || $model->task_worker_id ) ?
+                            ( '<span>' . Html::a(
+                                    $model->task_worker_id ? Html::encode($model->worker->getFullName()) : '+',
+                                    ['setworker', 'id'=>$model->task_id], // update
+                                    [
+                                        'class' => 'showinmodal greylink',
+                                        'title' => 'Сотрудник',
+                                    ]
+                                )
+//            . ' count = ' . count($model->allworker)
+                             . '</span>' ) : '')
+                    ) :
+                    (
+                        Html::encode($model->task_name)
+                        . ($model->task_worker_id ? ('<span>' . Html::encode($model->worker->getFullName()). '</span>') : '')
+                    )
+//            '<a href="#" data-toggle="tooltip" data-placement="top" data-html="false" title="' . $model->getTaskType() . '" style="float: right; display: block; text-align: right; text-decoration: none;"></a> ' . //  style="float: right; display: block; text-align: right; text-decoration: none;"
+
+            /*. '<span>' . $model->task_direct . '</span>' */;
+            //  . $model->getTaskType() . ', '
         },
         'contentOptions' => [
             'class' => 'griddate',
@@ -252,13 +278,18 @@ if( $searchModel->showTaskSummary ) {
 $aColumns = array_merge(
     $aColumns,
     [[
+        'class' => 'yii\grid\ActionColumn',
+        'template'=>'{update}' . (Yii::$app->user->can('createUser') ? ' {delete}' : ''), // {view}  {answer} {toword}
+        'contentOptions' => [
+            'class' => 'commandcell',
+        ],
+        'buttons'=>[
+            'update'=>function ($url, $model) {
+                return $model->canEdit() ? Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $url, ['title' => 'Изменить']) : '';
+            },
+        ],
 
-    'class' => 'yii\grid\ActionColumn',
-    'template'=>'{update}' . (Yii::$app->user->can('createUser') ? ' {delete}' : ''), // {view}  {answer} {toword}
-    'contentOptions' => [
-        'class' => 'commandcell',
-    ],
-    ]]
+        ]]
 );
 
 $aStat = Tasklist::getStatdata(empty($searchModel->task_dep_id) ? null : $searchModel->task_dep_id);
@@ -267,6 +298,9 @@ $aStat = Tasklist::getStatdata(empty($searchModel->task_dep_id) ? null : $search
 $sDop = 'Задачи: активные: ' . $aStat['active']
       . ', просроченные: ' . $aStat['defect']
       . ', отложенные: ' . $aStat['wait'] . '.';
+
+$oUser = Yii::$app->user;
+$bEdit = $oUser->can(User::ROLE_CONTROL) || $oUser->can(User::ROLE_DEPARTMENT);
 
 ?>
 
@@ -291,7 +325,7 @@ $sDop = 'Задачи: активные: ' . $aStat['active']
     </div>
     <div class="col-sm-2 no-horisontal-padding">
         <div class="form-group">
-            <?= Html::a('Добавить задачу', ['create'], ['class' => 'btn btn-success']) ?>
+            <?= $bEdit ? Html::a('Добавить задачу', ['create'], ['class' => 'btn btn-success']) : '' ?>
             <div class="clearfix"></div>
         </div>
     </div>

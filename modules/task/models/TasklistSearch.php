@@ -3,6 +3,7 @@
 namespace app\modules\task\models;
 
 use app\modules\user\models\Department;
+use app\modules\user\models\User;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -85,7 +86,7 @@ class TasklistSearch extends Tasklist
     public function search($params)
     {
         $query = Tasklist::find();
-        $query->with(['changes', 'department']);
+        $query->with(['changes', 'department', 'worker', 'allworker']);
         $query->joinWith(['department']);
 
         $dataProvider = new ActiveDataProvider([

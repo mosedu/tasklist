@@ -39,3 +39,8 @@ td.commandcell {
 .colorcell_green{
     background-color: #44dd44;
 }
+
+.greylink {
+    color: #777777;
+    text-decoration: none;
+}

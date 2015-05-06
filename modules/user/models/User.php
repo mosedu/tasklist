@@ -82,8 +82,13 @@ class User extends ActiveRecord implements IdentityInterface
                         'us_role_name' => ''
                     ];
                     if( $attribute === 'us_role_name' ) {
-                        $role = Department::getDepartmentrole($model->us_dep_id);
-                        $aVal['us_role_name'] = $role->name;
+                        if( empty($model->us_role_name) ) {
+                            $role = Department::getDepartmentrole($model->us_dep_id);
+                            $aVal['us_role_name'] = $role->name;
+                        }
+                        else {
+                            $aVal['us_role_name'] = $model->us_role_name;
+                        }
                     }
                     if( empty($model->us_login) ) {
                         $aVal['us_login'] = preg_replace('/\\W/', '', $model->us_email);
@@ -104,9 +109,14 @@ class User extends ActiveRecord implements IdentityInterface
                 ],
                 'value' => function ($event, $attribute) {
                     $model = $event->sender;
-                    if( $attribute === 'us_role_name' ) {
-                        $role = Department::getDepartmentrole($model->us_dep_id);
-                        return $role->name;
+                    if( ($attribute === 'us_role_name') ) {
+                        if( $model->us_role_name != User::ROLE_WORKER ) {
+                            $role = Department::getDepartmentrole($model->us_dep_id);
+                            return $role->name;
+                        }
+                        else {
+                            return User::ROLE_WORKER;
+                        }
                     }
 
                     return null;
@@ -125,7 +135,8 @@ class User extends ActiveRecord implements IdentityInterface
                     $auth = Yii::$app->authManager;
                     if( !empty($model->us_dep_id) ) {
                         /** @var Role $role */
-                        $role = Department::getDepartmentrole($model->us_dep_id);
+                        $role = $auth->getRole($model->us_role_name);
+//                        $role = Department::getDepartmentrole($model->us_dep_id);
 //                        Yii::info($event->name . ' [insert]: ' . $model->us_dep_id . ' -> ' . (($role !== null) ? $role->name : 'null'));
                         if( $role !== null ) {
                             $auth->assign($role, $model->us_id);
@@ -148,7 +159,8 @@ class User extends ActiveRecord implements IdentityInterface
                     $auth = Yii::$app->authManager;
                     if( !empty($model->us_dep_id) ) {
                         /** @var Role $role */
-                        $role = Department::getDepartmentrole($model->us_dep_id);
+                        $role = $auth->getRole($model->us_role_name);
+//                        $role = Department::getDepartmentrole($model->us_dep_id);
 //                        Yii::info($event->name . ' [update]: ' . $model->us_dep_id . ' -> ' . (($role !== null) ? $role->name : 'null'));
                         if( $role !== null ) {
                             $auth->revokeAll($model->us_id);
@@ -442,7 +454,7 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             self::ROLE_DEPARTMENT => self::ROLE_TEXT_DEPARTMENT,
             self::ROLE_CONTROL => self::ROLE_TEXT_CONTROL,
-            self::ROLE_WORKER => self::ROLE_TEXT_WORKER,
+//            self::ROLE_WORKER => self::ROLE_TEXT_WORKER,
 //            self::ROLE_ADMIN => self::ROLE_TEXT_ADMIN,
 //            self::ROLE_TEXT_GUEST => self::ROLE_TEXT_GUEST,
         ];
@@ -561,5 +573,22 @@ class User extends ActiveRecord implements IdentityInterface
         $this->us_name = isset($a[1]) ? $a[1] : ('-- ??? -- ' . $str);
         $this->us_secondname = isset($a[2]) ? $a[2] : ('-- ??? -- ' . $str);
         $this->us_lastname = isset($a[0]) ? $a[0] : ('-- ??? -- ' . $str);
+    }
+
+    /**
+     *
+     * Get worker list
+     *
+     * @param string $str
+     *
+     */
+    public static function getDepartmentWorker($dep_id = 0) {
+        return User::find()
+            ->where([
+                'us_dep_id' => $dep_id ? $dep_id : null,
+                'us_active' => self::STATUS_ACTIVE,
+                'us_role_name' => self::ROLE_WORKER,
+            ])
+            ->all();
     }
 }

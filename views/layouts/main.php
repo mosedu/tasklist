@@ -141,14 +141,6 @@ EOT;
             $aItems[] = ['label' => 'Задачи', 'url' => ['/']];
         }
 
-            if( Yii::$app->user->can('createWorker') ) {
-                $aLists = array_merge(
-                    $aLists,
-                    [
-                        ['label' => 'Сотрудники', 'url' => ['/user/worker']],
-                    ]
-                );
-            }
             if( Yii::$app->user->can('createUser') ) {
                 $aLists = array_merge(
                     $aLists,
@@ -159,6 +151,7 @@ EOT;
                     ]
                 );
             }
+
             if( Yii::$app->user->can(User::ROLE_ADMIN) ) {
                 $aLists = array_merge(
                     $aLists,
@@ -167,6 +160,16 @@ EOT;
                     ]
                 );
             }
+
+            if( Yii::$app->user->can('createWorker') ) {
+                $aLists = array_merge(
+                    $aLists,
+                    [
+                        ['label' => 'Сотрудники', 'url' => ['/user/worker']],
+                    ]
+                );
+            }
+
             if( count($aLists) > 0 ) {
                 $aItems[] = [
                     'label' => 'Дополнительно',

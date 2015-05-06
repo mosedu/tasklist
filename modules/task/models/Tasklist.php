@@ -69,6 +69,9 @@ class Tasklist extends \yii\db\ActiveRecord
     public $_oldAttributes = [];
     public $reasonchange = ''; // причина изменения даты
 
+    public $_canEdit = null; // сохранение проверки возможности редактирования
+//    public $countworker = ''; //
+
     public static $_tmpModel = null;
 
 
@@ -413,6 +416,19 @@ class Tasklist extends \yii\db\ActiveRecord
 
     /**
      *
+     * Отношение задачи к сотруднику
+     *
+     * @return \yii\db\ActiveQuery
+     */
+
+    public function getAllworker() {
+        return $this
+            ->hasOne(User::className(), ['us_dep_id' => 'task_dep_id'])
+            ->where(['us_active' => User::STATUS_ACTIVE, 'us_role_name' => User::ROLE_WORKER, ]);
+    }
+
+    /**
+     *
      * Отношение задачи к смене даты
      *
      * @return \yii\db\ActiveQuery
@@ -637,6 +653,31 @@ class Tasklist extends \yii\db\ActiveRecord
             }
         }
         return $bRet;
+    }
+
+    /**
+     * Проверка на возможность изменения задачи
+     *
+     * @return boolean
+     */
+    public function canEdit() {
+        if( $this->_canEdit === null ) {
+            $bRet = false;
+            $oUser = Yii::$app->user->identity;
+            if( $this->task_dep_id == $oUser->us_dep_id ) {
+                if( ($oUser->us_role_name == User::ROLE_DEPARTMENT)
+                    || ($oUser->us_role_name == User::ROLE_WORKER && $this->task_worker_id == $oUser->us_id) ) {
+                    $bRet = true;
+                }
+            }
+            else {
+                if( Yii::$app->user->can(User::ROLE_CONTROL) || Yii::$app->user->can(User::ROLE_ADMIN) ) {
+                    $bRet = true;
+                }
+            }
+            $this->_canEdit = $bRet;
+        }
+        return $this->_canEdit;
     }
 
 

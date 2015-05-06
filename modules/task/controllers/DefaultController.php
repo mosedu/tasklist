@@ -13,6 +13,7 @@ use yii\web\ForbiddenHttpException;
 use app\modules\task\models\Tasklist;
 use app\modules\task\models\TasklistSearch;
 use app\rbac\DepartmentRule;
+use yii\web\Response;
 
 class DefaultController extends Controller
 {
@@ -30,7 +31,7 @@ class DefaultController extends Controller
                         'roles' => ['createUser'],
                     ],
                     [
-                        'actions' => ['view', 'index', 'create', 'update', 'export', 'lastdirect'],
+                        'actions' => ['view', 'index', 'create', 'update', 'export', 'lastdirect', 'setworker', ],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -87,10 +88,12 @@ class DefaultController extends Controller
         $model = $this->findModel($id);
         $oUser = Yii::$app->user->identity;
 //        $bDeny = ($model->task_dep_id != $oUser->us_dep_id) && ($oUser->us_dep_id != 1);
-        $bDeny = ($model->task_dep_id != $oUser->us_dep_id)
+/*        $bDeny = ($model->task_dep_id != $oUser->us_dep_id)
             && ( !Yii::$app->user->can(User::ROLE_ADMIN) )
             && ($oUser->department->dep_user_roles != User::ROLE_CONTROL);
-        if( $bDeny ) {
+*/
+//        if( $bDeny ) {
+        if( !$model->canEdit() ) {
             throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
         }
 
@@ -136,10 +139,12 @@ class DefaultController extends Controller
         $model = $this->findModel($id);
         $oUser = Yii::$app->user->identity;
 //        $bDeny = ($model->task_dep_id != $oUser->us_dep_id) && ($oUser->us_dep_id != 1);
-        $bDeny = ($model->task_dep_id != $oUser->us_dep_id)
+/*        $bDeny = ($model->task_dep_id != $oUser->us_dep_id)
               && ( !Yii::$app->user->can(User::ROLE_ADMIN) )
               && ($oUser->department->dep_user_roles != User::ROLE_CONTROL);
-        if( $bDeny ) {
+*/
+//        if( $bDeny ) {
+        if( !$model->canEdit() ) {
             throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
         }
 
@@ -168,6 +173,35 @@ class DefaultController extends Controller
         }
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionSetworker($id)
+    {
+        $model = $this->findModel($id);
+        if( Yii::$app->request->isAjax ) {
+            if( $model->load(Yii::$app->request->post()) ) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                if( $model->save() ) {
+                    return [];
+                }
+                else {
+                    return $model->getErrors();
+                }
+            }
+            else {
+                return $this->renderAjax('selectworker', [
+                    'model' => $model,
+                ]);
+
+            }
+        }
+        else {
+
+        }
     }
 
     /**
