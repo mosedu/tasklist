@@ -183,6 +183,12 @@ class Tasklist extends \yii\db\ActiveRecord
                                     $this->task_finishtime = null;
                                 }
                             }
+                            if( isset($aChanged['task_worker_id']) ) {
+                                if( ($oUser = User::findOne($aChanged['task_worker_id']['new'])) !== null ) {
+                                    /** @var User $oUser */
+                                    $oUser->sendNotificate('user_new_task', 'Новая задача', $data = ['task'=>$model]);
+                                }
+                            }
                             return $model->_oldAttributes;
                     }
                 },

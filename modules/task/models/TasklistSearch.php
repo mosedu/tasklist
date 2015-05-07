@@ -36,7 +36,7 @@ class TasklistSearch extends Tasklist
             [['datestart', 'datefinish', 'actdatestart', 'actdatefinish'], 'filter', 'filter' => function($val) { if( $val && preg_match('|^(\\d{2})\\.(\\d{2})\\.(\\d{4})$|', $val, $a) ) { $val = "{$a[3]}-{$a[2]}-{$a[1]}"; } return $val; }],
             [['task_id', 'task_dep_id', 'task_type', 'task_numchanges', ], 'integer'], // 'task_num',
             [['task_num', ], 'match', 'pattern' => '|^\\d+[\\d.]*$|', 'message'=>'Нужно циферки ввести в формате 1.3 или 2', ],
-            [['numchangesstart', 'numchangesfinish', ], 'integer'],
+            [['numchangesstart', 'numchangesfinish', 'task_worker_id', ], 'integer'],
             [['task_progress'], 'in', 'range'=>array_keys(Tasklist::getAllProgresses()), 'allowArray' => true, ],
             [['datestart', 'datefinish', 'task_direct', 'task_name', 'task_createtime', 'task_finaltime', 'task_actualtime', 'task_reasonchanges', 'task_summary'], 'safe'],
             [['task_dep_id'], 'filter', 'filter' => function($val){ return ( $val <=0 ) ? null : $val; }, ],
@@ -165,11 +165,16 @@ class TasklistSearch extends Tasklist
             $query->andFilterWhere(['<>', 'task_progress', Tasklist::PROGRESS_FINISH]);
         }
 
+        if( Yii::$app->user->identity->isUserWorker() ) {
+            $this->task_worker_id = Yii::$app->user->identity->us_id;
+        }
+
         $query->andFilterWhere([
             'task_id' => $this->task_id,
             'task_dep_id' => $this->task_dep_id,
             'task_num' => $tasknum,
             'task_type' => $this->task_type,
+            'task_worker_id' => $this->task_worker_id,
             'task_active' => Tasklist::STATUS_ACTIVE,
 //            'task_createtime' => $this->task_createtime,
 //            'task_finaltime' => $this->task_finaltime,

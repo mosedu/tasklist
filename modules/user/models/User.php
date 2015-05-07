@@ -494,6 +494,15 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Проверка на сотрудника
+     * @return boolean
+     */
+    public function isUserWorker()
+    {
+        return in_array($this->us_role_name, array_keys(self::getWorkerRoles()));
+    }
+
+    /**
      * Получение названия роли
      * @param string $role
      * @return string
