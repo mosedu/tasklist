@@ -16,6 +16,7 @@ use yii\filters\VerbFilter;
 
 use app\modules\user\models\User;
 use app\modules\user\models\UserSearch;
+use yii\web\ForbiddenHttpException;
 
 class WorkerController extends Controller {
     public function behaviors()
@@ -83,12 +84,15 @@ class WorkerController extends Controller {
     public function actionCreate()
     {
         $model = new User();
+        if( !Yii::$app->user->identity->canCreateWorker() ) {
+            throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
+        }
 
         if ($model->load(Yii::$app->request->post()) ) {
             if( !Yii::$app->user->can(User::ROLE_ADMIN) ) {
                 $model->us_dep_id = Yii::$app->user->identity->us_dep_id;
             }
-            $model->us_role_name = User::ROLE_WORKER;
+            // $model->us_role_name = User::ROLE_WORKER;
             if ($model->save()) {
                 return $this->redirect(['index']);
             } else {
@@ -109,6 +113,9 @@ class WorkerController extends Controller {
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        if( !Yii::$app->user->identity->canEditWorker($model) ) {
+            throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 //            return $this->redirect(['view', 'id' => $model->dep_id]);

@@ -64,6 +64,10 @@ use app\modules\user\models\User;
         <?= $form->field($model, 'us_workposition')->textInput(['maxlength' => 255]) ?>
     </div>
 
+    <div class="col-sm-4">
+        <?= $form->field($model, 'us_role_name')->dropDownList(User::getWorkerRoles()) ?>
+    </div>
+
     <?php  if( Yii::$app->user->can(User::ROLE_ADMIN) ) { ?>
     <div class="col-sm-4">
         <?= $form->field($model, 'us_dep_id')->dropDownList(Department::getList(false))  ?>

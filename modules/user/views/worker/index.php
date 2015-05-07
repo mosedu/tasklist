@@ -37,8 +37,13 @@ $aColumns = array_merge($aColumns, [
         'attribute' => 'fname',
         'content' => function ($model, $key, $index, $column) {
             /** @var User $model */
-            return Html::encode($model->getFullName());
+            $ar = User::getAllRoles();
+            return Html::encode($model->getFullName()) . '<span>' . Html::encode($ar[$model->us_role_name] . ', ' . $model->us_workposition) . '</span>';
         },
+        'contentOptions' => [
+            'class' => 'griddate',
+        ],
+
     ],
 
     'us_email:email',
@@ -78,7 +83,8 @@ $aColumns[] = [
                 ['title' => Html::encode($model->getFullName()), 'class'=>'showinmodal']); // , 'data-pjax' => '0'
         },
         'update'=>function ($url, $model) {
-            return Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $url, ['title' => 'Изменить']);
+            /** @var User $model */
+            return in_array($model->us_role_name, array_keys(User::getWorkerRoles())) ? Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $url, ['title' => 'Изменить']) : '';
         },
         'delete' => function ($url, $model, $key) {
             return

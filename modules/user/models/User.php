@@ -47,12 +47,14 @@ class User extends ActiveRecord implements IdentityInterface
     const ROLE_DEPARTMENT = 'department';
     const ROLE_CONTROL = 'control';
     const ROLE_WORKER = 'worker';
+    const ROLE_TASKWORKER = 'taskworker';
     const ROLE_ADMIN = 'admin';
 
     const ROLE_TEXT_GUEST = 'Гость';
-    const ROLE_TEXT_DEPARTMENT = 'Обычный';
+    const ROLE_TEXT_DEPARTMENT = 'Руководитель';
     const ROLE_TEXT_CONTROL = 'Контроль';
     const ROLE_TEXT_WORKER = 'Сотрудник';
+    const ROLE_TEXT_TASKWORKER = 'Сотрудник, создающий задачи';
     const ROLE_TEXT_ADMIN = 'Админ';
 
     public $newPassword = '';
@@ -113,12 +115,12 @@ class User extends ActiveRecord implements IdentityInterface
                 'value' => function ($event, $attribute) {
                     $model = $event->sender;
                     if( ($attribute === 'us_role_name') ) {
-                        if( $model->us_role_name != User::ROLE_WORKER ) {
+                        if( !in_array($model->us_role_name, array_keys(User::getWorkerRoles())) ) {
                             $role = Department::getDepartmentrole($model->us_dep_id);
                             return $role->name;
                         }
                         else {
-                            return User::ROLE_WORKER;
+                            return $model->us_role_name;
                         }
                     }
 
@@ -126,7 +128,7 @@ class User extends ActiveRecord implements IdentityInterface
                 },
             ],
 
-            // добавляем роль пользователю после сохранения
+            // добавляем роль пользователю после добавления
             [
                 'class' =>  AttributewalkBehavior::className(),
                 'attributes' => [
@@ -150,7 +152,7 @@ class User extends ActiveRecord implements IdentityInterface
                 },
             ],
 
-            // добавляем роль пользователю после сохранения
+            // добавляем роль пользователю после изменения
             [
                 'class' =>  AttributewalkBehavior::className(),
                 'attributes' => [
@@ -464,6 +466,34 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Получение списка всех ролей
+     * @return array список ролей - ключ - id роли, значение - заголовок для отображения
+     */
+    public static function getAllRoles()
+    {
+        return [
+            self::ROLE_DEPARTMENT => self::ROLE_TEXT_DEPARTMENT,
+            self::ROLE_CONTROL => self::ROLE_TEXT_CONTROL,
+            self::ROLE_WORKER => self::ROLE_TEXT_WORKER,
+            self::ROLE_TASKWORKER => self::ROLE_TEXT_TASKWORKER,
+            self::ROLE_ADMIN => self::ROLE_TEXT_ADMIN,
+            self::ROLE_GUEST => self::ROLE_TEXT_GUEST,
+        ];
+    }
+
+    /**
+     * Получение списка ролей сотрудников
+     * @return array список ролей - ключ - id роли, значение - заголовок для отображения
+     */
+    public static function getWorkerRoles()
+    {
+        return [
+            self::ROLE_WORKER => self::ROLE_TEXT_WORKER,
+            self::ROLE_TASKWORKER => self::ROLE_TEXT_TASKWORKER,
+        ];
+    }
+
+    /**
      * Получение названия роли
      * @param string $role
      * @return string
@@ -604,6 +634,27 @@ class User extends ActiveRecord implements IdentityInterface
             self::$_map = ArrayHelper::map(self::find()->all(), 'us_id', function($model){ return $model->getFullName(); } );
         }
         return isset(self::$_map[$id]) ? self::$_map[$id] : '??';
+    }
+
+    /**
+     *
+     */
+    public function canCreateWorker()
+    {
+        $bRet = Yii::$app->user->can('createUser')
+            || Yii::$app->user->can(User::ROLE_DEPARTMENT);
+        return $bRet;
+    }
+
+    /**
+     *
+     * @param User $model
+     */
+    public function canEditWorker($model)
+    {
+        $bRet = Yii::$app->user->can('updateUser')
+            || (Yii::$app->user->can(User::ROLE_DEPARTMENT) && ($this->us_dep_id == $model->us_dep_id));
+        return $bRet;
     }
 
 }

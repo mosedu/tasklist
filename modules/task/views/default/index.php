@@ -300,7 +300,8 @@ $sDop = 'Задачи: активные: ' . $aStat['active']
       . ', отложенные: ' . $aStat['wait'] . '.';
 
 $oUser = Yii::$app->user;
-$bEdit = $oUser->can(User::ROLE_CONTROL) || $oUser->can(User::ROLE_DEPARTMENT);
+// $bEdit = $oUser->can(User::ROLE_CONTROL) || $oUser->can(User::ROLE_DEPARTMENT);
+$bCreateTask = Yii::$app->user->can('createTask');
 
 ?>
 
@@ -325,7 +326,7 @@ $bEdit = $oUser->can(User::ROLE_CONTROL) || $oUser->can(User::ROLE_DEPARTMENT);
     </div>
     <div class="col-sm-2 no-horisontal-padding">
         <div class="form-group">
-            <?= $bEdit ? Html::a('Добавить задачу', ['create'], ['class' => 'btn btn-success']) : '' ?>
+            <?= $bCreateTask ? Html::a('Добавить задачу', ['create'], ['class' => 'btn btn-success']) : '' ?>
             <div class="clearfix"></div>
         </div>
     </div>

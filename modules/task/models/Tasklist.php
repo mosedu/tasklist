@@ -81,7 +81,7 @@ class Tasklist extends \yii\db\ActiveRecord
             [
                 'class' =>  AttributewalkBehavior::className(),
                 'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => ['task_dep_id', 'task_actualtime', 'task_finaltime', 'task_active', 'task_createtime', 'task_num', ],
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['task_dep_id', 'task_actualtime', 'task_finaltime', 'task_active', 'task_createtime', 'task_num', 'task_worker_id', ],
                     ActiveRecord::EVENT_AFTER_FIND => ['_oldAttributes', ],
                 ],
                 /** @var Event $event */
@@ -101,6 +101,12 @@ class Tasklist extends \yii\db\ActiveRecord
 
                         case 'task_createtime':
                             return new Expression('NOW()');
+
+                        case 'task_worker_id':
+                            if( in_array(Yii::$app->user->identity->us_role_name, array_keys(User::getWorkerRoles())) ) {
+                                return Yii::$app->user->identity->us_id;
+                            }
+                            return $model->task_worker_id;
 
                         case 'task_active':
                             return self::STATUS_ACTIVE;
@@ -669,7 +675,7 @@ class Tasklist extends \yii\db\ActiveRecord
             $oUser = Yii::$app->user->identity;
             if( $this->task_dep_id == $oUser->us_dep_id ) {
                 if( ($oUser->us_role_name == User::ROLE_DEPARTMENT)
-                    || ($oUser->us_role_name == User::ROLE_WORKER && $this->task_worker_id == $oUser->us_id) ) {
+                    || (in_array($oUser->us_role_name, array_keys(User::getWorkerRoles())) && $this->task_worker_id == $oUser->us_id) ) {
                     $bRet = true;
                 }
             }

@@ -117,6 +117,10 @@ class DefaultController extends Controller
     {
         $model = new Tasklist();
         $model->setDepartmentByUser();
+        if( !Yii::$app->user->can('createTask') ) {
+            throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
+        }
+
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);

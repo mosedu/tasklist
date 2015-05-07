@@ -132,8 +132,8 @@ class UserSearch extends User
 //            'us_createtime' => $this->us_createtime,
         ]);
 
-        $query->andFilterWhere(['like', 'us_email', $this->us_email])
-            ->andFilterWhere(['us_role_name' => User::ROLE_WORKER]);
+        $query->andFilterWhere(['like', 'us_email', $this->us_email]);
+//            ->andFilterWhere(['us_role_name' => User::ROLE_WORKER]);
         if( !empty($this->fname) ) {
             $query->andFilterWhere([
                 'or',
