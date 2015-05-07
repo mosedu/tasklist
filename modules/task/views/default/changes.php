@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use app\modules\task\models\Tasklist;
 use app\modules\user\models\Department;
 use app\assets\GriddataAsset;
+use app\modules\user\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\modules\task\models\Tasklist */
@@ -25,6 +26,9 @@ if( !function_exists('formatVal') ) {
         }
         else if ($key == 'task_type') {
             return $model->getTaskType($val);
+        }
+        else if ($key == 'task_worker_id') {
+            return User::getUserNameById($val);
         }
         else if( preg_match('|[\\d]{4}-[\\d]{2}-[\\d]{2} [\\d]{2}:[\\d]{2}:[\\d]{2}|', $val) ) {
             $val = date('d.m.Y', strtotime($val));

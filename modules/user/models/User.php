@@ -9,6 +9,8 @@ use app\components\PasswordBehavior;
 use app\modules\user\models\Department;
 use yii\db\Expression;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
+
 use yii\rbac\Role;
 
 /**
@@ -54,6 +56,7 @@ class User extends ActiveRecord implements IdentityInterface
     const ROLE_TEXT_ADMIN = 'Админ';
 
     public $newPassword = '';
+    public static $_map = null;
 
     /**
      * @inheritdoc
@@ -591,4 +594,16 @@ class User extends ActiveRecord implements IdentityInterface
             ])
             ->all();
     }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getUserNameById($id)
+    {
+        if( self::$_map === null ) {
+            self::$_map = ArrayHelper::map(self::find()->all(), 'us_id', function($model){ return $model->getFullName(); } );
+        }
+        return isset(self::$_map[$id]) ? self::$_map[$id] : '??';
+    }
+
 }

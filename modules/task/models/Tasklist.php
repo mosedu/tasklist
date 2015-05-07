@@ -114,6 +114,7 @@ class Tasklist extends \yii\db\ActiveRecord
                     }
                 },
             ],
+
             // сохраним предыдущие аттрибуты
             [
                 'class' => AttributeBehavior::className(),
@@ -252,6 +253,7 @@ class Tasklist extends \yii\db\ActiveRecord
                 'when' => function($model) { return $model->task_progress == Tasklist::PROGRESS_FINISH; },
                 'whenClient' => "function (attribute, value) { return jQuery('#".Html::getInputId($this, 'task_summary')."').attr('data-req') == 1; }",
             ],
+            ['task_worker_id', 'filter', 'filter' => 'intval', ],
             [['task_dep_id', 'task_num', 'task_type', 'task_numchanges', 'task_progress', 'task_active', 'task_worker_id', ], 'integer'],
             [['task_direct', 'task_name', 'task_reasonchanges', 'task_summary', ], 'string'], // 'reasonchange'
             [['task_createtime', 'task_finaltime', 'task_actualtime'], 'safe']
@@ -501,6 +503,7 @@ class Tasklist extends \yii\db\ActiveRecord
     public function getTaskattibutes() {
         $a = $this->attributes;
         unset($a['task_numchanges']);
+        $a['task_worker_id'] = intval($a['task_worker_id']);
 //        unset($a['task_reasonchanges']);
         return $a;
     }
