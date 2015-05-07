@@ -12,6 +12,7 @@ use kartik\select2\Select2;
 
 use app\modules\user\models\Department;
 use app\modules\task\models\Tasklist;
+use app\modules\user\models\User;
 
 
 if( !isset($action) ) {
@@ -103,6 +104,31 @@ if( $model->actdatefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model
         ],
     ];
 
+    $aWorker = [
+        'horizontalCssClasses' => [
+            'label' => 'col-sm-2 col-sm-1-dop',
+            'offset' => 'col-sm-offset-1',
+            'wrapper' => 'col-sm-10 col-sm-11-dop',
+        ],
+        'inputOptions' => [
+//            'disabled' => true,
+        ]
+    ];
+
+
+    $aWorkerWidget = [
+        'data' => User::getWorkerList(),
+        'language' => 'ru',
+        'options' => [
+            'multiple' => true,
+//           'tags' => true,
+            'placeholder' => 'Выберите из списка ...',
+        ],
+        'pluginOptions' => [
+            'allowClear' => true,
+        ],
+    ];
+
     $aNumParam = [
         'horizontalCssClasses' => [
             'label' => 'col-sm-6',
@@ -162,10 +188,12 @@ if( $model->actdatefinish && preg_match('|^(\\d{4})-(\\d{2})-(\\d{2})$|', $model
         Html::getInputId($model, 'actdatestart'),
         Html::getInputId($model, 'actdatefinish'),
     ]);
+
     $sUnset = Json::encode([
         Html::getInputId($model, 'task_type'),
     ]);
     $sVal = Json::encode([Tasklist::PROGRESS_STOP, Tasklist::PROGRESS_WAIT, Tasklist::PROGRESS_WORK]);
+
     //    console.log(jQuery("#{$sIdProgressList} :selected"));
     $sJs = <<<EOT
     var aClear = {$sClearText},
@@ -285,6 +313,13 @@ EOT;
     <div class="col-sm-12">
         <?php echo $form->field($model, 'task_progress', $aProgress)
             ->widget(Select2::classname(), $aProgressWidget)
+        ?>
+        <?php // echo $form->field($model, 'task_progress')->dropDownList(array_merge(['' => ''], Tasklist::getAllProgresses())) ?>
+    </div>
+
+    <div class="col-sm-12">
+        <?php echo $form->field($model, 'task_worker_id', $aWorker)
+            ->widget(Select2::classname(), $aWorkerWidget)
         ?>
         <?php // echo $form->field($model, 'task_progress')->dropDownList(array_merge(['' => ''], Tasklist::getAllProgresses())) ?>
     </div>

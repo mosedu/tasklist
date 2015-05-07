@@ -635,6 +635,25 @@ class User extends ActiveRecord implements IdentityInterface
     }
 
     /**
+     *
+     * Get worker list for dropdown
+     *
+     * @param string $str
+     *
+     */
+    public static function getWorkerList()
+    {
+        return ArrayHelper::map(
+            self::getDepartmentWorker(Yii::$app->user->identity->us_dep_id),
+            'us_id',
+            function ($user) {
+                return $user->getFullName();
+            }
+        );
+    }
+
+
+    /**
      * @inheritdoc
      */
     public static function getUserNameById($id)
