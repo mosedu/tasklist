@@ -29,7 +29,7 @@ $aColumns = [
         'content' => function ($model, $key, $index, $column) {
             /** @var User $model */
 
-            return ($model->department !== null) ? Html::encode($model->department->dep_shortname) : '';
+            return ($model->department !== null) ? Html::encode($model->department->dep_name) : '';
         },
     ],
     [
