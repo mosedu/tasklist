@@ -587,7 +587,7 @@ class User extends ActiveRecord implements IdentityInterface
             ->where([
                 'us_dep_id' => $dep_id ? $dep_id : null,
                 'us_active' => self::STATUS_ACTIVE,
-                'us_role_name' => self::ROLE_WORKER,
+//                'us_role_name' => self::ROLE_WORKER,
             ])
             ->all();
     }
