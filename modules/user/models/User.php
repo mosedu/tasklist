@@ -626,7 +626,7 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function getDepartmentWorker($dep_id = 0) {
         return User::find()
-            ->where([
+            ->andFilterWhere([
                 'us_dep_id' => $dep_id ? $dep_id : null,
                 'us_active' => self::STATUS_ACTIVE,
 //                'us_role_name' => self::ROLE_WORKER,
