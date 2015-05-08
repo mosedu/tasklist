@@ -100,7 +100,7 @@ $aSetting = [
         <?= $form->field($model, 'task_summary', array_merge($aTextParam, ['options' => ($model->isNewRecord || (strlen($model->task_summary) == 0)) ? ['style' => 'display: none;', 'class'=>'form-group'] : ['class'=>'form-group']]) )->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0, ]) ?>
 
         <?php
-        if( $model->isNewRecord ) { // new record
+//        if( $model->isNewRecord ) { // new record
             $this->registerJs('var aChache = {},
             oSel = jQuery("#idselectdirectlist"),
             setDirectList = function(data) {
@@ -155,7 +155,7 @@ $aSetting = [
                 });',
                 View::POS_READY,
                 'selectdirection');
-        }
+//        }
 
         $sIdProgress = Html::getInputId($model, 'task_progress');
         $sIdSummary = Html::getInputId($model, 'task_summary');
