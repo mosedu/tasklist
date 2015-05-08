@@ -19,9 +19,9 @@ use yii\web\JsExpression;
 
 $aTextParam = [
     'horizontalCssClasses' => [
-        'label' => 'col-sm-2',
-        'offset' => 'col-sm-offset-2',
-        'wrapper' => 'col-sm-10',
+        'label' => 'col-sm-3',
+        'offset' => 'col-sm-offset-3',
+        'wrapper' => 'col-sm-9',
     ],
 ];
 
@@ -94,14 +94,13 @@ $aSetting = [
         <?= $form->field($model, 'task_direct', $aTextParam)
             ->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable))
             ->hint(Html::tag('div', Html::a('Выбрать направление', '', ['id'=>'idshowselectdirection',]), ['style'=>'text-align: right;'])) ?>
+
         <?= $form->field($model, 'task_name', $aTextParam)->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable)) ?>
+
+        <?= $form->field($model, 'task_summary', array_merge($aTextParam, ['options' => ($model->isNewRecord || (strlen($model->task_summary) == 0)) ? ['style' => 'display: none;'] : []]) )->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0, ]) ?>
+
         <?php
-        if( !$model->isNewRecord ) {
-        ?>
-                <?= $form->field($model, 'task_summary', $aTextParam)->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0]) ?>
-        <?php
-        }
-        else { // new record
+        if( $model->isNewRecord ) { // new record
             $this->registerJs('var aChache = {},
             oSel = jQuery("#idselectdirectlist"),
             setDirectList = function(data) {
@@ -163,15 +162,18 @@ $aSetting = [
         $nFinish = Tasklist::PROGRESS_FINISH;
         $sJs = <<<EOT
 var oSelProgress = jQuery("#{$sIdProgress}"),
-    oSummary = jQuery("#{$sIdSummary}");
+    oSummary = jQuery("#{$sIdSummary}"),
+    oDivSummary = jQuery(".field-tasklist-task_summary");
 oSelProgress.on(
     "change",
     function(event) {
         if( jQuery(this).val() == {$nFinish} ) {
             oSummary.attr("data-req", 1);
+            oDivSummary.show();
         }
         else {
             oSummary.attr("data-req", 0);
+//            oDivSummary.hide();
         }
     }
 );
