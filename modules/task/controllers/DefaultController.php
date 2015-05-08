@@ -215,7 +215,7 @@ class DefaultController extends Controller
     {
         $aData = Yii::$app
             ->db
-            ->createCommand('SELECT Distinct task_direct FROM tlst_tasklist Where task_dep_id = :depid Order By task_id Desc', ['depid'=>Yii::$app->request->get('depid', 0)])
+            ->createCommand('SELECT Distinct task_direct FROM tlst_tasklist Where task_dep_id = :depid And LENGTH(task_direct) > 0 Order By task_id Desc', ['depid'=>Yii::$app->request->get('depid', 0)])
             ->queryColumn();
         $response = Yii::$app->response;
         $response->format = \yii\web\Response::FORMAT_JSON;
