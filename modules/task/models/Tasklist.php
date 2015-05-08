@@ -589,7 +589,10 @@ class Tasklist extends \yii\db\ActiveRecord
 //        ->where('f.fl_id In (' . implode(',', $aStatFlags) . ')')
 //            ->groupBy(['f.fl_name', 'f.fl_id', 'f.fl_sname']);
 
-        if( $nRole == User::ROLE_DEPARTMENT ) {
+        if( Yii::$app->user->identity->isUserWorker() ) {
+            $query->andFilterWhere(['task_worker_id' => Yii::$app->user->identity->us_id]);
+        }
+        else if( $nRole == User::ROLE_DEPARTMENT ) {
             $query->andFilterWhere(['task_dep_id' => Yii::$app->user->identity->department->dep_id]);
         }
         else if( $dep_id > 0 ) {
