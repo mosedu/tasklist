@@ -28,9 +28,9 @@ use app\components\NotifyBehavior;
  * @property string $task_name
  * @property integer $task_type
  * @property string $task_createtime
- * @property string $task_finaltime
- * @property string $task_actualtime
- * @property string $task_finishtime
+ * @property string $task_finaltime  // первая дата завершения
+ * @property string $task_actualtime // дата завершения после переносов
+ * @property string $task_finishtime // реальная дата завершения
  * @property integer $task_numchanges
  * @property string $task_reasonchanges
  * @property integer $task_progress
@@ -81,7 +81,7 @@ class Tasklist extends \yii\db\ActiveRecord
             [
                 'class' =>  AttributewalkBehavior::className(),
                 'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => ['task_dep_id', 'task_actualtime', 'task_finaltime', 'task_active', 'task_createtime', 'task_num', 'task_worker_id', ],
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['task_dep_id', 'task_actualtime', 'task_finaltime', 'task_active', 'task_createtime', 'task_num', 'task_worker_id', 'task_finishtime', ],
                     ActiveRecord::EVENT_AFTER_FIND => ['_oldAttributes', ],
                 ],
                 /** @var Event $event */
@@ -94,6 +94,15 @@ class Tasklist extends \yii\db\ActiveRecord
 
                         case 'task_finaltime':
                             return $model->task_actualtime; // дата установленная при создании - это наша плановая
+
+                        case 'task_finishtime':
+                            // если создаем законченную задачу, то присваиваем ей дату завершения
+                            if( $model->task_progress == Tasklist::PROGRESS_FINISH ) {
+                                return $model->task_actualtime;
+                            }
+                            else {
+                                return $model->task_finishtime;
+                            }
 
                         case 'task_dep_id':
                             $model->setDepartmentByUser();
