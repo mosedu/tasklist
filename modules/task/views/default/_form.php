@@ -97,7 +97,7 @@ $aSetting = [
 
         <?= $form->field($model, 'task_name', $aTextParam)->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable)) ?>
 
-        <?= $form->field($model, 'task_summary', array_merge($aTextParam, ['options' => ($model->isNewRecord || (strlen($model->task_summary) == 0)) ? ['style' => 'display: none;'] : []]) )->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0, ]) ?>
+        <?= $form->field($model, 'task_summary', array_merge($aTextParam, ['options' => ($model->isNewRecord || (strlen($model->task_summary) == 0)) ? ['style' => 'display: none;', 'class'=>'form-group'] : ['class'=>'form-group']]) )->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0, ]) ?>
 
         <?php
         if( $model->isNewRecord ) { // new record
