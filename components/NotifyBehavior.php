@@ -43,6 +43,10 @@ class NotifyBehavior extends Behavior {
                 $ob->sendNotificate($sTemplate, $sTitle, ['task' => $model, 'department' => $dep]);
             }
         }
+
+        // Тут письма в отдел контроля
+                /** @var User $ob */
+/*
         if( $model->department->dep_id != 1 ) {
             $aUsers = User::find()
                 ->where([
@@ -51,11 +55,11 @@ class NotifyBehavior extends Behavior {
                 ])
                 ->all();
             foreach($aUsers As $ob) {
-                /** @var User $ob */
                 if( $ob->us_id != $curId ) {
                     $ob->sendNotificate($sTemplate, $sTitle, ['task' => $model, 'department' => $dep]);
                 }
             }
         }
+*/
     }
 }
