@@ -3,6 +3,9 @@ use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
+use yii\bootstrap\Modal;
+use yii\web\View;
+
 use app\assets\AppAsset;
 use app\modules\user\models\User;
 use app\components\widgets\Alert;
@@ -202,9 +205,38 @@ EOT;
     <footer class="footer">
         <div class="container">
             <p class="pull-left">&copy; ТемоЦентр <?= date('Y') ?></p>
-            <p class="pull-right"></p> <?php /* <?= Yii::powered() ?> */ ?>
+            <p class="pull-right"><?= Html::a('Сообщить о неполадках', '/message', ['id'=>'showmessagedialog'])  ?></p>
         </div>
     </footer>
+
+<?php
+Modal::begin([
+    'header' => 'Срочное сообщение',
+    'id' => 'sendmessagedialog',
+    'footer' => '<button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>'
+        . '<button type="button" class="btn btn-primary" id="sendmessage">Отправить</button>',
+]);
+
+Modal::end();
+$sJs =  <<<EOT
+jQuery('#showmessagedialog').on("click", function (event){
+    event.preventDefault();
+
+    var ob = jQuery('#sendmessagedialog'),
+        oBody = ob.find('.modal-body'),
+        oLink = $(this);
+
+    oBody.text("");
+    oBody.load("/support");
+//    ob.find('.modal-header span').text(oLink.attr('title'));
+    ob.modal('show');
+    return false;
+});
+
+EOT;
+
+$this->registerJs($sJs, View::POS_READY, 'showmodalmessage');
+?>
 
 <?php $this->endBody() ?>
 </body>
