@@ -6,6 +6,7 @@ use yii;
 use yii\web\Controller;
 use yii\widgets\ActiveForm;
 use yii\web\Response;
+use yii\helpers\Html;
 use app\modules\main\models\MessageForm;
 
 class DefaultController extends Controller
@@ -33,6 +34,14 @@ class DefaultController extends Controller
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 $aRet = ActiveForm::validate($model);
                 Yii::info('actionMessage(): return json ' . print_r($aRet, true));
+                if( count($aRet) == 0 ) {
+                    if( $model->contact() ) {
+                        $aRet = ['result' => true];
+                    }
+                    else {
+                        $aRet[Html::getInputId($model, 'body')] = ['Ошибка отправки сообщения'];
+                    }
+                }
                 return $aRet;
             }
             else {

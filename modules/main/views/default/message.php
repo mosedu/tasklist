@@ -50,6 +50,9 @@ jQuery('#message-form')
 .on('afterValidate', function (event, messages, deferreds) {
     console.log(event);
     console.log(messages);
+    if( "result" in messages ) {
+        jQuery('#sendmessagedialog').modal('hide');
+    }
 })
 .on('submit', function (event) {
     event.preventDefault();

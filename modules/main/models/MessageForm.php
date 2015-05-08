@@ -21,7 +21,7 @@ class MessageForm extends Model
     {
         return [
             [['body'], 'required'], // 'subject',
-            [['body'], 'mytest'], // 'subject',
+//            [['body'], 'mytest'], // 'subject',
         ];
     }
 
@@ -55,8 +55,9 @@ class MessageForm extends Model
                 ->setSubject('Сообщение с сайта ' . $_SERVER['HTTP_HOST'])
                 ->setTextBody($this->body)
                 ->send();
+            return true;
         }
-        return true;
+        return false;
     }
 
 }
