@@ -85,7 +85,7 @@ $aColumns[] = [
     'contentOptions' => [
         'class' => 'commandcell',
     ],
-    'template' => '{view} {update} {delete} {unlink}',
+    'template' => '{view} {update} {changerole} {delete} {unlink}',
     'buttons'=>[
         'view'=>function ($url, $model) {
             return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $url,
@@ -94,6 +94,13 @@ $aColumns[] = [
         },
         'update'=>function ($url, $model) {
             return Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $url, ['title' => 'Изменить']);
+        },
+        'changerole'=>function ($url, $model) {
+            $s = '';
+            if( Yii::$app->user->can(User::ROLE_ADMIN) ) {
+                $s = Html::a( '<span class="glyphicon glyphicon-user"></span>', $url, ['title' => 'Изменить роль']);
+            }
+            return $s;
         },
         'delete' => function ($url, $model, $key) {
             return

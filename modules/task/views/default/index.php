@@ -120,17 +120,13 @@ $aColumns = [
                                         'title' => 'Сотрудник',
                                     ]
                                 )
-//            . ' count = ' . count($model->allworker)
                              . '</span>' ) : '')
                     ) :
                     (
                         Html::encode($model->task_name)
                         . ($model->task_worker_id ? ('<span>' . Html::encode($model->worker->getFullName()). '</span>') : '')
                     )
-//            '<a href="#" data-toggle="tooltip" data-placement="top" data-html="false" title="' . $model->getTaskType() . '" style="float: right; display: block; text-align: right; text-decoration: none;"></a> ' . //  style="float: right; display: block; text-align: right; text-decoration: none;"
-
-            /*. '<span>' . $model->task_direct . '</span>' */;
-            //  . $model->getTaskType() . ', '
+            ;
         },
         'contentOptions' => [
             'class' => 'griddate',

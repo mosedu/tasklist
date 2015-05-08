@@ -30,7 +30,7 @@ class DefaultController extends Controller
                         'roles' => ['@'],
                     ],
                     [
-                        'actions' => ['create', 'update', 'view', 'delete', 'index'],
+                        'actions' => ['create', 'update', 'view', 'delete', 'index', 'changerole'],
                         'allow' => true,
                         'roles' => ['createUser'],
                     ],
@@ -180,6 +180,34 @@ class DefaultController extends Controller
             ]);
         }
 */
+    }
+
+    /**
+     * Updates an existing User role
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionChangerole($id)
+    {
+        $model = $this->findModel($id);
+
+        if ($model->load(Yii::$app->request->post())) {
+            $model->us_login = preg_replace('/\\W/', '', $model->us_email);
+
+            if( $model->save() ) {
+                return $this->redirect(['index', ]);
+            }
+            else {
+                Yii::info("On update save: " . print_r($model->getErrors(), true));
+            }
+        }
+        else {
+            Yii::info("On update load: " . print_r($model->getErrors(), true));
+        }
+
+        return $this->render('changerole', [
+            'model' => $model,
+        ]);
     }
 
     /**

@@ -477,7 +477,7 @@ class User extends ActiveRecord implements IdentityInterface
             self::ROLE_WORKER => self::ROLE_TEXT_WORKER,
             self::ROLE_TASKWORKER => self::ROLE_TEXT_TASKWORKER,
             self::ROLE_ADMIN => self::ROLE_TEXT_ADMIN,
-            self::ROLE_GUEST => self::ROLE_TEXT_GUEST,
+//            self::ROLE_GUEST => self::ROLE_TEXT_GUEST,
         ];
     }
 
@@ -491,6 +491,19 @@ class User extends ActiveRecord implements IdentityInterface
             self::ROLE_WORKER => self::ROLE_TEXT_WORKER,
             self::ROLE_TASKWORKER => self::ROLE_TEXT_TASKWORKER,
         ];
+    }
+
+    /**
+     * Получение списка ролей для переназначения
+     * @return array список ролей - ключ - id роли, значение - заголовок для отображения
+     */
+    public static function getSelectRoles()
+    {
+        $a = self::getAllRoles();
+        if( !Yii::$app->user->can(self::ROLE_ADMIN) ) {
+            unset($a[self::ROLE_ADMIN]);
+        }
+        return $a;
     }
 
     /**

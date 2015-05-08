@@ -660,7 +660,7 @@ class Tasklist extends \yii\db\ActiveRecord
      * @return boolean
      */
     public function canChangeDate() {
-        Yii::info('canChangeErrorDate(): ' . $this->task_createtime);
+//        Yii::info('canChangeErrorDate(): ' . $this->task_createtime);
         $bRet = false;
         if( $this->task_createtime !== null ) {
             if( time() - strtotime($this->task_createtime) <= self::DATE_CHANGE_INTERVAL ) {
