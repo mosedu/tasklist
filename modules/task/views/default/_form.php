@@ -257,10 +257,10 @@ EOT;
     <div class="clearfix"></div>
 
     <div class="col-sm-8">
-        <div class="col-sm-2">&nbsp;</div>
-        <div class="col-sm-3">
-            <div class="form-group">
-                <?= Html::submitButton('Сохранить изменения', ['class' => $model->isNewRecord ? 'btn btn-success btn-block' : 'btn btn-primary btn-block']) ?>
+        <div class="form-group">
+            <div class="col-sm-3">&nbsp;</div>
+            <div class="col-sm-4">
+                    <?= Html::submitButton('Сохранить изменения', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
             </div>
         </div>
     </div>
