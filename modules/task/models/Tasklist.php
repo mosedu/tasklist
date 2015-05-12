@@ -447,7 +447,7 @@ class Tasklist extends \yii\db\ActiveRecord
     public function getAllworker() {
         return $this
             ->hasOne(User::className(), ['us_dep_id' => 'task_dep_id'])
-            ->where(['us_active' => User::STATUS_ACTIVE, 'us_role_name' => User::ROLE_WORKER, ]);
+            ->where(['us_active' => User::STATUS_ACTIVE, ]); // 'us_role_name' => User::ROLE_WORKER, 
     }
 
     /**
