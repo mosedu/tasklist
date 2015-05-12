@@ -292,7 +292,7 @@ oSelDepartment.on("change", function(event){
     jQuery.get("{$sUrl}", {id: oSelDepartment.val()}, function(data, textStatus, jqXHR){ oSelWorker.html(''); jQuery('<option>').val(0).text("").appendTo(oSelWorker); for(var i in data) { jQuery('<option>').val(i).text(data[i]).appendTo(oSelWorker); } }, 'json');
 });
 EOT;
-    $this->registerJs($sJs, View::POS_READY, 'changeprogress');
+    $this->registerJs($sJs, View::POS_READY, 'fillselectworker');
 
 
     ?>
