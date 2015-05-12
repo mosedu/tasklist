@@ -79,7 +79,7 @@ use app\modules\user\models\User;
     <div class="col-sm-4">
     <div class="form-group">
         <div class="col-sm-9 col-sm-offset-3">
-        <?= Html::submitButton($model->isNewRecord ? 'Создать' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success btn-block' : 'btn btn-primary btn-block']) ?>
+        <?= Html::submitButton($model->isNewRecord ? 'Создать' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
         </div>
     </div>
     </div>
