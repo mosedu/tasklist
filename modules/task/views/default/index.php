@@ -84,7 +84,9 @@ $aColumns = [
         'filter' => false,
         'content' => function ($model, $key, $index, $column) {
             // $sGlyth = $model->task_type == Tasklist::TYPE_PLAN ? 'calendar' : 'flash';
-            return Html::encode($model->task_direct); //  . $model->getTaskType() . ', '
+            return
+                '<div style="display: none;">count = ' . count($model->allworker) . ' canedit = ' . ($model->canEdit() ? 'true' : 'false') . '</div>' .
+                Html::encode($model->task_direct); //  . $model->getTaskType() . ', '
         },
         'contentOptions' => [
             'class' => 'griddate',
