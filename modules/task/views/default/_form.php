@@ -13,6 +13,7 @@ use yii\web\JsExpression;
 use app\modules\user\models\Department;
 use app\modules\task\models\Tasklist;
 use app\modules\user\models\User;
+use app\modules\task\models\File;
 
 /* @var $this yii\web\View */
 /* @var $model app\modules\task\models\Tasklist */
@@ -81,7 +82,7 @@ foreach(User::getWorkerList($model->task_dep_id) As $k=>$v) {
         'id' => 'message-form',
         'layout' => 'horizontal',
         'options'=>[
-//            'enctype'=>'multipart/form-data'
+            'enctype' => 'multipart/form-data',
         ],
         'fieldConfig' => [
             'horizontalCssClasses' => [
@@ -202,6 +203,19 @@ EOT;
             'task_reasonchanges',
             array_merge($aTextParam, ['options' => ['style' => (strlen($model->task_reasonchanges) > 0 ? '' : 'display: none;'), 'class' => "form-group field-tasklist-reasonchange"]])
         )->textarea(array_merge(['rows' => 3, 'data-old'=>$model->isNewRecord ? '' : $model->_oldAttributes['task_actualtime'],], $bEditDates ? [] : $aDisable)) ?>
+
+        <?php
+/*
+            $sFile = $this->findViewFile('/file/_loadfile', $context = $this);
+            echo $this->renderPhpFile(
+                $sFile,
+                [
+                    'form' => $form,
+                    'model' => new File(),
+                ]
+            );
+*/
+        ?>
     </div>
 
     <div class="col-sm-4">

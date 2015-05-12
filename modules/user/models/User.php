@@ -12,6 +12,7 @@ use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 use yii\rbac\Role;
+use app\components\SwiftHeaders;
 
 /**
  * This is the model class for table "{{%user}}".
@@ -447,6 +448,7 @@ class User extends ActiveRecord implements IdentityInterface
         if( isset(Yii::$app->params['copyEmail']) ) {
             $oLett->setBcc(Yii::$app->params['copyEmail']);
         }
+        SwiftHeaders::serAntiSpamHeaders($oLett);
         $oLett->send();
     }
 

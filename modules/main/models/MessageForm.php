@@ -48,13 +48,14 @@ class MessageForm extends Model
         /** @var User $oUser */
         $oUser = Yii::$app->user->identity;
         if( isset(Yii::$app->params['contactEmail']) ) {
-            Yii::$app->mailer->compose()
+            $oLett = Yii::$app->mailer->compose()
                 ->setTo(Yii::$app->params['contactEmail'])
                 ->setFrom([$oUser->us_email => $oUser->getFullName()])
                 ->setReplyTo([$oUser->us_email => $oUser->getFullName()])
                 ->setSubject('Сообщение с сайта ' . $_SERVER['HTTP_HOST'])
-                ->setTextBody($this->body)
-                ->send();
+                ->setTextBody($this->body);
+            SwiftHeaders::serAntiSpamHeaders($oLett);
+            $oLett->send();
             return true;
         }
         return false;

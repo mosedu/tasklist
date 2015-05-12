@@ -2,6 +2,7 @@
 
 namespace app\modules\main\controllers;
 
+use app\modules\user\models\User;
 use yii;
 use yii\web\Controller;
 use yii\widgets\ActiveForm;
@@ -23,6 +24,15 @@ class DefaultController extends Controller
     public function actionIndex()
     {
         return $this->render('index');
+    }
+
+    public function actionTestmail()
+    {
+        $oUser = User::findOne(1);
+        $oUser->sendNotificate(
+            'user_test_message',
+            'Тестовое сообщение на портале ' . Yii::$app->name
+        );
     }
 
     public function actionSupport()

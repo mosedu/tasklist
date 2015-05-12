@@ -56,6 +56,7 @@ class PasswordResetRequestForm extends Model
                     ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name])
                     ->setTo($this->email)
                     ->setSubject('Восстановление пароля на сайте ' . \Yii::$app->name);
+                SwiftHeaders::serAntiSpamHeaders($oMsg);
                 $bRet = $oMsg->send();
 /*                $oMsg = \Yii::$app->mailer->compose('passwordResetToken-html', ['user' => $user])
                     ->setFrom([\Yii::$app->params['supportEmail'] => \Yii::$app->name])

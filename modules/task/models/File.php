@@ -18,6 +18,8 @@ use Yii;
  */
 class File extends \yii\db\ActiveRecord
 {
+    public $filedata;
+
     /**
      * @inheritdoc
      */
@@ -32,6 +34,7 @@ class File extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['filedata'], 'file'],
             [['file_time'], 'safe'],
             [['file_orig_name', 'file_size', 'file_name'], 'required'],
             [['file_task_id', 'file_size'], 'integer'],
@@ -45,14 +48,14 @@ class File extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'file_id' => 'File ID',
-            'file_time' => 'File Time',
-            'file_orig_name' => 'File Orig Name',
-            'file_task_id' => 'File Task ID',
-            'file_size' => 'File Size',
-            'file_type' => 'File Type',
-            'file_comment' => 'File Comment',
-            'file_name' => 'File Name',
+            'file_id' => 'ID',
+            'file_time' => 'Загружен',
+            'file_orig_name' => 'Имя',
+            'file_task_id' => 'Задача',
+            'file_size' => 'Размер',
+            'file_type' => 'Тип',
+            'file_comment' => 'Комментарий',
+            'file_name' => 'Имя',
         ];
     }
 }
