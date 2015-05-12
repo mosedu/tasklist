@@ -38,7 +38,7 @@ $aColumns = array_merge($aColumns, [
         'content' => function ($model, $key, $index, $column) {
             /** @var User $model */
             $ar = User::getAllRoles();
-            return Html::encode($model->getFullName()) . '<span>' . Html::encode($ar[$model->us_role_name] . ', ' . $model->us_workposition) . '</span>';
+            return Html::encode($model->getFullName()) . '<span>' . Html::encode((isset($ar[$model->us_role_name]) ? ($ar[$model->us_role_name] . ', ') : '') . $model->us_workposition) . '</span>';
         },
         'contentOptions' => [
             'class' => 'griddate',

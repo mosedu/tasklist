@@ -489,10 +489,16 @@ class User extends ActiveRecord implements IdentityInterface
      */
     public static function getWorkerRoles()
     {
-        return [
+        $a = [
             self::ROLE_WORKER => self::ROLE_TEXT_WORKER,
             self::ROLE_TASKWORKER => self::ROLE_TEXT_TASKWORKER,
         ];
+
+        if( Yii::$app->user->can(User::ROLE_ADMIN) ) {
+            $a[self::ROLE_DEPARTMENT] = self::ROLE_TEXT_DEPARTMENT;
+        }
+
+        return $a;
     }
 
     /**
