@@ -13,20 +13,6 @@
         "source": "https://github.com/yiisoft/yii2"
     },
     "minimum-stability": "stable",
-    "repositories": {
-        "jqueryfiler": {
-            "type": "package",
-            "package": {
-                "name": "creativedream/jqueryfiler",
-                "version": "1.0.1",
-                "source": {
-                    "url": "https://github.com/CreativeDream/jquery.filer",
-                    "type": "git",
-                    "reference": "2fd0d889d4d6ebf60a1ee08a1a6945ed0adfeeb8"
-                }
-            }
-        }
-    },
     "require": {
         "php": ">=5.4.0",
         "yiisoft/yii2": "*",
@@ -35,8 +21,7 @@
         "kartik-v/yii2-widget-datepicker": "*",
         "kartik-v/yii2-field-range": "*",
         "phpoffice/phpexcel": "dev-master",
-        "kartik-v/yii2-widget-select2": "*",
-        "creativedream/jqueryfiler": "*"
+        "kartik-v/yii2-widget-select2": "*"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",
