@@ -57,6 +57,11 @@ $aSetting = [
 
 $bHideSummary = ($model->isNewRecord || (strlen($model->task_summary) == 0));
 
+$aWorker = [0 => ''];
+foreach(User::getWorkerList($model->task_dep_id) As $k=>$v) {
+    $aWorker[$k] = $v;
+}
+
 ?>
 
 <div class="tasklist-form">
@@ -202,7 +207,7 @@ EOT;
     <div class="col-sm-4">
                 <?= $form->field($model, 'task_dep_id')->dropDownList(Department::getList(false), $aDisable) ?>
                 <?= $form->field($model, 'task_type')->dropDownList(Tasklist::getAllTypes(), $bEditDates ? [] : $aDisable) ?>
-                <?= $form->field($model, 'task_worker_id')->dropDownList(User::getWorkerList(), $bEditDates ? [] : $aDisable) ?>
+                <?= $form->field($model, 'task_worker_id')->dropDownList($aWorker, $bEditDates ? [] : $aDisable) ?>
                 <?= $form->field($model, 'task_progress')->dropDownList(Tasklist::getAllProgresses(), $bEditDates ? [] : $aDisable) ?>
                 <?= $form->field(
                     $model,
@@ -277,16 +282,19 @@ EOT;
     <?php ActiveForm::end(); ?>
     <?php
     // $model->isNewRecord ? 'Создать' :
-    if( $model->task_reasonchanges != '' ) {
-        $a = explode("\n", $model->task_reasonchanges);
-        foreach($a As $v) {
-            $v = trim($v);
-            if( $v == '' ) {
-                continue;
-            }
-            $aPart = explode("\t", $v);
-        }
-    }
+    $sDepartmentId = Html::getInputId($model, 'task_dep_id');
+    $sWorkerId = Html::getInputId($model, 'task_worker_id');
+    $sUrl = Url::to(['/user/worker/list'], true);
+    $sJs = <<<EOT
+var oSelDepartment = jQuery("#{$sDepartmentId}"),
+    oSelWorker = jQuery("#{$sWorkerId}");
+oSelDepartment.on("change", function(event){
+    jQuery.get("{$sUrl}", {id: oSelDepartment.val()}, function(data, textStatus, jqXHR){ oSelWorker.html(''); jQuery('<option>').val(0).text("").appendTo(oSelWorker); for(var i in data) { jQuery('<option>').val(i).text(data[i]).appendTo(oSelWorker); } }, 'json');
+});
+EOT;
+    $this->registerJs($sJs, View::POS_READY, 'changeprogress');
+
+
     ?>
 
 </div>

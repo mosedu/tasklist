@@ -634,7 +634,7 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * Get worker list
      *
-     * @param string $str
+     * @param integer $dep_id
      *
      */
     public static function getDepartmentWorker($dep_id = 0) {
@@ -651,13 +651,13 @@ class User extends ActiveRecord implements IdentityInterface
      *
      * Get worker list for dropdown
      *
-     * @param string $str
+     * @param integer $dep_id
      *
      */
-    public static function getWorkerList()
+    public static function getWorkerList($dep_id = 0)
     {
         return ArrayHelper::map(
-            self::getDepartmentWorker(Yii::$app->user->identity->us_dep_id),
+            self::getDepartmentWorker($dep_id > 0 ? $dep_id : Yii::$app->user->identity->us_dep_id),
             'us_id',
             function ($user) {
                 return $user->getFullName();

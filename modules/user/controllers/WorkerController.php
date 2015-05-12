@@ -13,6 +13,7 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 use app\modules\user\models\User;
 use app\modules\user\models\UserSearch;
@@ -29,6 +30,11 @@ class WorkerController extends Controller {
                         'actions' => ['create', 'view', 'delete', 'index', 'update', ],
                         'allow' => true,
                         'roles' => ['createWorker'],
+                    ],
+                    [
+                        'actions' => ['list', ],
+                        'allow' => true,
+                        'roles' => ['@'],
                     ],
                 ],
             ],
@@ -125,6 +131,18 @@ class WorkerController extends Controller {
                 'model' => $model,
             ]);
         }
+    }
+
+    /**
+     * Lists wokers for department
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionList($id)
+    {
+        $id = intval($id);
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return ($id > 0) ? User::getWorkerList($id) : [];
     }
 
     /**
