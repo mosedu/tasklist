@@ -19,7 +19,7 @@ class FileSearch extends File
     {
         return [
             [['file_id', 'file_task_id', 'file_size'], 'integer'],
-            [['file_time', 'file_orig_name', 'file_type', 'file_name'], 'safe'],
+            [['file_time', 'file_orig_name', 'file_type', 'file_comment', 'file_name'], 'safe'],
         ];
     }
 
@@ -64,6 +64,7 @@ class FileSearch extends File
 
         $query->andFilterWhere(['like', 'file_orig_name', $this->file_orig_name])
             ->andFilterWhere(['like', 'file_type', $this->file_type])
+            ->andFilterWhere(['like', 'file_comment', $this->file_comment])
             ->andFilterWhere(['like', 'file_name', $this->file_name]);
 
         return $dataProvider;

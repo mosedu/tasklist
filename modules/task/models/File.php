@@ -13,6 +13,7 @@ use Yii;
  * @property integer $file_task_id
  * @property integer $file_size
  * @property string $file_type
+ * @property string $file_comment
  * @property string $file_name
  */
 class File extends \yii\db\ActiveRecord
@@ -34,7 +35,7 @@ class File extends \yii\db\ActiveRecord
             [['file_time'], 'safe'],
             [['file_orig_name', 'file_size', 'file_name'], 'required'],
             [['file_task_id', 'file_size'], 'integer'],
-            [['file_orig_name', 'file_type', 'file_name'], 'string', 'max' => 255]
+            [['file_orig_name', 'file_type', 'file_comment', 'file_name'], 'string', 'max' => 255]
         ];
     }
 
@@ -50,6 +51,7 @@ class File extends \yii\db\ActiveRecord
             'file_task_id' => 'File Task ID',
             'file_size' => 'File Size',
             'file_type' => 'File Type',
+            'file_comment' => 'File Comment',
             'file_name' => 'File Name',
         ];
     }

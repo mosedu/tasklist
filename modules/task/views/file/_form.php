@@ -22,6 +22,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'file_type')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'file_comment')->textInput(['maxlength' => true]) ?>
+
     <?= $form->field($model, 'file_name')->textInput(['maxlength' => true]) ?>
 
     <div class="form-group">

@@ -19,20 +19,29 @@ class m150512_104339_add_task_files extends Migration
             'file_task_id' => Schema::TYPE_INTEGER,
             'file_size' => Schema::TYPE_INTEGER . ' NOT NULL',
             'file_type' => Schema::TYPE_STRING,
+            'file_comment' => Schema::TYPE_STRING,
             'file_name' => Schema::TYPE_STRING . ' NOT NULL',
         ], $tableOptionsMyISAM);
 
         $this->createIndex('idx_file_task_id', '{{%file}}', 'file_task_id');
         $this->createIndex('idx_file_name', '{{%file}}', 'file_name');
+        $this->refreshCache();
     }
 
     public function down()
     {
         $this->dropTable('{{%file}}');
+        $this->refreshCache();
 
         return true;
     }
-    
+
+    public function refreshCache()
+    {
+        Yii::$app->db->schema->refresh();
+        Yii::$app->db->schema->getTableSchemas();
+    }
+
     /*
     // Use safeUp/safeDown to run migration code within a transaction
     public function safeUp()

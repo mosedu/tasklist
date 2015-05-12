@@ -27,6 +27,8 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'file_type') ?>
 
+    <?php // echo $form->field($model, 'file_comment') ?>
+
     <?php // echo $form->field($model, 'file_name') ?>
 
     <div class="form-group">

@@ -31,6 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'file_task_id',
             'file_size',
             // 'file_type',
+            // 'file_comment',
             // 'file_name',
 
             ['class' => 'yii\grid\ActionColumn'],
