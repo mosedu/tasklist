@@ -205,7 +205,7 @@ EOT;
     <footer class="footer">
         <div class="container">
             <p class="pull-left">&copy; ТемоЦентр <?= date('Y') ?></p>
-            <p class="pull-right"><?= Html::a('Сообщить о неполадках', '/message', ['id'=>'showmessagedialog'])  ?></p>
+            <p class="pull-right"><?= '' //Html::a('Сообщить о неполадках', '/message', ['id'=>'showmessagedialog'])  ?></p>
         </div>
     </footer>
 
@@ -228,14 +228,13 @@ jQuery('#showmessagedialog').on("click", function (event){
 
     oBody.text("");
     oBody.load("/support");
-//    ob.find('.modal-header span').text(oLink.attr('title'));
     ob.modal('show');
     return false;
 });
 
 EOT;
 
-$this->registerJs($sJs, View::POS_READY, 'showmodalmessage');
+// $this->registerJs($sJs, View::POS_READY, 'showmodalmessage');
 ?>
 
 <?php $this->endBody() ?>

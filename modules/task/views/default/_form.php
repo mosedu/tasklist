@@ -6,12 +6,13 @@ use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Modal;
 use yii\web\View;
 use yii\helpers\Url;
-
-use app\modules\user\models\Department;
-use app\modules\task\models\Tasklist;
 use kartik\date\DatePicker;
 use kartik\select2\Select2;
 use yii\web\JsExpression;
+
+use app\modules\user\models\Department;
+use app\modules\task\models\Tasklist;
+use app\modules\user\models\User;
 
 /* @var $this yii\web\View */
 /* @var $model app\modules\task\models\Tasklist */
@@ -201,6 +202,7 @@ EOT;
     <div class="col-sm-4">
                 <?= $form->field($model, 'task_dep_id')->dropDownList(Department::getList(false), $aDisable) ?>
                 <?= $form->field($model, 'task_type')->dropDownList(Tasklist::getAllTypes(), $bEditDates ? [] : $aDisable) ?>
+                <?= $form->field($model, 'task_worker_id')->dropDownList(User::getWorkerList(), $bEditDates ? [] : $aDisable) ?>
                 <?= $form->field($model, 'task_progress')->dropDownList(Tasklist::getAllProgresses(), $bEditDates ? [] : $aDisable) ?>
                 <?= $form->field(
                     $model,

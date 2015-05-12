@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "98167b264304168bb8c7639312fbc74d",
+    "hash": "68e85778f814658cf55012f5cfe6f687",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -275,6 +275,16 @@
             "time": "2015-03-06 05:21:16"
         },
         {
+            "name": "creativedream/jqueryfiler",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/CreativeDream/jquery.filer",
+                "reference": "2fd0d889d4d6ebf60a1ee08a1a6945ed0adfeeb8"
+            },
+            "type": "library"
+        },
+        {
             "name": "ezyang/htmlpurifier",
             "version": "v4.6.0",
             "source": {
@@ -522,7 +532,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPOffice/PHPExcel/zipball/c40bb233bfa59fe8aadc6f3714cf500ec2c38e0f",
+                "url": "https://api.github.com/repos/PHPOffice/PHPExcel/zipball/049e85ae98a90869e1bc83087f755010e9223091",
                 "reference": "c40bb233bfa59fe8aadc6f3714cf500ec2c38e0f",
                 "shasum": ""
             },
