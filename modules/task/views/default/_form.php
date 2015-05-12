@@ -54,6 +54,8 @@ $aSetting = [
     ],
 ];
 
+$bHideSummary = ($model->isNewRecord || (strlen($model->task_summary) == 0));
+
 ?>
 
 <div class="tasklist-form">
@@ -97,7 +99,7 @@ $aSetting = [
 
         <?= $form->field($model, 'task_name', $aTextParam)->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable)) ?>
 
-        <?= $form->field($model, 'task_summary', array_merge($aTextParam, ['options' => ($model->isNewRecord || (strlen($model->task_summary) == 0)) ? ['style' => 'display: none;', 'class'=>'form-group'] : ['class'=>'form-group']]) )->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0, ]) ?>
+        <?= $form->field($model, 'task_summary', array_merge($aTextParam, ['options' => $bHideSummary ? ['style' => 'display: none;', 'class'=>'form-group'] : ['class'=>'form-group']]) )->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0, ]) ?>
 
         <?php
 //        if( $model->isNewRecord ) { // new record
@@ -163,7 +165,8 @@ $aSetting = [
         $sJs = <<<EOT
 var oSelProgress = jQuery("#{$sIdProgress}"),
     oSummary = jQuery("#{$sIdSummary}"),
-    oDivSummary = jQuery(".field-tasklist-task_summary");
+    oDivSummary = jQuery(".field-tasklist-task_summary"),
+    oShowSummaryButton = jQuery('#showsummaryfield');
 oSelProgress.on(
     "change",
     function(event) {
@@ -177,6 +180,12 @@ oSelProgress.on(
         }
     }
 );
+
+oShowSummaryButton.on('click', function(event){
+    event.preventDefault();
+    oDivSummary.show();
+    return false;
+});
 EOT;
         $this->registerJs($sJs, View::POS_READY, 'changeprogress');
 
@@ -225,7 +234,6 @@ EOT;
                          sCompare = dt.getFullYear() + '',
                          n = dt.getDate(),
                          ob = jQuery('.field-tasklist-reasonchange');
-//                     console.log('ob = ', ob);
                      s += ((n < 10) ? '0' : '') + n + '.';
                      n = dt.getMonth() + 1;
                      s += ((n < 10) ? '0' : '') + n + '.';
@@ -233,18 +241,13 @@ EOT;
                      s += dt.getFullYear()
                      n = dt.getDate();
                      sCompare += ((n < 10) ? '0' : '') + n;
-//                     console.log(s);
-//                     jQuery('#" . Html::getInputId($model, 'reasonchange') . "').attr('data-old', s);
                      jQuery('#" . Html::getInputId($model, 'task_reasonchanges') . "').attr('data-old', s);
-//                     if( (s != '" . $model->task_actualtime . "' && ".($model->isNewRecord ? 'false' : 'true').") || ".(strlen($model->task_reasonchanges) > 0 ? 'true' : 'false')." ) {
                      if( ".($bCanChange ? "false" : "true")." ) {
                          if( (sCompare > '" . preg_replace('|(\\d+)\\.(\\d+)\\.(\\d+)|', '${3}${2}${1}', $model->task_actualtime) . "' && ".($model->isNewRecord ? 'false' : 'true').") || ".(strlen($model->task_reasonchanges) > 0 ? 'true' : 'false')." ) {
                             ob.show();
-    //                        console.log('need show');
                          }
                          else {
                             ob.hide();
-    //                        console.log('need hide');
                          }
                      }
                      }",
@@ -260,7 +263,11 @@ EOT;
         <div class="form-group">
             <div class="col-sm-3">&nbsp;</div>
             <div class="col-sm-4">
-                    <?= Html::submitButton('Сохранить изменения', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+                <?= Html::submitButton('Сохранить изменения', ['class' => 'btn btn-success']) ?>
+                <?= '' // Html::submitButton('Сохранить изменения', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+            </div>
+            <div class="col-sm-5">
+                <?= ($bHideSummary ? Html::a('Добавить промежуточный результат', '', ['class' => 'btn btn-default', 'id'=>'showsummaryfield']) : '') ?>
             </div>
         </div>
     </div>
