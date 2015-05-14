@@ -121,6 +121,7 @@ class TasklistSearch extends Tasklist
         }
 
         if( !Yii::$app->user->can('createUser') ) {
+            Yii::info("Search: " . Yii::$app->user->identity->getFullName() . " cant createUser");
             $this->task_dep_id = Yii::$app->user->getIdentity()->us_dep_id;
             $tasknum = ( count($a) > 1 ) ? $a[1] : $a[0];
         }
