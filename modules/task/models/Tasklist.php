@@ -17,6 +17,7 @@ use app\modules\user\models\Department;
 use app\modules\task\models\Action;
 use app\modules\task\models\Changes;
 use app\components\NotifyBehavior;
+use yii\helpers\Url;
 
 /**
  * This is the model class for table "{{%tasklist}}".
@@ -707,5 +708,14 @@ class Tasklist extends \yii\db\ActiveRecord
         return $this->_canEdit;
     }
 
+    /**
+     * Получение Url на просмотр задачи
+     *
+     * $param boolean $bFull
+     * @return string
+     */
+    public function url($bFull = true) {
+        return Url::to(['/task/default/view/' . $this->task_id], $bFull);
+    }
 
 }

@@ -250,7 +250,7 @@ class Department extends \yii\db\ActiveRecord
         );
         $query->where([
             'us_active' => User::STATUS_ACTIVE,
-            'us_role_name' => User::ROLE_DEPARTMENT,
+            'us_role_name' => [User::ROLE_DEPARTMENT, User::ROLE_CONTROL],
         ]);
         return $query;
     }

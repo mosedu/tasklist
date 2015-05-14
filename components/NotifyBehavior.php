@@ -33,13 +33,22 @@ class NotifyBehavior extends Behavior {
         $dep = $model->department;
 //        Yii::info('Department: ' . print_r($dep->attributes, true));
         $aUsers = $dep->leaders;
+//        Yii::info('aUsers: ' . count($aUsers));
         $curId = Yii::$app->user->identity->getId();
         $sTitle = 'Новая задача в Системе мониторинга задач ГАУ ТемоЦентр';
         $sTemplate = 'new_task';
+        $nUserNotify = 0;
+
+        if( !empty($model->task_worker_id) ) {
+            $nUserNotify = $model->task_worker_id;
+            $model->worker->sendNotificate('user_new_task', $sTitle, ['task' => $model, 'department' => $dep]);
+        }
 
         foreach($aUsers As $ob) {
+            Yii::info('for: '.$ob->us_id.' != ' . $curId);
             /** @var User $ob */
-            if( $ob->us_id != $curId ) {
+            if( ($ob->us_id != $curId) && ($nUserNotify != $ob->us_id) ) {
+                $aNotify[$ob->us_id] = $ob->us_id;
                 $ob->sendNotificate($sTemplate, $sTitle, ['task' => $model, 'department' => $dep]);
             }
         }

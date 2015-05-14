@@ -36,13 +36,19 @@ $department = $data['department'];
 
 <p><?= Html::encode('Отдел: ' . $department->dep_name) ?>.</p>
 
-<p><?= Html::encode('Задача: ' . $task->task_name) ?>.</p>
+<p><?= Html::encode('Задача: ' . $task->task_name) . ' ' . Html::a($task->url(true), $task->url(true)) ?>.</p>
+
+<?php if( !empty($task->task_worker_id) ) { ?>
+    <p><?= Html::encode('Ответственный: ' . $task->worker->getFullName()) ?>.</p>
+<?php } ?>
 
 <?php if( !empty($task->task_direct) ) { ?>
     <p><?= Html::encode('Направление: ' . $task->task_direct) ?>.</p>
 <?php } ?>
 
 <p><?= Html::encode('Базовый срок: ' . date('d.m.Y', strtotime($task->task_finaltime))) ?>.</p>
+
+<p><?= Html::encode('Список задач доступен по адресу: ') . Html::a(Url::to('/', true), Url::to('/', true)) ?>.</p>
 
 <p>Сообщение сгенерировано автоматически, отвечать на него не нужно.</p>
 

@@ -28,11 +28,11 @@ $oTask = $data['task'];
 
 <p><?= Html::encode('В Системе мониторинга текущих задач структурных подразделений ГАУ «ТемоЦентр» Вам назначена задача') ?>.</p>
 
-<p><?= Html::encode($oTask->task_name) ?></p>
+<p><?= Html::encode($oTask->task_name) . ' ' . Html::a($oTask->url(true), $oTask->url(true)) ?></p>
+
 <p>Дата исполнения: <?= date('d.m.Y', strtotime($oTask->task_actualtime)) ?></p>
 
-<p>Задачи можно посмотреть по ссылке: <?= Html::a(Url::to('/', true), Url::to('/', true)) ?></p>
-
+<p><?= Html::encode('Список задач доступен по адресу: ') . Html::a(Url::to('/', true), Url::to('/', true)) ?>.</p>
 
 <p>Сообщение сгенерировано автоматически, отвечать на него не нужно.</p>
 
