@@ -7,8 +7,8 @@ use yii\web\View;
 /* @var $this yii\web\View */
 /* @var $model app\modules\task\models\File */
 /* @var $form yii\widgets\ActiveForm */
-?>
 
+/*
 <div class="file-data" id="filedata">
     <div class="form-group">
         <label class="control-label col-sm-3">Файлы</label>
@@ -18,26 +18,32 @@ use yii\web\View;
         <div class="clearfix"></div>
     </div>
 </div>
+*/
 
+if( !isset($index) ) {
+    $index = '';
+}
+?>
 
-<div class="form-group" id="fileuploadrow">
-    <label class="control-label col-sm-3">&nbsp;</label>
+<div class="form-group">
+    <label class="control-label col-sm-3"></label>
     <div class="col-sm-5">
-        <?= $form->field($model, '[]file_comment', ['template'=>"{input}\n{hint}\n{error}"])->textInput(['maxlength' => true]) ?>
+        <?= $form->field($model, '[' . $index . ']file_comment', ['template'=>"{input}\n{hint}\n{error}"])->textInput(['maxlength' => true]) ?>
     </div>
     <div class="col-sm-4">
-        <?= $form->field($model, '[]filedata', ['template'=>"{input}\n{hint}\n{error}"])->fileInput() ?>
+        <?= $form->field($model, '[' . $index . ']filedata', ['template'=>"{input}\n{hint}\n{error}"])->fileInput() ?>
     </div>
     <div class="clearfix"></div>
 </div>
 
 <?php
 
+/*
 $sJs = <<<EOT
 var oTemplateFile = jQuery("#fileuploadrow"),
     oFileData = jQuery("#filedata");
 
-oTemplateFile.hide();
+// oTemplateFile.hide();
 
 jQuery("#addfilelink").on("click", function(event){
     event.preventDefault();
@@ -50,3 +56,4 @@ jQuery("#addfilelink").on("click", function(event){
 });
 EOT;
 $this->registerJs($sJs, View::POS_READY, 'fileselectscript');
+*/

@@ -15,6 +15,8 @@ use app\modules\task\models\Tasklist;
 use app\modules\user\models\User;
 use app\modules\task\models\File;
 
+use mosedu\multirows\MultirowsWidget;
+
 /* @var $this yii\web\View */
 /* @var $model app\modules\task\models\Tasklist */
 /* @var $form yii\widgets\ActiveForm */
@@ -79,7 +81,7 @@ foreach(User::getWorkerList($model->task_dep_id) As $k=>$v) {
     ?>
 
     <?php $form = ActiveForm::begin([
-        'id' => 'message-form',
+        'id' => 'task-form',
         'layout' => 'horizontal',
         'options'=>[
             'enctype' => 'multipart/form-data',
@@ -106,7 +108,72 @@ foreach(User::getWorkerList($model->task_dep_id) As $k=>$v) {
 
         <?= $form->field($model, 'task_name', $aTextParam)->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable)) ?>
 
+        <?php
+            echo MultirowsWidget::widget(
+                [
+                    'model' => File::className(),
+                    'form' => $form,
+                    'records' => [], // [new OrderItems(),],
+                    'rowview' => '@app/modules/task/views/file/_loadfile.php',
+//                    'tag' => 'tr',
+//                    'defaultattributes' => ['count' => 1],
+//                    'tagOptions' => ['class' => 'clear-item'],
+                    'addlinkselector' => '#add-task-file-link',
+                    'dellinkselector' => '.remove-file',
+//                    'formselector' => '#task-form',
+                    'afterInsert' => 'function(ob){ console.log("Insert row : task-file"); /*operatorApp.initItem(ob);*/ }',
+                    'afterDelete' => 'function(){ console.log("Delete row : task-file"); /*operatorApp.recalcSumm();*/ }',
+//                    'scenario' => 'userform',
+                    'canDeleteLastRow' => true,
+                ]
+            );
+        ?>
+
+        <div class="file-data" id="filedata">
+            <div class="form-group">
+                <label class="control-label col-sm-3">Файлы</label>
+                <div class="col-sm-9">
+                    <?= Html::a('Добавить файл', '', ['id' => 'add-task-file-link', 'class'=>'btn btn-default']) ?>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+
         <?= $form->field($model, 'task_summary', array_merge($aTextParam, ['options' => $bHideSummary ? ['style' => 'display: none;', 'class'=>'form-group'] : ['class'=>'form-group']]) )->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0, ]) ?>
+
+        <?php
+
+        echo MultirowsWidget::widget(
+            [
+                'model' => File::className(),
+                'form' => $form,
+                'records' => [], // [new OrderItems(),],
+                'rowview' => '@app/modules/task/views/file/_loadfile.php',
+//                    'tag' => 'tr',
+//                    'defaultattributes' => ['count' => 1],
+//                    'tagOptions' => ['class' => 'clear-item'],
+                'addlinkselector' => '#add-summary-file-link',
+                'dellinkselector' => '.remove-file',
+//                    'formselector' => '#task-form',
+                'afterInsert' => 'function(ob){ console.log("Insert row : summary-file"); }',
+                'afterDelete' => 'function(){ console.log("Delete row : summary-file"); }',
+//                    'scenario' => 'userform',
+                'canDeleteLastRow' => true,
+            ]
+        );
+
+        ?>
+
+        <div class="file-data" id="filedata">
+            <div class="form-group">
+                <label class="control-label col-sm-3">Файлы</label>
+                <div class="col-sm-9">
+                    <?= Html::a('Добавить файл отчета', '', ['id' => 'add-summary-file-link', 'class'=>'btn btn-default']) ?>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
 
         <?php
 //        if( $model->isNewRecord ) { // new record

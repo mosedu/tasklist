@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "98167b264304168bb8c7639312fbc74d",
+    "hash": "6cb8e77ddf773408fbc78119cf7a1ef4",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -512,6 +512,46 @@
                 "yii2"
             ],
             "time": "2015-05-09 08:06:45"
+        },
+        {
+            "name": "mosedu/yii2-multirows",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mosedu/yii2-multirows.git",
+                "reference": "bb496f85de5d6f1adaed380744e7cf71b712555b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mosedu/yii2-multirows/zipball/bb496f85de5d6f1adaed380744e7cf71b712555b",
+                "reference": "bb496f85de5d6f1adaed380744e7cf71b712555b",
+                "shasum": ""
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "mosedu\\multirows\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Victor Kozmin",
+                    "email": "promcalc@gmail.com",
+                    "homepage": "http://zeltorg.ru/"
+                }
+            ],
+            "description": "Widget to show dynamicaly add new form rows with model fields.",
+            "keywords": [
+                "dynamic",
+                "multirows",
+                "widget",
+                "yii2"
+            ],
+            "time": "2015-05-15 08:21:56"
         },
         {
             "name": "phpoffice/phpexcel",
@@ -1166,7 +1206,7 @@
     "stability-flags": {
         "phpoffice/phpexcel": 20
     },
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=5.4.0"
