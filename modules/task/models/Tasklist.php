@@ -12,6 +12,8 @@ use yii\base\Event;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\db\Query;
+use yii\validators\RangeValidator;
+use yii\validators\Validator;
 
 use app\components\AttributewalkBehavior;
 use app\modules\user\models\Department;
@@ -86,7 +88,7 @@ class Tasklist extends \yii\db\ActiveRecord
             [
                 'class' =>  AttributewalkBehavior::className(),
                 'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => ['task_dep_id', 'task_actualtime', 'task_finaltime', 'task_active', 'task_createtime', 'task_num', 'task_worker_id', 'task_finishtime', ],
+                    ActiveRecord::EVENT_BEFORE_INSERT => ['task_dep_id', 'task_actualtime', 'task_finaltime', 'task_active', 'task_createtime', 'task_num', /*'task_worker_id', */'task_finishtime', ],
                     ActiveRecord::EVENT_AFTER_FIND => ['curworkers', '_oldAttributes', ],
                 ],
                 /** @var Event $event */
@@ -116,11 +118,11 @@ class Tasklist extends \yii\db\ActiveRecord
                         case 'task_createtime':
                             return new Expression('NOW()');
 
-                        case 'task_worker_id':
-                            if( in_array(Yii::$app->user->identity->us_role_name, array_keys(User::getWorkerRoles())) ) {
-                                return Yii::$app->user->identity->us_id;
-                            }
-                            return $model->task_worker_id;
+//                        case 'task_worker_id':
+//                            if( in_array(Yii::$app->user->identity->us_role_name, array_keys(User::getWorkerRoles())) ) {
+//                                return Yii::$app->user->identity->us_id;
+//                            }
+//                            return $model->task_worker_id;
 
                         case 'task_active':
                             return self::STATUS_ACTIVE;
@@ -281,13 +283,14 @@ class Tasklist extends \yii\db\ActiveRecord
             [['task_summary', ], 'filter', 'filter'=>'trim'],
 
             [['task_dep_id', 'task_name', 'task_actualtime', 'task_type', 'task_progress', ], 'required'], // 'task_direct',
+            [['curworkers'], 'filter', 'filter' => function($val){ if( is_string($val) ) { if( trim($val) == '' ) { $val = []; } else { $val = [intval($val)]; } } return $val; }],
             [['curworkers'], 'in', 'range' => array_keys($this->getTaskAvailWokers()), 'allowArray' => true],
             [['task_summary', ], 'required',
                 'when' => function($model) { return $model->task_progress == Tasklist::PROGRESS_FINISH; },
                 'whenClient' => "function (attribute, value) { return jQuery('#".Html::getInputId($this, 'task_summary')."').attr('data-req') == 1; }",
             ],
-            ['task_worker_id', 'filter', 'filter' => 'intval', ],
-            [['task_dep_id', 'task_num', 'task_type', 'task_numchanges', 'task_progress', 'task_active', 'task_worker_id', ], 'integer'],
+//            ['task_worker_id', 'filter', 'filter' => 'intval', ],
+            [['task_dep_id', 'task_num', 'task_type', 'task_numchanges', 'task_progress', 'task_active', /*'task_worker_id',*/ ], 'integer'],
             [['task_direct', 'task_name', 'task_reasonchanges', 'task_summary', ], 'string'], // 'reasonchange'
             [['task_createtime', 'task_finaltime', 'task_actualtime'], 'safe']
         ];
@@ -337,7 +340,7 @@ class Tasklist extends \yii\db\ActiveRecord
             'task_progress' => 'Статус',
             'task_summary' => 'Отчет',
             'task_active' => 'Удалена',
-            'task_worker_id' => 'Сотрудник',
+//            'task_worker_id' => 'Сотрудник',
             'curworkers' => 'Сотрудники',
         ];
     }
@@ -446,9 +449,9 @@ class Tasklist extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getWorker() {
-        return $this->hasOne(User::className(), ['us_id' => 'task_worker_id']);
-    }
+//    public function getWorker() {
+//        return $this->hasOne(User::className(), ['us_id' => 'task_worker_id']);
+//    }
 
     /**
      *
@@ -470,8 +473,8 @@ class Tasklist extends \yii\db\ActiveRecord
      *
      * @return array
      */
-    public function getTaskAvailWokers() {
-        if( $this->_workersid === null ) {
+    public function getTaskAvailWokers($bRefresh = false) {
+        if( ($this->_workersid === null) || $bRefresh ) {
             $this->_workersid = ArrayHelper::map(
                 User::find()->where(['us_dep_id' => $this->task_dep_id, 'us_active' => User::STATUS_ACTIVE, ])->all(),
                 'us_id',
@@ -539,9 +542,15 @@ class Tasklist extends \yii\db\ActiveRecord
         if( !Yii::$app->user->can('createUser') ) {
             if( $user ) {
                 $this->task_dep_id = $user->us_dep_id;
+                if( empty($this->curworkers) ) {
+                    $this->curworkers = [$user->us_id];
+                }
             }
             else if( Yii::$app->user->identity ) {
                 $this->task_dep_id = Yii::$app->user->identity->us_dep_id;
+                if( empty($this->curworkers) ) {
+                    $this->curworkers = [Yii::$app->user->identity->us_id];
+                }
             }
         }
     }
@@ -576,7 +585,7 @@ class Tasklist extends \yii\db\ActiveRecord
     public function getTaskattibutes() {
         $a = $this->attributes;
         unset($a['task_numchanges']);
-        $a['task_worker_id'] = intval($a['task_worker_id']);
+//        $a['task_worker_id'] = intval($a['task_worker_id']);
         $a['curworkers'] = array_keys($this->curworkers);
 //        unset($a['task_reasonchanges']);
         return $a;
@@ -652,7 +661,10 @@ class Tasklist extends \yii\db\ActiveRecord
 //            ->groupBy(['f.fl_name', 'f.fl_id', 'f.fl_sname']);
 
         if( Yii::$app->user->identity->isUserWorker() ) {
-            $query->andFilterWhere(['task_worker_id' => Yii::$app->user->identity->us_id]);
+//            $query->andFilterWhere(['task_worker_id' => Yii::$app->user->identity->us_id]);
+            $query->join('LEFT JOIN', '{{%worker}}', 'worker_task_id = task_id');
+            // LEFT JOIN `tlst_worker` ON `tlst_tasklist`.`task_id` = `tlst_worker`.`worker_task_id`
+            $query->andFilterWhere(['in', Worker::tableName() . '.worker_us_id', Yii::$app->user->identity->us_id]);
         }
         else if( $nRole == User::ROLE_DEPARTMENT ) {
             $query->andFilterWhere(['task_dep_id' => Yii::$app->user->identity->department->dep_id]);
@@ -746,7 +758,7 @@ class Tasklist extends \yii\db\ActiveRecord
             $oUser = Yii::$app->user->identity;
             if( $this->task_dep_id == $oUser->us_dep_id ) {
                 if( ($oUser->us_role_name == User::ROLE_DEPARTMENT)
-                    || (in_array($oUser->us_role_name, array_keys(User::getWorkerRoles())) && $this->task_worker_id == $oUser->us_id) ) {
+                    || (in_array($oUser->us_role_name, array_keys(User::getWorkerRoles())) && in_array($oUser->us_id, $this->curworkers)/*$this->task_worker_id == $oUser->us_id*/) ) {
                     $bRet = true;
                 }
             }
@@ -812,4 +824,36 @@ class Tasklist extends \yii\db\ActiveRecord
 
     }
 
+    /**
+     * Перекрываем родительский метод, чтобы подмеинть валидаптор сотрудников таким же, но с новыми значениями
+     *
+     * @param null $attribute
+     * @return array
+     */
+
+    public function getActiveValidators($attribute = null)
+    {
+//        $this->_validators = null;
+        /** @var ArrayObject $validators */
+        $validators = parent::getActiveValidators($attribute);
+        foreach($validators As $k=>$v) {
+            /** @var $v RangeValidator */
+            if( $v instanceof RangeValidator && in_array('curworkers', $v->attributes) ) {
+                Yii::info("Validator: " . ($v instanceof RangeValidator ? 'RangeValidator' : ' --- ') . ' = ' . print_r($v->attributes, true));
+                                $rule = [['curworkers'], 'in', 'range' => array_keys($this->getTaskAvailWokers()), 'allowArray' => true];
+                                $validator = Validator::createValidator($rule[1], $this, (array) $rule[0], array_slice($rule, 2));
+                                $validators[$k] = $validator;
+                //                $validators->append($validator);
+                break;
+            }
+        }
+        return $validators;
+    }
+
+/*
+    public function clearValidators()
+    {
+        $this->_validators = null;
+    }
+*/
 }

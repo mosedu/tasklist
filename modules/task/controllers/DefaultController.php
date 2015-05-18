@@ -4,6 +4,7 @@ namespace app\modules\task\controllers;
 
 use app\modules\user\models\User;
 use Yii;
+use yii\bootstrap\ActiveForm;
 use yii\web\Controller;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -121,6 +122,14 @@ class DefaultController extends Controller
             throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
         }
 
+        if( Yii::$app->request->isAjax && $model->load(Yii::$app->request->post()) ) {
+            Yii::info("Load from POST: " . print_r($model->attributes, true));
+            $model->getTaskAvailWokers(true);
+//            $model->clearValidators();
+//            $model->_validWorkers = array_keys($model->getTaskAvailWokers(true));
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ActiveForm::validate($model);
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);

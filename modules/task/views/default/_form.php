@@ -21,6 +21,11 @@ use mosedu\multirows\MultirowsWidget;
 /* @var $model app\modules\task\models\Tasklist */
 /* @var $form yii\widgets\ActiveForm */
 
+$sDepartmentId = Html::getInputId($model, 'task_dep_id');
+$sWorkerId = Html::getInputId($model, 'task_worker_id');
+$sCurWorkersId = Html::getInputId($model, 'curworkers');
+$sUrl = Url::to(['/user/worker/list'], true);
+
 $aTextParam = [
     'horizontalCssClasses' => [
         'label' => 'col-sm-3',
@@ -77,8 +82,22 @@ $aWorkerSelect = [
     ],
     'pluginOptions' => [
         'allowClear' => true,
+        'ajax' => [
+            'url' => $sUrl,
+            'dataType' => 'json',
+            'data' => new JsExpression('function(params) { return {id: jQuery("#'.$sDepartmentId.'").val(), type: "select2"}; }')
+        ],
     ],
 ];
+
+/*
+var oSelDepartment = jQuery("#{$sDepartmentId}"),
+    oSelWorker = jQuery("#{$sWorkerId}");
+oSelDepartment.on("change", function(event){
+    jQuery.get("{$sUrl}", {id: oSelDepartment.val()}, function(data, textStatus, jqXHR){ oSelWorker.html(''); jQuery('<option>').val(0).text("").appendTo(oSelWorker); for(var i in data) { jQuery('<option>').val(i).text(data[i]).appendTo(oSelWorker); } }, 'json');
+});
+
+*/
 
 if( !$bEditDates ) {
     $aWorkerSelect = ['readonly' => true, 'disabled' => true];
@@ -102,6 +121,15 @@ if( !$bEditDates ) {
     <?php $form = ActiveForm::begin([
         'id' => 'task-form',
         'layout' => 'horizontal',
+
+        'enableAjaxValidation' => true,
+        'enableClientValidation' => false,
+
+        'validateOnSubmit' => true,
+        'validateOnChange' => false,
+        'validateOnBlur' => false,
+        'validateOnType' => false,
+
         'options'=>[
             'enctype' => 'multipart/form-data',
         ],
@@ -383,9 +411,6 @@ EOT;
     <?php ActiveForm::end(); ?>
     <?php
     // $model->isNewRecord ? 'Создать' :
-    $sDepartmentId = Html::getInputId($model, 'task_dep_id');
-    $sWorkerId = Html::getInputId($model, 'task_worker_id');
-    $sUrl = Url::to(['/user/worker/list'], true);
     $sJs = <<<EOT
 var oSelDepartment = jQuery("#{$sDepartmentId}"),
     oSelWorker = jQuery("#{$sWorkerId}");

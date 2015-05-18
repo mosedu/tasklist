@@ -89,7 +89,7 @@ class TasklistSearch extends Tasklist
     public function search($params)
     {
         $query = Tasklist::find();
-        $query->with(['changes', 'department', 'worker', 'allworker', 'workers', 'workersdata']);
+        $query->with(['changes', 'department', /*'worker', */'allworker', 'workers', 'workersdata']);
         $query->joinWith(['department', 'workers']);
 
         $dataProvider = new ActiveDataProvider([

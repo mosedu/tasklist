@@ -141,8 +141,17 @@ class WorkerController extends Controller {
     public function actionList($id)
     {
         $id = intval($id);
+        $type = Yii::$app->request->getQueryParam('type', '');
         Yii::$app->response->format = Response::FORMAT_JSON;
-        return ($id > 0) ? User::getWorkerList($id) : [];
+        $a = User::getWorkerList($id);
+        if( $type == 'select2' ) {
+            $aNew = [];
+            foreach($a As $k=>$v) {
+                $aNew[] = ['id' => $k, 'text'=>$v];
+            }
+            $a = ['results' => $aNew];
+        }
+        return ($id > 0) ? $a : [];
     }
 
     /**

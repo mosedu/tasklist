@@ -133,7 +133,8 @@ $aColumns = [
                     ) :
                     (
                         Html::encode($model->task_name)
-                        . ($model->task_worker_id ? ('<span>' . Html::encode($model->worker->getFullName()). '</span>') : '')
+//                        . ($model->task_worker_id ? ('<span>' . Html::encode($model->worker->getFullName()). '</span>') : '')
+                        . ((count($model->workersdata) > 0) ? ('<span>' . implode(', ', ArrayHelper::map($model->workersdata, 'us_id', function($item){ return $item->getFullName(); })). '</span>') : '')
                     )
             ;
         },
