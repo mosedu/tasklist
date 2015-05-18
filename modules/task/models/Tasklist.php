@@ -9,6 +9,7 @@ use yii\db\ActiveRecord;
 use yii\db\Expression;
 use yii\behaviors\AttributeBehavior;
 use yii\base\Event;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\db\Query;
 
@@ -16,6 +17,7 @@ use app\components\AttributewalkBehavior;
 use app\modules\user\models\Department;
 use app\modules\task\models\Action;
 use app\modules\task\models\Changes;
+use app\modules\task\models\Worker;
 use app\components\NotifyBehavior;
 use yii\helpers\Url;
 
@@ -69,12 +71,14 @@ class Tasklist extends \yii\db\ActiveRecord
 
     public $_oldAttributes = [];
     public $reasonchange = ''; // причина изменения даты
+    public $curworkers = []; // список id сотрудников в задаче
+
+    private  $_workersid = null; // возможные сотружники
 
     public $_canEdit = null; // сохранение проверки возможности редактирования
 //    public $countworker = ''; //
 
     public static $_tmpModel = null;
-
 
     public function behaviors()
     {
@@ -83,7 +87,7 @@ class Tasklist extends \yii\db\ActiveRecord
                 'class' =>  AttributewalkBehavior::className(),
                 'attributes' => [
                     ActiveRecord::EVENT_BEFORE_INSERT => ['task_dep_id', 'task_actualtime', 'task_finaltime', 'task_active', 'task_createtime', 'task_num', 'task_worker_id', 'task_finishtime', ],
-                    ActiveRecord::EVENT_AFTER_FIND => ['_oldAttributes', ],
+                    ActiveRecord::EVENT_AFTER_FIND => ['curworkers', '_oldAttributes', ],
                 ],
                 /** @var Event $event */
                 'value' => function ($event, $attribute) {
@@ -127,6 +131,9 @@ class Tasklist extends \yii\db\ActiveRecord
                         case '_oldAttributes':
                             $model->task_actualtime = date('d.m.Y', strtotime($model->task_actualtime));
                             return $this->getTaskattibutes();
+
+                        case 'curworkers':
+                            return ArrayHelper::map($this->workers, 'worker_us_id', 'worker_us_id');
                     }
                 },
             ],
@@ -223,6 +230,7 @@ class Tasklist extends \yii\db\ActiveRecord
 
                     if( $event->name == ActiveRecord::EVENT_AFTER_INSERT ) {
                         Action::appendCreation($data);
+                        $model->saveWorkers();
                     }
                     else if( $event->name == ActiveRecord::EVENT_AFTER_UPDATE ) {
                         $aChanged = $model->getChangeattibutes();
@@ -240,6 +248,7 @@ class Tasklist extends \yii\db\ActiveRecord
                                 }
                             }
                         }
+                        $model->saveWorkers();
                     }
                     return $model->_oldAttributes;
                 },
@@ -266,11 +275,13 @@ class Tasklist extends \yii\db\ActiveRecord
      */
     public function rules()
     {
+
         $aRules = [
             [['task_dep_id', 'task_type', 'task_progress', 'task_active', ], 'filter', 'filter' => 'intval'],
             [['task_summary', ], 'filter', 'filter'=>'trim'],
 
             [['task_dep_id', 'task_name', 'task_actualtime', 'task_type', 'task_progress', ], 'required'], // 'task_direct',
+            [['curworkers'], 'in', 'range' => array_keys($this->getTaskAvailWokers()), 'allowArray' => true],
             [['task_summary', ], 'required',
                 'when' => function($model) { return $model->task_progress == Tasklist::PROGRESS_FINISH; },
                 'whenClient' => "function (attribute, value) { return jQuery('#".Html::getInputId($this, 'task_summary')."').attr('data-req') == 1; }",
@@ -327,6 +338,7 @@ class Tasklist extends \yii\db\ActiveRecord
             'task_summary' => 'Отчет',
             'task_active' => 'Удалена',
             'task_worker_id' => 'Сотрудник',
+            'curworkers' => 'Сотрудники',
         ];
     }
 
@@ -447,8 +459,47 @@ class Tasklist extends \yii\db\ActiveRecord
 
     public function getAllworker() {
         return $this
-            ->hasOne(User::className(), ['us_dep_id' => 'task_dep_id'])
+//            ->hasOne(User::className(), ['us_dep_id' => 'task_dep_id'])
+            ->hasMany(User::className(), ['us_dep_id' => 'task_dep_id'])
             ->where(['us_active' => User::STATUS_ACTIVE, ]); // 'us_role_name' => User::ROLE_WORKER,
+    }
+
+    /**
+     *
+     * Возможные сотрудники - список id
+     *
+     * @return array
+     */
+    public function getTaskAvailWokers() {
+        if( $this->_workersid === null ) {
+            $this->_workersid = ArrayHelper::map(
+                User::find()->where(['us_dep_id' => $this->task_dep_id, 'us_active' => User::STATUS_ACTIVE, ])->all(),
+                'us_id',
+                function($ob) { return $ob->getFullName(); }
+            );
+            Yii::info("getTaskAvailWokers(): " . print_r($this->getTaskAvailWokers(), true));
+        }
+        return $this->_workersid;
+    }
+
+    /**
+     *
+     * Отношение задачи к сотруднику в модели, когда много ответственных
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWorkers() {
+        return $this->hasMany(Worker::className(), ['worker_task_id' => 'task_id']);
+    }
+
+    /**
+     *
+     * Отношение задачи к сотруднику в модели, когда много ответственных
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWorkersdata() {
+        return $this->hasMany(User::className(), ['us_id' => 'worker_us_id'])->via('workers');
     }
 
     /**
@@ -526,6 +577,7 @@ class Tasklist extends \yii\db\ActiveRecord
         $a = $this->attributes;
         unset($a['task_numchanges']);
         $a['task_worker_id'] = intval($a['task_worker_id']);
+        $a['curworkers'] = array_keys($this->curworkers);
 //        unset($a['task_reasonchanges']);
         return $a;
     }
@@ -716,6 +768,48 @@ class Tasklist extends \yii\db\ActiveRecord
      */
     public function url($bFull = true) {
         return Url::to(['/task/default/view/' . $this->task_id], $bFull);
+    }
+
+    /**
+     * Сохранение соответствующих сотрудников в задаче
+     *
+     */
+    public function saveWorkers() {
+        $aDel = []; // То, что надо будет удалить
+        foreach($this->workers As $ob) {
+            $nKey = array_search($ob->worker_us_id, $this->curworkers);
+            if( $nKey === false ) {
+                // сотрудника удалили из списка
+                $aDel[] = $ob;
+//                Yii::info('saveWorkers(): need del ' . $ob->worker_us_id);
+            }
+            else {
+                unset($this->curworkers[$nKey]);
+//                Yii::info('saveWorkers(): go ' . $ob->worker_us_id);
+            }
+        }
+        $ob = reset($aDel);
+        foreach($this->curworkers As $v) {
+            if($ob === false) {
+                // если нечего взять из старых записей, создаем новую
+                $ob = new Worker();
+                $ob->worker_task_id = $this->task_id;
+//                Yii::info('saveWorkers(): add record for ' . $v);
+            }
+            $ob->worker_us_id = $v;
+            if( !$ob->save() ) {
+                Yii::error('Error save worker records: ' . print_r($ob->getErrors(), true));
+            }
+            $ob = next($aDel);
+        }
+
+        while( $ob ) {
+            // удаляем остатки старого
+//            Yii::info('saveWorkers(): delete ' . $ob->worker_us_id);
+            $ob->delete();
+            $ob = next($aDel);
+        }
+
     }
 
 }

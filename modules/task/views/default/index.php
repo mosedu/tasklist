@@ -5,12 +5,16 @@ use yii\grid\GridView;
 use yii\web\View;
 use yii\helpers\Url;
 use yii\bootstrap\Modal;
+use yii\helpers\ArrayHelper;
+
+use kartik\select2\Select2Asset;
 
 use app\assets\GriddataAsset;
 use app\modules\task\models\Tasklist;
 use app\modules\user\models\User;
 
 GriddataAsset::register($this);
+// Select2Asset::register($this);
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\modules\task\models\TasklistSearch */
@@ -99,6 +103,7 @@ $aColumns = [
 //                'filter' => Tasklist::getAllTypes(),
         'filter' => false,
         'content' => function ($model, $key, $index, $column) {
+            // Yii::info('index: ' . $model->task_id . ' -> ' . print_r($model->workersdata, true));
             // $sGlyth = $model->task_type == Tasklist::TYPE_PLAN ? 'calendar' : 'flash';
 //            $oUser = Yii::$app->user;
 //            $bEdit = $oUser->can(User::ROLE_CONTROL) || $oUser->can(User::ROLE_DEPARTMENT);
@@ -113,13 +118,15 @@ $aColumns = [
                                 'title' => Html::encode($model->task_name),
                             ]
                         )
-                        . (( (count($model->allworker) > 0) || $model->task_worker_id ) ?
+                        . (( (count($model->allworker) > 0) || (count($model->workersdata) > 0) ) ? // $model->task_worker_id
                             ( '<span>' . Html::a(
-                                    $model->task_worker_id ? Html::encode($model->worker->getFullName()) : '+',
+//                                    ($model->task_worker_id ? Html::encode($model->worker->getFullName()) : '+') . ' //// ' .
+                                    ((count($model->workersdata) > 0) ? implode(', ', ArrayHelper::map($model->workersdata, 'us_id', function($item){ return $item->getFullName(); })) : '+'),
+//                                    ((count($model->workersdata) > 0) ? array_reduce($model->workersdata, function($carry, $item){ return (($carry != '') ? ', ' : '') . $item->getFullName(); }, '') : '+'),
                                     ['setworker', 'id'=>$model->task_id], // update
                                     [
                                         'class' => 'showinmodal greylink',
-                                        'title' => 'Сотрудник',
+                                        'title' => 'Сотрудники',
                                     ]
                                 )
                              . '</span>' ) : '')

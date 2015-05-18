@@ -318,8 +318,11 @@ EOT;
     </div>
 
     <div class="col-sm-12">
-        <?php echo $form->field($model, 'task_worker_id', $aWorker)
+        <?php echo $form->field($model, 'curworkers', $aWorker)
             ->widget(Select2::classname(), $aWorkerWidget)
+        ?>
+        <?php /*echo $form->field($model, 'task_worker_id', $aWorker)
+            ->widget(Select2::classname(), $aWorkerWidget) */
         ?>
         <?php // echo $form->field($model, 'task_progress')->dropDownList(array_merge(['' => ''], Tasklist::getAllProgresses())) ?>
     </div>

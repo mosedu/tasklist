@@ -37,9 +37,9 @@ class Worker extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'worker_id' => 'Worker ID',
-            'worker_task_id' => 'Worker Task ID',
-            'worker_us_id' => 'Worker Us ID',
+            'worker_id' => 'ID',
+            'worker_task_id' => 'ID задачи',
+            'worker_us_id' => 'ID сотрудника',
         ];
     }
 }

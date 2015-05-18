@@ -65,6 +65,25 @@ foreach(User::getWorkerList($model->task_dep_id) As $k=>$v) {
     $aWorker[$k] = $v;
 }
 
+$bFinished = ($model->task_progress == Tasklist::PROGRESS_FINISH);
+$bEditDates = !$bFinished || Yii::$app->user->can('createUser');
+
+$aWorkerSelect = [
+    'data' => $model->getTaskAvailWokers() ,//ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_SUBJECT), 'tag_id', 'tag_title'),
+    'language' => 'ru',
+    'options' => [
+        'placeholder' => 'Выберите из списка ...',
+        'multiple' => true,
+    ],
+    'pluginOptions' => [
+        'allowClear' => true,
+    ],
+];
+
+if( !$bEditDates ) {
+    $aWorkerSelect = ['readonly' => true, 'disabled' => true];
+}
+
 ?>
 
 <div class="tasklist-form">
@@ -95,9 +114,6 @@ foreach(User::getWorkerList($model->task_dep_id) As $k=>$v) {
             ],
         ],
     ]);
-
-    $bFinished = ($model->task_progress == Tasklist::PROGRESS_FINISH);
-    $bEditDates = !$bFinished || Yii::$app->user->can('createUser');
 
     ?>
 
@@ -291,7 +307,8 @@ EOT;
     <div class="col-sm-4">
                 <?= $form->field($model, 'task_dep_id')->dropDownList(Department::getList(false), $aDisable) ?>
                 <?= $form->field($model, 'task_type')->dropDownList(Tasklist::getAllTypes(), $bEditDates ? [] : $aDisable) ?>
-                <?= $form->field($model, 'task_worker_id')->dropDownList($aWorker, $bEditDates ? [] : $aDisable) ?>
+                <?= '' // $form->field($model, 'task_worker_id')->dropDownList($aWorker, $bEditDates ? [] : $aDisable) ?>
+                <?= $form->field($model, 'curworkers')->widget(Select2::classname(), $aWorkerSelect) ?>
                 <?= $form->field($model, 'task_progress')->dropDownList(Tasklist::getAllProgresses(), $bEditDates ? [] : $aDisable) ?>
                 <?= $form->field(
                     $model,

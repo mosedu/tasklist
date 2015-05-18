@@ -8,6 +8,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\modules\task\models\Tasklist;
+use app\modules\task\models\Worker;
 
 /**
  * TasklistSearch represents the model behind the search form about `app\modules\task\models\Tasklist`.
@@ -37,7 +38,8 @@ class TasklistSearch extends Tasklist
             [['task_id', 'task_dep_id', 'task_type', 'task_numchanges', ], 'integer'], // 'task_num',
             [['task_num', ], 'match', 'pattern' => '|^\\d+[\\d.]*$|', 'message'=>'Нужно циферки ввести в формате 1.3 или 2', ],
             [['numchangesstart', 'numchangesfinish', ], 'integer'],
-            [['task_worker_id', ], 'in', 'range'=>array_keys(User::getWorkerList()), 'allowArray' => true, ],
+//            [['task_worker_id', ], 'in', 'range'=>array_keys(User::getWorkerList()), 'allowArray' => true, ],
+            [['curworkers', ], 'in', 'range'=>array_keys(User::getWorkerList()), 'allowArray' => true, ],
             [['task_progress'], 'in', 'range'=>array_keys(Tasklist::getAllProgresses()), 'allowArray' => true, ],
             [['datestart', 'datefinish', 'task_direct', 'task_name', 'task_createtime', 'task_finaltime', 'task_actualtime', 'task_reasonchanges', 'task_summary'], 'safe'],
             [['task_dep_id'], 'filter', 'filter' => function($val){ return ( $val <=0 ) ? null : $val; }, ],
@@ -87,8 +89,8 @@ class TasklistSearch extends Tasklist
     public function search($params)
     {
         $query = Tasklist::find();
-        $query->with(['changes', 'department', 'worker', 'allworker']);
-        $query->joinWith(['department']);
+        $query->with(['changes', 'department', 'worker', 'allworker', 'workers', 'workersdata']);
+        $query->joinWith(['department', 'workers']);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -167,7 +169,12 @@ class TasklistSearch extends Tasklist
         }
 
         if( Yii::$app->user->identity->isUserWorker() ) {
-            $this->task_worker_id = Yii::$app->user->identity->us_id;
+//            $this->task_worker_id = Yii::$app->user->identity->us_id;
+            $this->curworkers = [Yii::$app->user->identity->us_id];
+        }
+
+        if( !empty($this->curworkers) ) {
+            $query->andFilterWhere(['in', Worker::tableName() . '.worker_us_id', $this->curworkers]);
         }
 
         $query->andFilterWhere([
@@ -175,7 +182,7 @@ class TasklistSearch extends Tasklist
             'task_dep_id' => $this->task_dep_id,
             'task_num' => $tasknum,
             'task_type' => $this->task_type,
-            'task_worker_id' => $this->task_worker_id,
+//            'task_worker_id' => $this->task_worker_id,
             'task_active' => Tasklist::STATUS_ACTIVE,
 //            'task_createtime' => $this->task_createtime,
 //            'task_finaltime' => $this->task_finaltime,

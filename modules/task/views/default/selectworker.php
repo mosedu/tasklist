@@ -7,6 +7,7 @@ use yii\helpers\ArrayHelper;
 
 use app\modules\task\models\Tasklist;
 use app\modules\user\models\User;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $model app\modules\task\models\Tasklist */
@@ -15,8 +16,21 @@ use app\modules\user\models\User;
 $aDisable = [];
 $bFinished = ($model->task_progress == Tasklist::PROGRESS_FINISH);
 
+$aWorkerSelect = [
+    'data' => $model->getTaskAvailWokers() ,//ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_SUBJECT), 'tag_id', 'tag_title'),
+    'language' => 'ru',
+    'options' => [
+        'placeholder' => 'Выберите из списка ...',
+        'multiple' => true,
+    ],
+    'pluginOptions' => [
+        'allowClear' => true,
+    ],
+];
+
 if( $bFinished ) {
     $aDisable = ['readonly' => true, 'disabled' => true];
+    $aWorkerSelect = ['readonly' => true, 'disabled' => true];
 }
 
 ?>
@@ -50,15 +64,23 @@ if( $bFinished ) {
         ],
         'enableAjaxValidation' => true,
         'enableClientValidation' => false,
+        'validateOnChange' => false,
+        'validateOnBlur' => false,
+        'validateOnType' => false,
     ]);
 
     ?>
 
     <div class="col-sm-8">
-    <?= $form->field($model, 'task_worker_id')->dropDownList(
-        ArrayHelper::map(User::getDepartmentWorker($model->task_dep_id), 'us_id', function($model){ return $model->getFullName(); }),
-        $aDisable
-    ) ?>
+    <?= $form
+            ->field($model, 'curworkers')
+/*            ->dropDownList(
+                ArrayHelper::map(User::getDepartmentWorker($model->task_dep_id), 'us_id', function($model){ return $model->getFullName(); }),
+                $aDisable
+            )*/
+//            ->listBox($model->getTaskAvailWokers(), ['multiple'=>'multiple'])
+            ->widget(Select2::classname(), $aWorkerSelect)
+    ?>
     </div>
     <div class="clearfix"></div>
 
@@ -79,6 +101,9 @@ if( $bFinished ) {
 </div>
 
 <?php
+// $sIdRoles = Html::getInputId($model, 'curworkers');
+// jQuery("#{$sIdRoles}").select2();
+
 $sJs = <<<EOT
 var nCou = 0;
 jQuery("#setworker-form")
