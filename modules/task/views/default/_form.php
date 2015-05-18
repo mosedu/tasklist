@@ -109,6 +109,7 @@ foreach(User::getWorkerList($model->task_dep_id) As $k=>$v) {
         <?= $form->field($model, 'task_name', $aTextParam)->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable)) ?>
 
         <?php
+/*
             echo MultirowsWidget::widget(
                 [
                     'model' => File::className(),
@@ -121,14 +122,14 @@ foreach(User::getWorkerList($model->task_dep_id) As $k=>$v) {
                     'addlinkselector' => '#add-task-file-link',
                     'dellinkselector' => '.remove-file',
 //                    'formselector' => '#task-form',
-                    'afterInsert' => 'function(ob){ console.log("Insert row : task-file"); /*operatorApp.initItem(ob);*/ }',
-                    'afterDelete' => 'function(){ console.log("Delete row : task-file"); /*operatorApp.recalcSumm();*/ }',
+                    'afterInsert' => 'function(ob){ console.log("Insert row : task-file"); }',
+                    'afterDelete' => 'function(){ console.log("Delete row : task-file"); }',
 //                    'scenario' => 'userform',
                     'canDeleteLastRow' => true,
                 ]
             );
         ?>
-
+<?php
         <div class="file-data" id="filedata">
             <div class="form-group">
                 <label class="control-label col-sm-3">Файлы</label>
@@ -138,12 +139,13 @@ foreach(User::getWorkerList($model->task_dep_id) As $k=>$v) {
                 <div class="clearfix"></div>
             </div>
         </div>
-
+*/
+?>
 
         <?= $form->field($model, 'task_summary', array_merge($aTextParam, ['options' => $bHideSummary ? ['style' => 'display: none;', 'class'=>'form-group'] : ['class'=>'form-group']]) )->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0, ]) ?>
 
         <?php
-
+/*
         echo MultirowsWidget::widget(
             [
                 'model' => File::className(),
@@ -176,6 +178,7 @@ foreach(User::getWorkerList($model->task_dep_id) As $k=>$v) {
         </div>
 
         <?php
+*/
 //        if( $model->isNewRecord ) { // new record
             $this->registerJs('var aChache = {},
             oSel = jQuery("#idselectdirectlist"),

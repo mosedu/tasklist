@@ -25,8 +25,8 @@ if( !isset($index) ) {
 }
 ?>
 
-<div class="form-group">
-    <label class="control-label col-sm-3"></label>
+<!-- div class="" -->
+    <label class="control-label col-sm-3">&nbsp;</label>
     <div class="col-sm-5">
         <?= $form->field($model, '[' . $index . ']file_comment', ['template'=>"{input}\n{hint}\n{error}"])->textInput(['maxlength' => true]) ?>
     </div>
@@ -34,7 +34,7 @@ if( !isset($index) ) {
         <?= $form->field($model, '[' . $index . ']filedata', ['template'=>"{input}\n{hint}\n{error}"])->fileInput() ?>
     </div>
     <div class="clearfix"></div>
-</div>
+<!-- /div -->
 
 <?php
 
