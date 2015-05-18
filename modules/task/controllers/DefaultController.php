@@ -131,14 +131,20 @@ class DefaultController extends Controller
             return ActiveForm::validate($model);
         }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+        if ($model->load(Yii::$app->request->post()) ) {
+            $model->getTaskAvailWokers(true);
+            if ($model->save()) {
+                return $this->redirect(['index']);
+            }
+        }
+
+
 //            return $this->redirect(['view', 'id' => $model->task_id]);
-        } else {
+//        } else {
             return $this->render('create', [
                 'model' => $model,
             ]);
-        }
+//        }
     }
 
     /**
