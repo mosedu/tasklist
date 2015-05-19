@@ -152,8 +152,12 @@ if( !$bEditDates ) {
 
         <?= $form->field($model, 'task_name', $aTextParam)->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable)) ?>
 
+        <div class="file-data" id="filedata">
+            <div class="form-group">
+                <label class="control-label col-sm-3"></label>
+                <div class="col-sm-9">
         <?php
-/*
+
             echo MultirowsWidget::widget(
                 [
                     'model' => File::className(),
@@ -173,7 +177,11 @@ if( !$bEditDates ) {
                 ]
             );
         ?>
-<?php
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
         <div class="file-data" id="filedata">
             <div class="form-group">
                 <label class="control-label col-sm-3">Файлы</label>
@@ -183,13 +191,16 @@ if( !$bEditDates ) {
                 <div class="clearfix"></div>
             </div>
         </div>
-*/
-?>
+
 
         <?= $form->field($model, 'task_summary', array_merge($aTextParam, ['options' => $bHideSummary ? ['style' => 'display: none;', 'class'=>'form-group'] : ['class'=>'form-group']]) )->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0, ]) ?>
 
+        <div class="file-data" id="filedata">
+            <div class="form-group">
+                <label class="control-label col-sm-3"></label>
+                <div class="col-sm-9">
         <?php
-/*
+
         echo MultirowsWidget::widget(
             [
                 'model' => File::className(),
@@ -201,7 +212,6 @@ if( !$bEditDates ) {
 //                    'tagOptions' => ['class' => 'clear-item'],
                 'addlinkselector' => '#add-summary-file-link',
                 'dellinkselector' => '.remove-file',
-//                    'formselector' => '#task-form',
                 'afterInsert' => 'function(ob){ console.log("Insert row : summary-file"); }',
                 'afterDelete' => 'function(){ console.log("Delete row : summary-file"); }',
 //                    'scenario' => 'userform',
@@ -210,6 +220,11 @@ if( !$bEditDates ) {
         );
 
         ?>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
 
         <div class="file-data" id="filedata">
             <div class="form-group">
@@ -222,7 +237,7 @@ if( !$bEditDates ) {
         </div>
 
         <?php
-*/
+
 //        if( $model->isNewRecord ) { // new record
             $this->registerJs('var aChache = {},
             oSel = jQuery("#idselectdirectlist"),

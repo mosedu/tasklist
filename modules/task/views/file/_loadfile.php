@@ -26,12 +26,21 @@ if( !isset($index) ) {
 ?>
 
 <!-- div class="" -->
-    <label class="control-label col-sm-3">&nbsp;</label>
-    <div class="col-sm-5">
-        <?= $form->field($model, '[' . $index . ']file_comment', ['template'=>"{input}\n{hint}\n{error}"])->textInput(['maxlength' => true]) ?>
-    </div>
-    <div class="col-sm-4">
+    <div class="col-sm-11">
         <?= $form->field($model, '[' . $index . ']filedata', ['template'=>"{input}\n{hint}\n{error}"])->fileInput() ?>
+    </div>
+    <div class="col-sm-1">
+        <?= Html::a(
+            Html::tag('span', '', ['class' => 'glyphicon glyphicon-remove']),
+            '',
+            [
+                'class' => 'btn btn-danger remove-file',
+            ]
+        ) ?>
+    </div>
+    <div class="col-sm-12">
+        <?= $form->field($model, '[' . $index . ']file_id', ['template'=>"{input}"])->hiddenInput() ?>
+        <?= $form->field($model, '[' . $index . ']file_comment', ['template'=>"{input}\n{hint}\n{error}"])->textInput(['maxlength' => true]) ?>
     </div>
     <div class="clearfix"></div>
 <!-- /div -->
