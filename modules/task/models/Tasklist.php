@@ -284,7 +284,7 @@ class Tasklist extends \yii\db\ActiveRecord
             [['task_summary', ], 'filter', 'filter'=>'trim'],
 
             [['task_dep_id', 'task_name', 'task_actualtime', 'task_type', 'task_progress', ], 'required'], // 'task_direct',
-            [['curworkers'], 'filter', 'filter' => function($val){ if( is_string($val) ) { if( trim($val) == '' ) { $val = []; } else { $val = [intval($val)]; } } return $val; }],
+            [['curworkers'], 'filter', 'filter' => function($val){ if( is_string($val) ) { if( trim($val) == '' ) { $val = []; } else { $val = [intval($val)]; } } else if( is_array($val) ) { foreach($val As $k=>$v) { if( trim($v) == '' ) { unset($val[$k]); } } } return $val; }],
 //            [['curworkers'], 'in', 'range' => array_keys($this->getTaskAvailWokers()), 'allowArray' => true],
             [['curworkers'], 'isWorkersInDepartment'],
             [['task_summary', ], 'required',
@@ -568,13 +568,13 @@ class Tasklist extends \yii\db\ActiveRecord
             if( $user ) {
                 $this->task_dep_id = $user->us_dep_id;
                 if( empty($this->curworkers) ) {
-                    $this->curworkers = [$user->us_id];
+                    $this->curworkers = [$user->us_id => $user->us_id, ];
                 }
             }
             else if( Yii::$app->user->identity ) {
                 $this->task_dep_id = Yii::$app->user->identity->us_dep_id;
                 if( empty($this->curworkers) ) {
-                    $this->curworkers = [Yii::$app->user->identity->us_id];
+                    $this->curworkers = [Yii::$app->user->identity->us_id => Yii::$app->user->identity->us_id];
                 }
             }
         }
@@ -611,7 +611,8 @@ class Tasklist extends \yii\db\ActiveRecord
         $a = $this->attributes;
         unset($a['task_numchanges']);
 //        $a['task_worker_id'] = intval($a['task_worker_id']);
-        $a['curworkers'] = array_keys($this->curworkers);
+//        $a['curworkers'] = array_keys($this->curworkers);
+        $a['curworkers'] = array_values($this->curworkers);
 //        unset($a['task_reasonchanges']);
         return $a;
     }

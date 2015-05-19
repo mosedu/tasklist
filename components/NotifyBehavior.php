@@ -38,16 +38,25 @@ class NotifyBehavior extends Behavior {
         $sTitle = 'Новая задача в Системе мониторинга задач ГАУ ТемоЦентр';
         $sTemplate = 'new_task';
         $nUserNotify = 0;
-
-        if( !empty($model->task_worker_id) ) {
-            $nUserNotify = $model->task_worker_id;
-            $model->worker->sendNotificate('user_new_task', $sTitle, ['task' => $model, 'department' => $dep]);
+        /*
+                if( !empty($model->task_worker_id) ) {
+                    $nUserNotify = $model->task_worker_id;
+                    $model->worker->sendNotificate('user_new_task', $sTitle, ['task' => $model, 'department' => $dep]);
+                }
+        */
+        if( !empty($model->curworkers) ) {
+            foreach( User::find()
+                         ->where(['us_id' => $model->curworkers])
+                         ->all() As $ob) {
+                $ob->sendNotificate('user_new_task', $sTitle, ['task' => $model, 'department' => $dep]);
+            }
         }
 
         foreach($aUsers As $ob) {
             Yii::info('for: '.$ob->us_id.' != ' . $curId);
             /** @var User $ob */
-            if( ($ob->us_id != $curId) && ($nUserNotify != $ob->us_id) ) {
+//            if( ($ob->us_id != $curId) && ($nUserNotify != $ob->us_id) ) {
+            if( ($ob->us_id != $curId) && ( !in_array($ob->us_id, $model->curworkers)) ) {
                 $aNotify[$ob->us_id] = $ob->us_id;
                 $ob->sendNotificate($sTemplate, $sTitle, ['task' => $model, 'department' => $dep]);
             }
