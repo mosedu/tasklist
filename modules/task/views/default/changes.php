@@ -30,6 +30,14 @@ if( !function_exists('formatVal') ) {
         else if ($key == 'task_worker_id') {
             return User::getUserNameById($val);
         }
+        else if ($key == 'curworkers') {
+            $aVal = [];
+            foreach( $val As $v ) {
+//                Yii::info('formatVal(model, '.$key.', ['.implode(', ', $val).']) : ' . User::getUserNameById($v));
+                $aVal[] = User::getUserNameById($v);
+            }
+            return implode(', ', $aVal);
+        }
         else if( preg_match('|[\\d]{4}-[\\d]{2}-[\\d]{2} [\\d]{2}:[\\d]{2}:[\\d]{2}|', $val) ) {
             $val = date('d.m.Y', strtotime($val));
         }
