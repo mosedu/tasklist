@@ -21,6 +21,7 @@ class NotifyBehavior extends Behavior {
     public function events() {
         return [
             ActiveRecord::EVENT_AFTER_INSERT => 'notyfyUsers',
+            ActiveRecord::EVENT_AFTER_UPDATE => 'notyfyNewUsers',
         ];
     }
 
@@ -80,4 +81,25 @@ class NotifyBehavior extends Behavior {
         }
 */
     }
+
+    /**
+     * @param Event $event
+     */
+    public function notyfyNewUsers($event) {
+        /** @var Tasklist $model */
+        $model = $event->sender;
+        $dep = $model->department;
+        $sTitle = 'Новая задача в Системе мониторинга задач ГАУ ТемоЦентр';
+        $aChanged = $model->getChangeattibutes();
+        if( isset($aChanged['curworkers']) ) {
+            $aDiff = array_diff($aChanged['curworkers']['new'], $aChanged['curworkers']['old']);
+            Yii::info('Worker diff: ' . print_r($aDiff, true));
+            foreach( User::find()
+                         ->where(['us_id' => $aDiff])
+                         ->all() As $ob) {
+                $ob->sendNotificate('user_new_task', $sTitle, ['task' => $model, 'department' => $dep]);
+            }
+        }
+    }
+
 }
