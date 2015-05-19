@@ -356,7 +356,7 @@ class Tasklist extends \yii\db\ActiveRecord
             'task_progress' => 'Статус',
             'task_summary' => 'Отчет',
             'task_active' => 'Удалена',
-//            'task_worker_id' => 'Сотрудник',
+            'task_worker_id' => 'Сотрудник',
             'curworkers' => 'Сотрудники',
         ];
     }
