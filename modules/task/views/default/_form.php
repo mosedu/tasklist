@@ -198,6 +198,7 @@ if( !$bEditDates ) {
 
         <?= $form->field($model, 'task_summary', array_merge($aTextParam, ['options' => $bHideSummary ? ['style' => 'display: none;', 'class'=>'form-group'] : ['class'=>'form-group']]) )->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0, ]) ?>
 
+        <div id="file-forsummary-region">
         <div class="file-data" id="filedata">
             <div class="form-group">
                 <label class="control-label col-sm-3"></label>
@@ -238,6 +239,8 @@ if( !$bEditDates ) {
                 </div>
                 <div class="clearfix"></div>
             </div>
+        </div>
+
         </div>
 
         <?php
@@ -307,6 +310,9 @@ var oSelProgress = jQuery("#{$sIdProgress}"),
     oSummary = jQuery("#{$sIdSummary}"),
     oDivSummary = jQuery(".field-tasklist-task_summary"),
     oShowSummaryButton = jQuery('#showsummaryfield');
+
+oDivSummary.append(jQuery("#file-forsummary-region"));
+
 oSelProgress.on(
     "change",
     function(event) {

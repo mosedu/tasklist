@@ -866,15 +866,66 @@ class Tasklist extends \yii\db\ActiveRecord
      *
      */
     public function uploadFiles($aData) {
-        Yii::info("loadFiles() = " . print_r(UploadedFile::getFiles(), true));
+//        Yii::info("loadFiles() = " . print_r(UploadedFile::getFiles(), true));
 
-        // if no image was uploaded abort the upload
-/*        if( empty($files) ) {
-            return;
+        $aModels = $this->taskfiles;
+        $aNeedDel = [];
+        foreach($aModels As $oFile) {
+            $nIndex = $this->searchFile($aData['data'], $oFile->file_id);
+//            Yii::info('saveRoles('.$uid.'): find: ' . print_r($obData->attributes, true) . ' = ' . (( $aRoleData !== null ) ? '' : 'not ') . 'exists');
+            if( $nIndex !== -1 ) {
+                // все нормально, запись остается
+//                Yii::info('uploadFiles('.$oFile->file_id.'): ['.$nIndex.'] ' . $oFile->file_comment . ' -> ' . $aData['data'][$nIndex]['file_comment']);
+
+                $oFile = File::findOne($aData['data'][$nIndex]['file_id']);
+                $oFile->file_comment = $aData['data'][$nIndex]['file_comment'];
+                $oFile->save();
+                unset($aData['data'][$nIndex]);
+            }
+            else {
+                Yii::info('uploadFiles('.$oFile->file_id.'): need del');
+                $aNeedDel[] = $oFile;
+//                Yii::info('saveRoles('.$uid.'): delete');
+            }
         }
-*/
 
+        // оставшиеся данные пытаемся запихать в существующие записи, которые должны быть удалены
+        $oFile = reset($aNeedDel);
         foreach($aData['data'] As $k=>$data) {
+//            Yii::info('uploadFiles(): data ' . $k . ' ' . print_r($data, true));
+            if( $oFile === false ) {
+                // кончились удаляемые записи - создаем новые
+                $oFile = new File();
+//                Yii::info('uploadFiles(): new File');
+            }
+            $ob = UploadedFile::getInstance(new File(), '['.$k.']filedata');
+            $oFile->setDataByUpload(
+                $ob,
+                $this->task_id,
+                $data['file_comment'],
+                $data['file_group']
+            );
+
+            if( !$oFile->save() ) {
+                Yii::error("uploadFiles() Error save: " . print_r($oFile->getErrors(), true));
+            }
+            else {
+                $ob->saveAs($oFile->getFullpath());
+            }
+            $oFile = next($aNeedDel);
+        }
+
+        // если остались удаляемые записи - удаляем их
+        while( $oFile !== false ) {
+//            Yii::error("uploadFiles() Delete File");
+            $oFile->delete();
+            $oFile = next($aNeedDel);
+        }
+
+        return;
+
+        /** @var  UploadedFile $ob */
+/*        foreach($aData['data'] As $k=>$data) {
 //            $ob = $files[$k];
             $ob = UploadedFile::getInstance(new File(), '['.$k.']filedata');
             Yii::info("uploadFiles() files = " . print_r($ob, true));
@@ -890,8 +941,6 @@ class Tasklist extends \yii\db\ActiveRecord
                 $oFile->file_comment = $data['file_comment'];
                 $oFile->save();
             }
-            /** @var  UploadedFile $ob */
-
 
             if( $oFile->hasErrors() ) {
                 Yii::info('uploadFiles(): File error: ' . print_r($oFile->getErrors(), true));
@@ -900,5 +949,22 @@ class Tasklist extends \yii\db\ActiveRecord
                 Yii::info('uploadFiles(): save file ['.$k.'] ' . $oFile->file_orig_name . ' [' . $oFile->file_size . ']');
             }
         }
+*/
+    }
+
+    /**
+     * @param array $data post data for files
+     * @param int $id file id for search
+     * @return int index in data
+     */
+    public function searchFile($data, $id) {
+        $index = -1;
+        foreach($data As $k=>$v) {
+            if( $v['file_id'] == $id ) {
+                $index = $k;
+                break;
+            }
+        }
+        return $index;
     }
 }

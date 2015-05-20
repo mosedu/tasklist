@@ -133,25 +133,14 @@ class File extends \yii\db\ActiveRecord
      * @param $taskid integer Task id
      * @param $comment string Comment string
      * @param $group integer File Group
-     * @param $isnew boolean is new record
      */
     public function addFile($ob, $taskid, $comment, $group) {
         if( !$this->isUploadDirExists() ) {
-            Yii::info("Error: Upload dir not exists");
+            Yii::error("Error: Upload dir not exists");
             return;
         }
         if( $this->isNewRecord ) {
-            $a = explode(".", $ob->name);
-            $ext = array_pop($a);
-
-            $this->file_time = new Expression('NOW()');
-            $this->file_orig_name = $ob->name;
-            $this->file_size = $ob->size;
-            $this->file_type = $ob->type;
-            $this->file_name = Yii::$app->security->generateRandomString() . $ob->size . ".{$ext}";
-            $this->file_user_id = Yii::$app->user->id;
-            $this->file_task_id = $taskid;
-            $this->file_group = $group;
+            $this->setDataByUpload($ob, $taskid, $comment, $group);
         }
 
         $this->file_comment = $comment; // . ' ' . $ob->name . ' * ' . $ob->size;
@@ -159,6 +148,41 @@ class File extends \yii\db\ActiveRecord
         if( $this->save() ) {
             $ob->saveAs($this->getFullpath());
         }
+    }
+
+    /**
+     * @param $ob UploadedFile
+     * @param $taskid integer Task id
+     * @param $comment string Comment string
+     * @param $group integer File Group
+     */
+    public function setDataByUpload($ob, $taskid, $comment, $group)
+    {
+        if( !$this->isNewRecord ) {
+            unlink($this->getFullpath());
+        }
+
+        $a = explode(".", $ob->name);
+        $ext = array_pop($a);
+
+        $this->file_time = new Expression('NOW()');
+        $this->file_orig_name = $ob->name;
+        $this->file_size = $ob->size;
+        $this->file_type = $ob->type;
+        $this->file_name = Yii::$app->security->generateRandomString() . $ob->size . ".{$ext}";
+        $this->file_user_id = Yii::$app->user->id;
+        $this->file_task_id = $taskid;
+        $this->file_group = $group;
+        $this->file_comment = $comment;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function delete()
+    {
+        unlink($this->getFullpath());
+        parent::delete();
     }
 
 }

@@ -32,7 +32,7 @@ if( !isset($index) ) {
         <?php
             if( $model->file_id > 0 ) {
         ?>
-            <?= Html::a($model->file_orig_name, $model->url, ['class'=>'btn btn-default btn-block']) ?>
+            <?= Html::a($model->file_orig_name, $model->url, ['class'=>'btn btn-default btn-block', 'target'=>'_blank']) ?>
         <?php
             }
             else {
@@ -48,13 +48,16 @@ if( !isset($index) ) {
         <?= $form->field($model, '[' . $index . ']file_comment', ['template'=>"{input}\n{hint}\n{error}"])->textInput(['maxlength' => true]) ?>
     </div>
     <div class="col-sm-2">
-        <?= Html::a(
-            Html::tag('span', '', ['class' => 'glyphicon glyphicon-remove']),
-            '',
-            [
-                'class' => 'btn btn-danger remove-file',
-            ]
-        ) ?>
+        <?= $model->isNewRecord
+            ? Html::a(
+                Html::tag('span', '', ['class' => 'glyphicon glyphicon-remove']),
+                '',
+                [
+                    'class' => 'btn btn-danger remove-file',
+                ]
+            )
+            : '&nbsp;'
+        ?>
     </div>
     <div class="clearfix"></div>
 
