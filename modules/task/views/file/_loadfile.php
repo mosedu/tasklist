@@ -4,6 +4,9 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\web\View;
 
+if( isset($additionalData) && ($additionalData != $model->file_group) ) {
+    return;
+}
 /* @var $this yii\web\View */
 /* @var $model app\modules\task\models\File */
 /* @var $form yii\widgets\ActiveForm */
@@ -25,11 +28,26 @@ if( !isset($index) ) {
 }
 ?>
 
-<!-- div class="" -->
-    <div class="col-sm-11">
-        <?= $form->field($model, '[' . $index . ']filedata', ['template'=>"{input}\n{hint}\n{error}"])->fileInput() ?>
+    <div class="col-sm-5">
+        <?php
+            if( $model->file_id > 0 ) {
+        ?>
+            <?= Html::a($model->file_orig_name, $model->url, ['class'=>'btn btn-default btn-block']) ?>
+        <?php
+            }
+            else {
+        ?>
+            <?= $form->field($model, '[' . $index . ']filedata', ['template' => "{input}\n{hint}\n{error}"])->fileInput() ?>
+        <?php
+        }
+        ?>
     </div>
-    <div class="col-sm-1">
+    <div class="col-sm-5">
+        <?= $form->field($model, '[' . $index . ']file_id', ['template'=>"{input}", 'options' => ['class' => ''], ])->hiddenInput() ?>
+        <?= $form->field($model, '[' . $index . ']file_group', ['template'=>"{input}", 'options' => ['class' => ''], ])->hiddenInput() ?>
+        <?= $form->field($model, '[' . $index . ']file_comment', ['template'=>"{input}\n{hint}\n{error}"])->textInput(['maxlength' => true]) ?>
+    </div>
+    <div class="col-sm-2">
         <?= Html::a(
             Html::tag('span', '', ['class' => 'glyphicon glyphicon-remove']),
             '',
@@ -38,31 +56,5 @@ if( !isset($index) ) {
             ]
         ) ?>
     </div>
-    <div class="col-sm-12">
-        <?= $form->field($model, '[' . $index . ']file_id', ['template'=>"{input}"])->hiddenInput() ?>
-        <?= $form->field($model, '[' . $index . ']file_comment', ['template'=>"{input}\n{hint}\n{error}"])->textInput(['maxlength' => true]) ?>
-    </div>
     <div class="clearfix"></div>
-<!-- /div -->
 
-<?php
-
-/*
-$sJs = <<<EOT
-var oTemplateFile = jQuery("#fileuploadrow"),
-    oFileData = jQuery("#filedata");
-
-// oTemplateFile.hide();
-
-jQuery("#addfilelink").on("click", function(event){
-    event.preventDefault();
-    console.log("click file");
-    var oNew = oTemplateFile.clone();
-    oNew.attr({id: "id_file_" + (new Date()).getTime()}).appendTo(oFileData).show();
-    oNew.find("[type='file']").trigger("click");
-    console.log(oNew.find("[type='file']"));
-    return false;
-});
-EOT;
-$this->registerJs($sJs, View::POS_READY, 'fileselectscript');
-*/

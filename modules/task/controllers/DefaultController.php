@@ -10,9 +10,11 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
+use mosedu\multirows\MultirowsBehavior;
 
 use app\modules\task\models\Tasklist;
 use app\modules\task\models\TasklistSearch;
+use app\modules\task\models\File;
 use app\rbac\DepartmentRule;
 use yii\web\Response;
 
@@ -32,7 +34,7 @@ class DefaultController extends Controller
                         'roles' => ['createUser'],
                     ],
                     [
-                        'actions' => ['view', 'index', 'create', 'update', 'export', 'lastdirect', 'setworker', ],
+                        'actions' => ['view', 'index', 'create', 'update', 'export', 'lastdirect', 'setworker', 'validatetask'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -55,12 +57,19 @@ class DefaultController extends Controller
                     ], */
                 ],
             ],
+
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['post'],
                 ],
             ],
+
+            'validateFiles' => [
+                'class' => MultirowsBehavior::className(),
+                'model' => File::className(),
+            ],
+
         ];
     }
 
@@ -168,6 +177,7 @@ class DefaultController extends Controller
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $model->uploadFiles($this->getBehavior('validateFiles')->getData());
             return $this->redirect(['index']);
 //            return $this->redirect(['view', 'id' => $model->task_id]);
         } else {
@@ -175,6 +185,31 @@ class DefaultController extends Controller
                 'model' => $model,
             ]);
         }
+    }
+
+    /**
+     * Validate models
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionValidatetask($id = 0)
+    {
+        if( $id == 0 ) {
+            $model = new Tasklist();
+        }
+        else {
+            $model = $this->findModel($id); // ->delete();
+        }
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $result = $this->getBehavior('validateFiles')->validateData();
+
+        $model->load(Yii::$app->request->post());
+        $aModelResult = ActiveForm::validate($model);
+        Yii::info('result = ' . print_r($result, true));
+        Yii::info('aModelResult = ' . print_r($aModelResult, true));
+
+        return array_merge($result, $aModelResult);
     }
 
     /**

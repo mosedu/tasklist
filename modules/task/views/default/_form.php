@@ -130,6 +130,8 @@ if( !$bEditDates ) {
         'validateOnBlur' => false,
         'validateOnType' => false,
 
+        'validationUrl' => ['default/validatetask', 'id' => $model->isNewRecord ? 0 : $model->task_id],
+
         'options'=>[
             'enctype' => 'multipart/form-data',
         ],
@@ -162,10 +164,11 @@ if( !$bEditDates ) {
                 [
                     'model' => File::className(),
                     'form' => $form,
-                    'records' => [], // [new OrderItems(),],
+                    'records' => $model->taskfiles, // [new OrderItems(),],
+                    'additionalData' => File::FILE_TASK_GROUP, // [new OrderItems(),],
                     'rowview' => '@app/modules/task/views/file/_loadfile.php',
 //                    'tag' => 'tr',
-//                    'defaultattributes' => ['count' => 1],
+                    'defaultattributes' => ['file_group' => File::FILE_TASK_GROUP],
 //                    'tagOptions' => ['class' => 'clear-item'],
                     'addlinkselector' => '#add-task-file-link',
                     'dellinkselector' => '.remove-file',
@@ -184,9 +187,9 @@ if( !$bEditDates ) {
 
         <div class="file-data" id="filedata">
             <div class="form-group">
-                <label class="control-label col-sm-3">Файлы</label>
+                <label class="control-label col-sm-3">&nbsp;</label>
                 <div class="col-sm-9">
-                    <?= Html::a('Добавить файл', '', ['id' => 'add-task-file-link', 'class'=>'btn btn-default']) ?>
+                    <?= Html::a('Добавить файл к задаче', '', ['id' => 'add-task-file-link', 'class'=>'btn btn-default']) ?>
                 </div>
                 <div class="clearfix"></div>
             </div>
@@ -205,10 +208,11 @@ if( !$bEditDates ) {
             [
                 'model' => File::className(),
                 'form' => $form,
-                'records' => [], // [new OrderItems(),],
+                'records' => $model->taskfiles, // [new OrderItems(),],
+                'additionalData' => File::FILE_SUMMARY_GROUP, // [new OrderItems(),],
                 'rowview' => '@app/modules/task/views/file/_loadfile.php',
 //                    'tag' => 'tr',
-//                    'defaultattributes' => ['count' => 1],
+                'defaultattributes' => ['file_group' => File::FILE_SUMMARY_GROUP],
 //                    'tagOptions' => ['class' => 'clear-item'],
                 'addlinkselector' => '#add-summary-file-link',
                 'dellinkselector' => '.remove-file',
@@ -228,9 +232,9 @@ if( !$bEditDates ) {
 
         <div class="file-data" id="filedata">
             <div class="form-group">
-                <label class="control-label col-sm-3">Файлы</label>
+                <label class="control-label col-sm-3">&nbsp;</label>
                 <div class="col-sm-9">
-                    <?= Html::a('Добавить файл отчета', '', ['id' => 'add-summary-file-link', 'class'=>'btn btn-default']) ?>
+                    <?= Html::a('Добавить файл к отчету', '', ['id' => 'add-summary-file-link', 'class'=>'btn btn-default']) ?>
                 </div>
                 <div class="clearfix"></div>
             </div>

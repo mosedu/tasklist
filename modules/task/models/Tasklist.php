@@ -14,6 +14,7 @@ use yii\helpers\Html;
 use yii\db\Query;
 use yii\validators\RangeValidator;
 use yii\validators\Validator;
+use yii\web\UploadedFile;
 
 use app\components\AttributewalkBehavior;
 use app\modules\user\models\Department;
@@ -294,7 +295,7 @@ class Tasklist extends \yii\db\ActiveRecord
 //            ['task_worker_id', 'filter', 'filter' => 'intval', ],
             [['task_dep_id', 'task_num', 'task_type', 'task_numchanges', 'task_progress', 'task_active', /*'task_worker_id',*/ ], 'integer'],
             [['task_direct', 'task_name', 'task_reasonchanges', 'task_summary', ], 'string'], // 'reasonchange'
-            [['task_createtime', 'task_finaltime', 'task_actualtime'], 'safe']
+            [['task_createtime', 'task_finaltime', ], 'safe'] // 'task_actualtime'
         ];
 
         if( !$this->canChangeDate() && !$this->isNewRecord ) {
@@ -518,6 +519,16 @@ class Tasklist extends \yii\db\ActiveRecord
      */
     public function getWorkers() {
         return $this->hasMany(Worker::className(), ['worker_task_id' => 'task_id']);
+    }
+
+    /**
+     *
+     * Отношение задачи к файлам
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTaskfiles() {
+        return $this->hasMany(File::className(), ['file_task_id' => 'task_id']);
     }
 
     /**
@@ -850,4 +861,44 @@ class Tasklist extends \yii\db\ActiveRecord
 
     }
 
+    /**
+     * Process upload of file
+     *
+     */
+    public function uploadFiles($aData) {
+        Yii::info("loadFiles() = " . print_r(UploadedFile::getFiles(), true));
+
+        // if no image was uploaded abort the upload
+/*        if( empty($files) ) {
+            return;
+        }
+*/
+
+        foreach($aData['data'] As $k=>$data) {
+//            $ob = $files[$k];
+            $ob = UploadedFile::getInstance(new File(), '['.$k.']filedata');
+            Yii::info("uploadFiles() files = " . print_r($ob, true));
+
+            if( $data['file_id'] == 0 ) {
+                Yii::info("uploadFiles() new file " . $k);
+                $oFile = new File();
+                $oFile->addFile($ob, $this->task_id, $data['file_comment'], $data['file_group']);
+            }
+            else {
+                Yii::info("uploadFiles() old file " . $k);
+                $oFile = File::findOne($data['file_id']);
+                $oFile->file_comment = $data['file_comment'];
+                $oFile->save();
+            }
+            /** @var  UploadedFile $ob */
+
+
+            if( $oFile->hasErrors() ) {
+                Yii::info('uploadFiles(): File error: ' . print_r($oFile->getErrors(), true));
+            }
+            else {
+                Yii::info('uploadFiles(): save file ['.$k.'] ' . $oFile->file_orig_name . ' [' . $oFile->file_size . ']');
+            }
+        }
+    }
 }
