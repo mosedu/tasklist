@@ -38,7 +38,7 @@ if( !isset($index) ) {
                         '',
                         [
 //                            'class' => 'btn btn-danger remove-file',
-                            'class' => 'text-danger',
+                            'class' => 'text-danger remove-file',
                             'title' => 'Удалить файл',
                         ]
                     )
