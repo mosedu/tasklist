@@ -185,4 +185,32 @@ class File extends \yii\db\ActiveRecord
         parent::delete();
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function humanSize()
+    {
+        $aLett = ['', 'kb', 'Mb', 'Gb'];
+        $n = $this->file_size;
+        $s = '';
+        foreach($aLett As $k => $v) {
+            $s = $v;
+            if( $n < 1000 ) {
+                break;
+            }
+            $n = intval($n) / 1000.0;
+        }
+        return sprintf("%" . ($n == intval($n) ? "d" : ".1f"), $n) . $s;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getGrous()
+    {
+        return [
+            self::FILE_TASK_GROUP => 'Файл задачи',
+            self::FILE_SUMMARY_GROUP => 'Файл отчета',
+        ];
+    }
 }

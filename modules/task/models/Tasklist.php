@@ -523,22 +523,22 @@ class Tasklist extends \yii\db\ActiveRecord
 
     /**
      *
-     * Отношение задачи к файлам
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTaskfiles() {
-        return $this->hasMany(File::className(), ['file_task_id' => 'task_id']);
-    }
-
-    /**
-     *
      * Отношение задачи к сотруднику в модели, когда много ответственных
      *
      * @return \yii\db\ActiveQuery
      */
     public function getWorkersdata() {
         return $this->hasMany(User::className(), ['us_id' => 'worker_us_id'])->via('workers');
+    }
+
+    /**
+     *
+     * Отношение задачи к файлам
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTaskfiles() {
+        return $this->hasMany(File::className(), ['file_task_id' => 'task_id'])->orderBy('file_time');
     }
 
     /**

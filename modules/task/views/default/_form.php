@@ -154,92 +154,9 @@ if( !$bEditDates ) {
 
         <?= $form->field($model, 'task_name', $aTextParam)->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable)) ?>
 
-        <div class="file-data" id="filedata">
-            <div class="form-group">
-                <label class="control-label col-sm-3"></label>
-                <div class="col-sm-9">
-        <?php
-
-            echo MultirowsWidget::widget(
-                [
-                    'model' => File::className(),
-                    'form' => $form,
-                    'records' => $model->taskfiles, // [new OrderItems(),],
-                    'additionalData' => File::FILE_TASK_GROUP, // [new OrderItems(),],
-                    'rowview' => '@app/modules/task/views/file/_loadfile.php',
-//                    'tag' => 'tr',
-                    'defaultattributes' => ['file_group' => File::FILE_TASK_GROUP],
-//                    'tagOptions' => ['class' => 'clear-item'],
-                    'addlinkselector' => '#add-task-file-link',
-                    'dellinkselector' => '.remove-file',
-//                    'formselector' => '#task-form',
-                    'afterInsert' => 'function(ob){ console.log("Insert row : task-file"); }',
-                    'afterDelete' => 'function(){ console.log("Delete row : task-file"); }',
-//                    'scenario' => 'userform',
-                    'canDeleteLastRow' => true,
-                ]
-            );
-        ?>
-                </div>
-                <div class="clearfix"></div>
-            </div>
-        </div>
-
-        <div class="file-data" id="filedata">
-            <div class="form-group">
-                <label class="control-label col-sm-3">&nbsp;</label>
-                <div class="col-sm-9">
-                    <?= Html::a('Добавить файл к задаче', '', ['id' => 'add-task-file-link', 'class'=>'btn btn-default']) ?>
-                </div>
-                <div class="clearfix"></div>
-            </div>
-        </div>
-
-
         <?= $form->field($model, 'task_summary', array_merge($aTextParam, ['options' => $bHideSummary ? ['style' => 'display: none;', 'class'=>'form-group'] : ['class'=>'form-group']]) )->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0, ]) ?>
 
         <div id="file-forsummary-region">
-        <div class="file-data" id="filedata">
-            <div class="form-group">
-                <label class="control-label col-sm-3"></label>
-                <div class="col-sm-9">
-        <?php
-
-        echo MultirowsWidget::widget(
-            [
-                'model' => File::className(),
-                'form' => $form,
-                'records' => $model->taskfiles, // [new OrderItems(),],
-                'additionalData' => File::FILE_SUMMARY_GROUP, // [new OrderItems(),],
-                'rowview' => '@app/modules/task/views/file/_loadfile.php',
-//                    'tag' => 'tr',
-                'defaultattributes' => ['file_group' => File::FILE_SUMMARY_GROUP],
-//                    'tagOptions' => ['class' => 'clear-item'],
-                'addlinkselector' => '#add-summary-file-link',
-                'dellinkselector' => '.remove-file',
-                'afterInsert' => 'function(ob){ console.log("Insert row : summary-file"); }',
-                'afterDelete' => 'function(){ console.log("Delete row : summary-file"); }',
-//                    'scenario' => 'userform',
-                'canDeleteLastRow' => true,
-            ]
-        );
-
-        ?>
-                </div>
-                <div class="clearfix"></div>
-            </div>
-        </div>
-
-
-        <div class="file-data" id="filedata">
-            <div class="form-group">
-                <label class="control-label col-sm-3">&nbsp;</label>
-                <div class="col-sm-9">
-                    <?= Html::a('Добавить файл к отчету', '', ['id' => 'add-summary-file-link', 'class'=>'btn btn-default']) ?>
-                </div>
-                <div class="clearfix"></div>
-            </div>
-        </div>
 
         </div>
 
@@ -416,6 +333,88 @@ EOT;
                     ]
                     ) ?>
                 <?= '' // $form->field($model, 'reasonchange', ['options' => ['style' => 'display: none;', 'class' => "form-group field-tasklist-reasonchange"]])->textarea(['rows' => 2, 'data-old'=>$model->isNewRecord ? '' : $model->_oldAttributes['task_actualtime'], ]) ?>
+
+        <div class="file-data" id="filedata">
+            <div class="form-group">
+                <label class="control-label col-sm-3"></label>
+                <div class="col-sm-9">
+                    <?php
+
+                    echo MultirowsWidget::widget(
+                        [
+                            'model' => File::className(),
+                            'form' => $form,
+                            'records' => $model->taskfiles, // [new OrderItems(),],
+                            'additionalData' => File::FILE_TASK_GROUP, // [new OrderItems(),],
+                            'rowview' => '@app/modules/task/views/file/_loadfile2.php',
+//                    'tag' => 'tr',
+                            'defaultattributes' => ['file_group' => File::FILE_TASK_GROUP],
+//                    'tagOptions' => ['class' => 'clear-item'],
+                            'addlinkselector' => '#add-task-file-link',
+                            'dellinkselector' => '.remove-file',
+//                    'formselector' => '#task-form',
+                            'afterInsert' => 'function(ob){ console.log("Insert row : task-file"); }',
+                            'afterDelete' => 'function(){ console.log("Delete row : task-file"); }',
+//                    'scenario' => 'userform',
+                            'canDeleteLastRow' => true,
+                        ]
+                    );
+                    ?>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+
+        <div class="file-data" id="filesummdata">
+            <div class="form-group">
+                <label class="control-label col-sm-3"></label>
+                <div class="col-sm-9">
+                    <?php
+
+                    echo MultirowsWidget::widget(
+                        [
+                            'model' => File::className(),
+                            'form' => $form,
+                            'records' => $model->taskfiles, // [new OrderItems(),],
+                            'additionalData' => File::FILE_SUMMARY_GROUP, // [new OrderItems(),],
+                            'rowview' => '@app/modules/task/views/file/_loadfile2.php',
+//                    'tag' => 'tr',
+                            'defaultattributes' => ['file_group' => File::FILE_SUMMARY_GROUP],
+//                    'tagOptions' => ['class' => 'clear-item'],
+                            'addlinkselector' => '#add-summary-file-link',
+                            'dellinkselector' => '.remove-file',
+                            'afterInsert' => 'function(ob){ console.log("Insert row : summary-file"); }',
+                            'afterDelete' => 'function(){ console.log("Delete row : summary-file"); }',
+//                    'scenario' => 'userform',
+                            'canDeleteLastRow' => true,
+                        ]
+                    );
+
+                    ?>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+
+        <div class="file-data" id="filedata">
+            <div class="form-group">
+                <div class="col-sm-3">&nbsp;</div>
+                <div class="col-sm-9">
+                    <?= Html::a('Добавить файл', '', ['id' => 'add-task-file-link', 'class'=>'btn btn-default']) ?>
+                </div>
+                <?php
+                /*
+                    <div class="col-sm-4">
+                        <?= Html::a('Файл к отчету', '', ['id' => 'add-summary-file-link', 'class'=>'btn btn-default']) ?>
+                    </div>
+                */
+                ?>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
     </div>
 
     <div class="clearfix"></div>

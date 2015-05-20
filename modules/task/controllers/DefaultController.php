@@ -130,7 +130,7 @@ class DefaultController extends Controller
         if( !Yii::$app->user->can('createTask') ) {
             throw new ForbiddenHttpException(Yii::t('yii', 'You are not allowed to perform this action.'));
         }
-
+/*
         if( Yii::$app->request->isAjax && $model->load(Yii::$app->request->post()) ) {
             Yii::info("Load from POST: " . print_r($model->attributes, true));
             $model->getTaskAvailWokers(true);
@@ -139,10 +139,11 @@ class DefaultController extends Controller
             Yii::$app->response->format = Response::FORMAT_JSON;
             return ActiveForm::validate($model);
         }
-
+*/
         if ($model->load(Yii::$app->request->post()) ) {
             $model->getTaskAvailWokers(true);
             if ($model->save()) {
+                $model->uploadFiles($this->getBehavior('validateFiles')->getData());
                 return $this->redirect(['index']);
             }
         }
