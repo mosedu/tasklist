@@ -50,9 +50,9 @@ if( !isset($index) ) {
         ?>
     <div class="col-sm-12" style="<?= ($model->file_id > 0) ? 'display: none;' : '' ?>">
         <?= $form->field($model, '[' . $index . ']file_id', ['template'=>"{input}", 'options' => ['class' => ''], ])->hiddenInput() ?>
-        <?= '' // $form->field($model, '[' . $index . ']file_group', ['template'=>"{input}", 'options' => ['class' => ''], ])->hiddenInput() ?>
+        <?= $form->field($model, '[' . $index . ']file_group', ['template'=>"{input}", 'options' => ['class' => ''], ])->hiddenInput() ?>
         <?= $form->field($model, '[' . $index . ']file_comment', ['template'=>"{input}\n{hint}\n{error}"])->textInput(['maxlength' => true, 'placeholder' => $model->getAttributeLabel('file_comment')]) ?>
-        <?= $form->field($model, '[' . $index . ']file_group', ['template'=>"{input}", ])->dropDownList($model->getGrous()) ?>
+        <?= '' // $form->field($model, '[' . $index . ']file_group', ['template'=>"{input}", ])->dropDownList($model->getGrous()) ?>
     </div>
     <?= ( $model->file_id == 0 ) ? '<div class="clearfix"></div></div>' : '' ?>
     <div class="clearfix"></div>
