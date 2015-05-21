@@ -402,7 +402,7 @@ EOT;
             <div class="form-group">
                 <div class="col-sm-3">&nbsp;</div>
                 <div class="col-sm-9">
-                    <?= Html::a('Добавить файл', '', ['id' => 'add-task-file-link', 'class'=>'btn btn-default']) ?>
+                    <?= Html::a('<span class="glyphicon glyphicon-cloud-upload"></span> Добавить файл', '', ['id' => 'add-task-file-link', 'class'=>'btn btn-default btn-lg']) ?>
                 </div>
                 <?php
                 /*
@@ -422,12 +422,12 @@ EOT;
     <div class="col-sm-8">
         <div class="form-group">
             <div class="col-sm-3">&nbsp;</div>
-            <div class="col-sm-4">
-                <?= Html::submitButton('Сохранить изменения', ['class' => 'btn btn-success']) ?>
+            <div class="col-sm-3">
+                <?= Html::submitButton('<span class="glyphicon glyphicon-ok"></span> Сохранить', ['class' => 'btn btn-success btn-lg']) ?>
                 <?= '' // Html::submitButton('Сохранить изменения', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
             </div>
-            <div class="col-sm-5">
-                <?= ($bHideSummary ? Html::a('Добавить промежуточный результат', '', ['class' => 'btn btn-default', 'id'=>'showsummaryfield']) : '') ?>
+            <div class="col-sm-6">
+                <?= ($bHideSummary ? Html::a('<span class="glyphicon glyphicon-file"></span> Добавить промежуточный результат', '', ['class' => 'btn btn-default btn-lg', 'id'=>'showsummaryfield']) : '') ?>
             </div>
         </div>
     </div>
