@@ -74,7 +74,7 @@ $bFinished = ($model->task_progress == Tasklist::PROGRESS_FINISH);
 $bEditDates = !$bFinished || Yii::$app->user->can('createUser');
 
 $aWorkerSelect = [
-    'data' => $model->getTaskAvailWokers() ,//ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_SUBJECT), 'tag_id', 'tag_title'),
+    'data' =>  $model->getTaskAvailWokers(),//ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_SUBJECT), 'tag_id', 'tag_title'),
     'language' => 'ru',
     'options' => [
         'placeholder' => 'Выберите из списка ...',
@@ -100,7 +100,7 @@ oSelDepartment.on("change", function(event){
 */
 
 if( !$bEditDates ) {
-    $aWorkerSelect = ['readonly' => true, 'disabled' => true];
+    $aWorkerSelect = array_merge($aWorkerSelect, ['readonly' => true, 'disabled' => true]);
 }
 
 ?>
