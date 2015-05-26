@@ -157,13 +157,42 @@ $aField = [
     ],
     [
         'attribute' => 'task_numchanges',
-        'val' => function($model) { return count($model->changes); },
+        'val' => function($model) {
+            // return count($model->changes);
+            return ($model->task_numchanges > 0 ? $model->task_numchanges : '');
+/*
+            $bFinish = ($model->task_progress == Tasklist::PROGRESS_FINISH);
+            $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime( !$bFinish ? $model->task_actualtime : $model->task_finishtime ));
+
+            if( ($diff == 0) && ($model->task_numchanges == 0) && (!$bFinish) ) {
+                return '';
+            }
+            $sNumChanges = '';
+            if( $model->task_numchanges > 0 ) {
+                $sTip = array_reduce(
+                    $model->changes,
+                    function($carry, $item) {
+                        $carry .= (($carry !== '') ? "\n" : "") . $item->ch_data;
+                        // }
+                        return $carry;
+                    },
+                    ''
+                );
+                $sTip .= "\n" . $model->task_reasonchanges;
+                $nChanges = $model->task_numchanges;
+                $sNumChanges = $nChanges . "\n" . $sTip;
+            }
+
+            return $sNumChanges;
+*/
+        },
         'w' => 14,
     ],
     [
         'attribute' => 'task_reasonchanges',
         'w' => 20,
-        'val' => function($model) { return array_reduce($model->changes, function($carry, $item) { return $carry . (($carry !== '') ? "\r\n" : "") . $item->ch_data . ' ' . $item->ch_text; }, ''); },
+        'val' => function($model) { return $model->task_reasonchanges; },
+//        'val' => function($model) { return array_reduce($model->changes, function($carry, $item) { return $carry . (($carry !== '') ? "\r\n" : "") . $item->ch_data . ' ' . $item->ch_text; }, ''); },
 //        'val' => function($model) { return str_replace("\n", "\r\n", str_replace("\\n", "\n", $model->task_reasonchanges)); },
     ],
     [
