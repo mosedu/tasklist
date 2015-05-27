@@ -159,8 +159,8 @@ $aField = [
         'attribute' => 'task_numchanges',
         'val' => function($model) {
             // return count($model->changes);
-            return ($model->task_numchanges > 0 ? $model->task_numchanges : '');
-/*
+//            return ($model->task_numchanges > 0 ? $model->task_numchanges : '');
+
             $bFinish = ($model->task_progress == Tasklist::PROGRESS_FINISH);
             $diff = date('Ymd', strtotime($model->task_finaltime)) - date('Ymd', strtotime( !$bFinish ? $model->task_actualtime : $model->task_finishtime ));
 
@@ -173,7 +173,6 @@ $aField = [
                     $model->changes,
                     function($carry, $item) {
                         $carry .= (($carry !== '') ? "\n" : "") . $item->ch_data;
-                        // }
                         return $carry;
                     },
                     ''
@@ -184,7 +183,7 @@ $aField = [
             }
 
             return $sNumChanges;
-*/
+
         },
         'w' => 14,
     ],
