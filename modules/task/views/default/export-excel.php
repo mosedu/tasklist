@@ -177,7 +177,7 @@ $aField = [
                     },
                     ''
                 );
-                $sTip .= "\n" . $model->task_reasonchanges;
+//                $sTip .= "\n" . $model->task_reasonchanges;
                 $nChanges = $model->task_numchanges;
                 $sNumChanges = $nChanges . "\n" . $sTip;
             }
