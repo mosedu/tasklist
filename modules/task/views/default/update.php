@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\modules\task\models\Tasklist */
 
-$this->title = 'Изменение ' . ' ' . $model->task_name;
+$this->title = 'Изменение задачи ' . $model->getTasknum() . ': ' . mb_strimwidth($model->task_name, 0, 30, ' ...', 'UTF-8') ;
 // $this->params['breadcrumbs'][] = ['label' => 'Tasklists', 'url' => ['index']];
 //$this->params['breadcrumbs'][] = ['label' => $model->task_id, 'url' => ['view', 'id' => $model->task_id]];
 $this->params['breadcrumbs'][] = $this->title;
