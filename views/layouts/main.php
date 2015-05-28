@@ -173,6 +173,7 @@ EOT;
                         ['label' => 'Лог задач', 'url' => ['/task/action']],
                         ['label' => 'Пользователи', 'url' => ['/user']],
                         ['label' => 'Отделы', 'url' => ['/user/department']],
+                        ['label' => 'Направления', 'url' => ['/task/subject']],
                     ]
                 );
             }

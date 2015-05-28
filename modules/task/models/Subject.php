@@ -3,6 +3,9 @@
 namespace app\modules\task\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
+use yii\db\BaseActiveRecord;
 
 /**
  * This is the model class for table "{{%subject}}".
@@ -16,6 +19,21 @@ use Yii;
  */
 class Subject extends \yii\db\ActiveRecord
 {
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'attributes' => [
+                    BaseActiveRecord::EVENT_BEFORE_INSERT => ['subj_created'],
+                ],
+//                'createdAtAttribute' => 'subj_created',
+                'value' => new Expression('NOW()'),
+            ],
+
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -51,5 +69,23 @@ class Subject extends \yii\db\ActiveRecord
             'subj_comment' => 'Комментарий',
             'subj_is_active' => 'Активно',
         ];
+    }
+
+    public static function import($data) {
+        foreach($data As $k=>$v) {
+            $ob = self::find()->where(['subj_title' => $v])->one();
+            if( $ob === null ) {
+                Yii::info('Subject::import(): create ['.$k.'] ' . $v);
+                $ob = new Subject();
+                $ob->subj_title = $v;
+                $ob->subj_is_active = 1;
+                if( !$ob->save() ) {
+                    Yii::info('Error save import data to Subject: ' . print_r($ob->getErrors(), true) . "\nattributes = " . print_r($ob->attributes, true));
+                }
+            }
+            else {
+                Yii::info('Subject::import(): exists ['.$k.'] ' . $v . ' = ' . print_r($ob->attributes, true));
+            }
+        }
     }
 }

@@ -17,6 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Создать напраление', ['create'], ['class' => 'btn btn-success showinmodal', 'title' => 'Новое направление']) ?>
+        <?= Html::a('Импорт напралений из Excel', ['import'], ['class' => 'btn btn-success', 'title' => 'Импорт направлений']) ?>
     </p>
 
     <?= GridView::widget([

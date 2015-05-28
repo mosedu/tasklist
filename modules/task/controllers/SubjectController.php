@@ -11,6 +11,7 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\widgets\ActiveForm;
 use yii\web\Response;
+use app\modules\task\models\SubjectImportForm;
 
 /**
  * SubjectController implements the CRUD actions for Subject model.
@@ -130,6 +131,36 @@ class SubjectController extends Controller
             return $this->redirect(['view', 'id' => $model->subj_id]);
         } else {
             return $this->render('update', [
+                'model' => $model,
+            ]);
+        }
+    }
+
+    /**
+     * Import data from Excel file
+     * @return mixed
+     */
+    public function actionImport()
+    {
+        $model = new SubjectImportForm();
+
+        if( Yii::$app->request->isAjax ) {
+            if( $model->load(Yii::$app->request->post()) ) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                $aValidate = ActiveForm::validate($model);
+                return $aValidate;
+            }
+        }
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $data = $model->getFileData();
+//            Yii::info('model->getFileData() = ' . print_r($data, true));
+            if( count($data) > 0 ) {
+                Subject::import($data);
+            }
+            return $this->redirect(['index', ]);
+        } else {
+            return $this->render('_formimport', [
                 'model' => $model,
             ]);
         }
