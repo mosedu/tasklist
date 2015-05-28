@@ -433,6 +433,28 @@ EOT;
             ]) ?>
     </div>
 
+    <?php
+    if( Yii::$app->user->can('admin') ) {
+    ?>
+    <div class="col-sm-2">
+    </div>
+
+    <div class="col-sm-2">
+        <?= $form->field(
+            $model,
+            'task_active',
+            ['template' => "<div class=\"col-sm-12\">{input}</div>"]
+        )
+        ->dropDownList([
+            '' => 'Все',
+            Tasklist::STATUS_ACTIVE => Tasklist::STATUS_TEXT_ACTIVE,
+            Tasklist::STATUS_DELETED => Tasklist::STATUS_TEXT_DELETED,
+        ]) ?>
+    </div>
+    <?php
+    }
+    ?>
+
     <div class="clearfix"></div>
 
     <div class="col-sm-4">

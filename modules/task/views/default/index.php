@@ -288,7 +288,7 @@ $aColumns = array_merge(
     $aColumns,
     [[
         'class' => 'yii\grid\ActionColumn',
-        'template'=>'{update}' . (Yii::$app->user->can('createUser') ? ' {delete}' : ''), // {view}  {answer} {toword}
+        'template'=>'{update}' . (Yii::$app->user->can('createUser') ? ' {delete} {undelete}' : '') . (Yii::$app->user->can('department') ? ' {findate}' : ''), // {view}  {answer} {toword}
         'contentOptions' => [
             'class' => 'commandcell',
         ],
@@ -296,6 +296,35 @@ $aColumns = array_merge(
             'update'=>function ($url, $model) {
                 return $model->canEdit() ? Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $url, ['title' => 'Изменить']) : '';
             },
+            'findate'=>function ($url, $model) {
+                $bFinish = ($model->task_progress == Tasklist::PROGRESS_FINISH);
+                return $bFinish ? Html::a( '<span class="glyphicon glyphicon-new-window"></span>', ['requestmsg/create', 'taskid' => $model->task_id], ['title' => 'Запрос на перенос даты', 'class'=>'showinmodal']) : '';
+            },
+            'delete' => function ($url, $model, $key) {
+                /** @var Tasklist $model */
+                return
+                    ( $model->task_active == Tasklist::STATUS_DELETED ) ?
+                        '' :
+                        Html::a('<span class="glyphicon glyphicon-trash"></span>', $url, [
+                            'title' => Yii::t('yii', 'Delete'),
+                            'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+                            'data-method' => 'post',
+                            'data-pjax' => '0',
+                        ]);
+            },
+            'undelete' => function ($url, $model, $key) {
+                /** @var Tasklist $model */
+                return
+                    ( $model->task_active == Tasklist::STATUS_DELETED ) ?
+                        Html::a(
+                            '<span class="glyphicon glyphicon-share-alt"></span>',
+                            $url,
+                            [
+                                'title' => 'Восстановить',
+                            ])
+                        : '';
+            },
+
         ],
 
         ]]

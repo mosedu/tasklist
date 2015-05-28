@@ -43,7 +43,7 @@ class TasklistSearch extends Tasklist
             [['task_progress'], 'in', 'range'=>array_keys(Tasklist::getAllProgresses()), 'allowArray' => true, ],
             [['datestart', 'datefinish', 'task_direct', 'task_name', 'task_createtime', 'task_finaltime', 'task_actualtime', 'task_reasonchanges', 'task_summary'], 'safe'],
             [['task_dep_id'], 'filter', 'filter' => function($val){ return ( $val <=0 ) ? null : $val; }, ],
-            [['showFilterForm', 'showFinishedTask', 'showTaskSummary'], 'integer', ],
+            [['showFilterForm', 'showFinishedTask', 'showTaskSummary', 'task_active', ], 'integer', ],
         ];
     }
 
@@ -177,13 +177,17 @@ class TasklistSearch extends Tasklist
             $query->andFilterWhere(['in', Worker::tableName() . '.worker_us_id', $this->curworkers]);
         }
 
+        if( $this->task_active == '' ) {
+            $this->task_active = Tasklist::STATUS_ACTIVE;
+        }
+
         $query->andFilterWhere([
             'task_id' => $this->task_id,
             'task_dep_id' => $this->task_dep_id,
             'task_num' => $tasknum,
             'task_type' => $this->task_type,
 //            'task_worker_id' => $this->task_worker_id,
-            'task_active' => Tasklist::STATUS_ACTIVE,
+            'task_active' => $this->task_active,
 //            'task_createtime' => $this->task_createtime,
 //            'task_finaltime' => $this->task_finaltime,
 //            'task_actualtime' => $this->task_actualtime,

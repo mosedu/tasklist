@@ -29,7 +29,7 @@ class DefaultController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['delete', ],
+                        'actions' => ['delete', 'undelete', ],
                         'allow' => true,
                         'roles' => ['createUser'],
                     ],
@@ -231,6 +231,23 @@ class DefaultController extends Controller
     }
 
     /**
+     * Deletes an existing Tasklist model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionUndelete($id)
+    {
+        $model = $this->findModel($id); // ->delete();
+        if( $model !== null ) {
+            $model->task_active = Tasklist::STATUS_ACTIVE;
+            $model->save();
+        }
+
+        return $this->redirect(['index']);
+    }
+
+    /**
      * @param integer $id
      * @return mixed
      */
@@ -332,7 +349,7 @@ class DefaultController extends Controller
         $this->_model = Tasklist::find()
             ->where([
                 'task_id' => $id,
-                'task_active' => Tasklist::STATUS_ACTIVE,
+//                'task_active' => Tasklist::STATUS_ACTIVE,
             ])
             ->with('department')
             ->one();
