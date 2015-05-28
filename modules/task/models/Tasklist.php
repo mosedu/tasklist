@@ -804,6 +804,7 @@ class Tasklist extends \yii\db\ActiveRecord
             $oUser = Yii::$app->user->identity;
             if( $this->task_dep_id == $oUser->us_dep_id ) {
                 if( ($oUser->us_role_name == User::ROLE_DEPARTMENT)
+                    || Yii::$app->user->can(User::ROLE_CONTROL)
                     || (in_array($oUser->us_role_name, array_keys(User::getWorkerRoles())) && in_array($oUser->us_id, $this->curworkers)/*$this->task_worker_id == $oUser->us_id*/) ) {
                     $bRet = true;
                 }
