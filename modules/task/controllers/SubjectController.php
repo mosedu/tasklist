@@ -8,6 +8,9 @@ use app\modules\task\models\SubjectSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
+use yii\widgets\ActiveForm;
+use yii\web\Response;
 
 /**
  * SubjectController implements the CRUD actions for Subject model.
@@ -17,6 +20,17 @@ class SubjectController extends Controller
     public function behaviors()
     {
         return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'actions' => ['view', 'index', 'create', 'update', 'import', 'delete'],
+                        'allow' => true,
+                        'roles' => ['createUser'],
+                    ],
+                ],
+            ],
+
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -60,8 +74,9 @@ class SubjectController extends Controller
      */
     public function actionCreate()
     {
+        return $this->actionUpdate(0);
+        /*
         $model = new Subject();
-
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->subj_id]);
         } else {
@@ -69,6 +84,7 @@ class SubjectController extends Controller
                 'model' => $model,
             ]);
         }
+        */
     }
 
     /**
@@ -79,7 +95,36 @@ class SubjectController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        if( $id == 0 ) {
+            $model = new Subject();
+        }
+        else {
+            $model = $this->findModel($id);
+        }
+
+        if( Yii::$app->request->isAjax ) {
+            if( $model->load(Yii::$app->request->post()) ) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                $aValidate = ActiveForm::validate($model);
+                if( count($aValidate) == 0 ) {
+                    if( !$model->save() ) {
+                        $s = 'Error save Resource: ' . print_r($model->getErrors(), true);
+
+                        Yii::info($s);
+                        Yii::error($s);
+                    }
+                }
+                return $aValidate;
+            }
+            else {
+                return $this->renderAjax(
+                    '_form',
+                    [
+                        'model' => $model,
+                    ]
+                );
+            }
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->subj_id]);
@@ -98,7 +143,11 @@ class SubjectController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id); // ->delete();
+        $model->subj_is_active = $model->subj_is_active == 1 ? 0 : 1;
+        if( !$model->save() ) {
+            Yii::info("Error delete subject: " . print_r($model->getErrors(), true) . "\nmodel = " . print_r($model->attributes, true));
+        }
 
         return $this->redirect(['index']);
     }

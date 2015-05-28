@@ -44,12 +44,12 @@ class Subject extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'subj_id' => 'Subj ID',
-            'subj_title' => 'Subj Title',
-            'subj_created' => 'Subj Created',
-            'subj_dep_id' => 'Subj Dep ID',
-            'subj_comment' => 'Subj Comment',
-            'subj_is_active' => 'Subj Is Active',
+            'subj_id' => 'ID',
+            'subj_title' => 'Название',
+            'subj_created' => 'Создано',
+            'subj_dep_id' => 'Отдел',
+            'subj_comment' => 'Комментарий',
+            'subj_is_active' => 'Активно',
         ];
     }
 }

@@ -131,11 +131,33 @@ EOT;
     line-height: 14px;
     padding: 5px 15px;
 }
+.grig-active-column {
+    width: 120px;
+    text-align: center;
+}
 EOT;
         $this->registerCss($sCss);
         $sJs = <<<EOT
 var oToplink = jQuery("a.navbar-brand");
 oToplink.replaceWith(oToplink.html());
+
+var params = {};
+params[jQuery('meta[name=csrf-param]').prop('content')] = jQuery('meta[name=csrf-token]').prop('content');
+
+jQuery('.showinmodal').on("click", function (event){
+    event.preventDefault();
+
+    var ob = jQuery('#messagedata'),
+        oBody = ob.find('.modal-body'),
+        oLink = $(this);
+
+    oBody.text("");
+    oBody.load(oLink.attr('href'), params);
+    ob.find('.modal-header span').text(oLink.attr('title'));
+    ob.modal('show');
+    return false;
+});
+
 EOT;
 
         $this->registerJs($sJs);
@@ -218,6 +240,14 @@ Modal::begin([
 ]);
 
 Modal::end();
+
+Modal::begin([
+    'header' => '<span></span>',
+    'id' => 'messagedata',
+    'size' => Modal::SIZE_LARGE,
+]);
+Modal::end();
+
 $sJs =  <<<EOT
 jQuery('#showmessagedialog').on("click", function (event){
     event.preventDefault();

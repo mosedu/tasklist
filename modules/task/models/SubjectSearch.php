@@ -55,6 +55,10 @@ class SubjectSearch extends Subject
             return $dataProvider;
         }
 
+        if( $this->subj_is_active == '' ) {
+            $this->subj_is_active = 1;
+        }
+
         $query->andFilterWhere([
             'subj_id' => $this->subj_id,
             'subj_created' => $this->subj_created,
