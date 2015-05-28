@@ -3,6 +3,10 @@
 namespace app\modules\task\models;
 
 use Yii;
+use yii\behaviors\AttributeBehavior;
+use yii\db\ActiveRecord;
+use yii\base\Event;
+use app\modules\task\models\Tasklist;
 
 /**
  * This is the model class for table "{{%requestmsg}}".
@@ -18,7 +22,30 @@ use Yii;
  */
 class Requestmsg extends \yii\db\ActiveRecord
 {
-    /**
+    public $new_finish_date;
+
+    public function behaviors() {
+        return [
+            [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_VALIDATE => 'req_user_id',
+                ],
+                'value' => function ($event) {
+                    /** @var Event $event */
+                    /** @var Requestmsg $ob */
+                    $ob = $event->sender;
+                    $val = $ob->req_user_id;
+                    if( $ob->isNewRecord ) {
+                        $val = Yii::$app->user->identity->getId();
+                    }
+                    return $val;
+                },
+            ],
+
+        ];
+    }
+/**
      * @inheritdoc
      */
     public static function tableName()
@@ -34,9 +61,10 @@ class Requestmsg extends \yii\db\ActiveRecord
         return [
             [['req_user_id', 'req_task_id'], 'required'],
             [['req_user_id', 'req_task_id', 'req_is_active'], 'integer'],
-            [['req_created'], 'safe'],
+            [['req_created', 'new_finish_date', ], 'safe'],
             [['req_data'], 'string'],
-            [['req_text', 'req_comment'], 'string', 'max' => 255]
+            [['req_text', ], 'string', 'max' => 255 ],
+            [['req_comment', ], 'string', ],
         ];
     }
 
@@ -49,11 +77,18 @@ class Requestmsg extends \yii\db\ActiveRecord
             'req_id' => 'ID',
             'req_user_id' => 'Пользователь',
             'req_task_id' => 'Задача',
-            'req_text' => 'Текст',
+            'req_text' => 'Причина переноса',
             'req_comment' => 'Комментарий',
             'req_created' => 'Создан',
             'req_data' => 'Данные',
             'req_is_active' => 'Активен',
+            'new_finish_date' => 'Новая дата окончания',
         ];
+    }
+
+    public function getTask()
+    {
+        // Order has_one Customer via Customer.id -> customer_id
+        return $this->hasOne(Tasklist::className(), ['task_id' => 'req_task_id']);
     }
 }

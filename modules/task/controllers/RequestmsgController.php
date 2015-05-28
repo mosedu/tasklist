@@ -79,6 +79,8 @@ class RequestmsgController extends Controller
      */
     public function actionCreate()
     {
+        return $this->actionUpdate(0);
+        /*
         $model = new Requestmsg();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -88,6 +90,7 @@ class RequestmsgController extends Controller
                 'model' => $model,
             ]);
         }
+        */
     }
 
     /**
@@ -101,10 +104,15 @@ class RequestmsgController extends Controller
         if( $id == 0 ) {
             $model = new Requestmsg();
             $sForm = '_requestdate';
+            $model->req_task_id = Yii::$app->request->getQueryParam('taskid', 0);
         }
         else {
             $model = $this->findModel($id);
             $sForm = '_commit';
+        }
+        $task = $model->task;
+        if( $task === null  ) {
+            $sForm = '_notask';
         }
 
         if( Yii::$app->request->isAjax ) {

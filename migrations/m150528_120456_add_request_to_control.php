@@ -16,7 +16,7 @@ class m150528_120456_add_request_to_control extends MyMigration
             'req_id' => Schema::TYPE_PK,
             'req_user_id' => Schema::TYPE_INTEGER . ' NOT NULL',
             'req_task_id' => Schema::TYPE_INTEGER . ' NOT NULL',
-            'req_text' => Schema::TYPE_STRING,
+            'req_text' => Schema::TYPE_TEXT,
             'req_comment' => Schema::TYPE_STRING,
             'req_created' => Schema::TYPE_DATETIME,
             'req_data' => Schema::TYPE_TEXT,
