@@ -36,7 +36,7 @@ $department = $data['department'];
 
 <p><?= Html::encode('Отдел: ' . $department->dep_name) ?>.</p>
 
-<p><?= Html::encode('Задача: ' . $task->task_name) . ' ' . Html::a($task->url(true), $task->url(true)) ?>.</p>
+<p><?= Html::encode('Задача: ' . $task->getTasknum() . ' ' . $task->task_name) . ' ' . Html::a($task->url(true), $task->url(true)) ?>.</p>
 
 <?php if( !empty($task->task_worker_id) ) { ?>
     <p><?= Html::encode('Ответственный: ' . $task->worker->getFullName()) ?>.</p>
