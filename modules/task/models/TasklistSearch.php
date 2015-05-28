@@ -194,7 +194,8 @@ class TasklistSearch extends Tasklist
         $query->andFilterWhere(['like', 'task_direct', $this->task_direct])
             ->andFilterWhere(['like', 'task_name', $this->task_name])
             ->andFilterWhere(['like', 'task_reasonchanges', $this->task_reasonchanges])
-            ->andFilterWhere(['like', 'task_summary', $this->task_summary]);
+            ->andFilterWhere(['like', 'task_summary', $this->task_summary])
+            ->andFilterWhere(['like', 'task_expectation', $this->task_expectation]);
 
         return $dataProvider;
     }

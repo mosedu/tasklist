@@ -42,6 +42,7 @@ use yii\helpers\Url;
  * @property integer $task_progress
  * @property integer $task_worker_id
  * @property string $task_summary
+ * @property string $task_expectation
  * @property integer $task_active
  */
 class Tasklist extends \yii\db\ActiveRecord
@@ -285,6 +286,13 @@ class Tasklist extends \yii\db\ActiveRecord
             [['task_summary', ], 'filter', 'filter'=>'trim'],
 
             [['task_dep_id', 'task_name', 'task_actualtime', 'task_type', 'task_progress', ], 'required'], // 'task_direct',
+            [
+                ['task_expectation', ],
+                'required',
+                'when' => function ($model) { return $model->isNewRecord; },
+                'whenClient' => "function (attribute, value) { return " . ($this->isNewRecord ? 'true' : 'false') . "; }"
+            ],
+
             [['curworkers'], 'filter', 'filter' => function($val){ if( is_string($val) ) { if( trim($val) == '' ) { $val = []; } else { $val = [intval($val)]; } } else if( is_array($val) ) { foreach($val As $k=>$v) { if( trim($v) == '' ) { unset($val[$k]); } } } return $val; }],
 //            [['curworkers'], 'in', 'range' => array_keys($this->getTaskAvailWokers()), 'allowArray' => true],
             [['curworkers'], 'isWorkersInDepartment'],
@@ -294,7 +302,7 @@ class Tasklist extends \yii\db\ActiveRecord
             ],
 //            ['task_worker_id', 'filter', 'filter' => 'intval', ],
             [['task_dep_id', 'task_num', 'task_type', 'task_numchanges', 'task_progress', 'task_active', /*'task_worker_id',*/ ], 'integer'],
-            [['task_direct', 'task_name', 'task_reasonchanges', 'task_summary', ], 'string'], // 'reasonchange'
+            [['task_direct', 'task_name', 'task_reasonchanges', 'task_summary', 'task_expectation', ], 'string'], // 'reasonchange'
             [['task_createtime', 'task_finaltime', ], 'safe'] // 'task_actualtime'
         ];
 
@@ -359,6 +367,7 @@ class Tasklist extends \yii\db\ActiveRecord
             'task_active' => 'Удалена',
             'task_worker_id' => 'Сотрудник',
             'curworkers' => 'Сотрудники',
+            'task_expectation' => 'Ожидаемый результат',
         ];
     }
 

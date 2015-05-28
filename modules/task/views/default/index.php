@@ -272,7 +272,10 @@ if( $searchModel->showTaskSummary ) {
             'attribute' => 'task_summary',
             'filter' => false,
             'content' => function ($model, $key, $index, $column) {
-                return nl2br(Html::encode($model->task_summary));
+                return nl2br(
+                    Html::encode($model->task_expectation)
+                  . ((($model->task_expectation != '') && ($model->task_summary != '') ) ? "\n<hr>" : '')
+                  . Html::encode($model->task_summary));
             },
             'contentOptions' => [
                 'class' => 'griddate',

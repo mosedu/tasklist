@@ -154,6 +154,8 @@ if( !$bEditDates ) {
 
         <?= $form->field($model, 'task_name', $aTextParam)->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable)) ?>
 
+        <?= $form->field($model, 'task_expectation', array_merge($aTextParam) )->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable)) ?>
+
         <?= $form->field($model, 'task_summary', array_merge($aTextParam, ['options' => $bHideSummary ? ['style' => 'display: none;', 'class'=>'form-group'] : ['class'=>'form-group']]) )->textarea(['rows' => 4, 'data-req' => $bFinished ? 1 : 0, ]) ?>
 
         <div id="file-forsummary-region">
