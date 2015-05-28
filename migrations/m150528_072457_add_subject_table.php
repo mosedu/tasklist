@@ -26,7 +26,6 @@ class m150528_072457_add_subject_table extends MyMigration
 
 
         $this->refreshCache();
-
     }
 
     public function down()

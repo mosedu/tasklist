@@ -3,20 +3,19 @@
 namespace app\modules\task\controllers;
 
 use Yii;
-use app\modules\task\models\Subject;
-use app\modules\task\models\SubjectSearch;
+use app\modules\task\models\Requestmsg;
+use app\modules\task\models\RequestmsgSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\widgets\ActiveForm;
 use yii\web\Response;
-use app\modules\task\models\SubjectImportForm;
 
 /**
- * SubjectController implements the CRUD actions for Subject model.
+ * RequestmsgController implements the CRUD actions for Requestmsg model.
  */
-class SubjectController extends Controller
+class RequestmsgController extends Controller
 {
     public function behaviors()
     {
@@ -25,9 +24,14 @@ class SubjectController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['view', 'index', 'create', 'update', 'import', 'delete'],
+                        'actions' => ['update', 'index', 'view', 'delete', ],
                         'allow' => true,
                         'roles' => ['createUser'],
+                    ],
+                    [
+                        'actions' => ['create', ],
+                        'allow' => true,
+                        'roles' => ['@'],
                     ],
                 ],
             ],
@@ -42,12 +46,12 @@ class SubjectController extends Controller
     }
 
     /**
-     * Lists all Subject models.
+     * Lists all Requestmsg models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new SubjectSearch();
+        $searchModel = new RequestmsgSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -57,7 +61,7 @@ class SubjectController extends Controller
     }
 
     /**
-     * Displays a single Subject model.
+     * Displays a single Requestmsg model.
      * @param integer $id
      * @return mixed
      */
@@ -69,27 +73,25 @@ class SubjectController extends Controller
     }
 
     /**
-     * Creates a new Subject model.
+     * Creates a new Requestmsg model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        return $this->actionUpdate(0);
-        /*
-        $model = new Subject();
+        $model = new Requestmsg();
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->subj_id]);
+            return $this->redirect(['view', 'id' => $model->req_id]);
         } else {
             return $this->render('create', [
                 'model' => $model,
             ]);
         }
-        */
     }
 
     /**
-     * Updates an existing Subject model.
+     * Updates an existing Requestmsg model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -97,10 +99,12 @@ class SubjectController extends Controller
     public function actionUpdate($id)
     {
         if( $id == 0 ) {
-            $model = new Subject();
+            $model = new Requestmsg();
+            $sForm = '_requestdate';
         }
         else {
             $model = $this->findModel($id);
+            $sForm = '_commit';
         }
 
         if( Yii::$app->request->isAjax ) {
@@ -109,7 +113,7 @@ class SubjectController extends Controller
                 $aValidate = ActiveForm::validate($model);
                 if( count($aValidate) == 0 ) {
                     if( !$model->save() ) {
-                        $s = 'Error save Subject: ' . print_r($model->getErrors(), true);
+                        $s = 'Error save Requestmsg: ' . print_r($model->getErrors(), true);
 
                         Yii::info($s);
                         Yii::error($s);
@@ -119,7 +123,7 @@ class SubjectController extends Controller
             }
             else {
                 return $this->renderAjax(
-                    '_form',
+                    $sForm,
                     [
                         'model' => $model,
                     ]
@@ -128,71 +132,38 @@ class SubjectController extends Controller
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->subj_id]);
+            return $this->redirect(['index', ]);
         } else {
             return $this->render('update', [
                 'model' => $model,
+                'form' => $sForm,
             ]);
         }
     }
 
     /**
-     * Import data from Excel file
-     * @return mixed
-     */
-    public function actionImport()
-    {
-        $model = new SubjectImportForm();
-
-        if( Yii::$app->request->isAjax ) {
-            if( $model->load(Yii::$app->request->post()) ) {
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                $aValidate = ActiveForm::validate($model);
-                return $aValidate;
-            }
-        }
-
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $data = $model->getFileData();
-//            Yii::info('model->getFileData() = ' . print_r($data, true));
-            if( count($data) > 0 ) {
-                Subject::import($data);
-            }
-            return $this->redirect(['index', ]);
-        } else {
-            return $this->render('_formimport', [
-                'model' => $model,
-            ]);
-        }
-    }
-
-    /**
-     * Deletes an existing Subject model.
+     * Deletes an existing Requestmsg model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
      */
     public function actionDelete($id)
     {
-        $model = $this->findModel($id); // ->delete();
-        $model->subj_is_active = $model->subj_is_active == 1 ? 0 : 1;
-        if( !$model->save() ) {
-            Yii::info("Error delete subject: " . print_r($model->getErrors(), true) . "\nmodel = " . print_r($model->attributes, true));
-        }
+        $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
     }
 
     /**
-     * Finds the Subject model based on its primary key value.
+     * Finds the Requestmsg model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Subject the loaded model
+     * @return Requestmsg the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Subject::findOne($id)) !== null) {
+        if (($model = Requestmsg::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
