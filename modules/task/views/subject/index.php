@@ -16,8 +16,8 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Создать напраление', ['create'], ['class' => 'btn btn-success showinmodal', 'title' => 'Новое направление']) ?>
-        <?= Html::a('Импорт напралений из Excel', ['import'], ['class' => 'btn btn-success', 'title' => 'Импорт направлений']) ?>
+        <?= Html::a('Создать направление', ['create'], ['class' => 'btn btn-success showinmodal', 'title' => 'Новое направление']) ?>
+        <?= Html::a('Импорт направлений из Excel', ['import'], ['class' => 'btn btn-success', 'title' => 'Импорт направлений']) ?>
     </p>
 
     <?= GridView::widget([
