@@ -164,6 +164,7 @@ EOT;
 
         if( !Yii::$app->user->isGuest ) {
             $aItems[] = ['label' => 'Задачи', 'url' => ['/']];
+            $aItems[] = ['label' => 'KPI', 'url' => ['/user/default/getkpi']];
         }
 
             if( Yii::$app->user->can('createUser') ) {

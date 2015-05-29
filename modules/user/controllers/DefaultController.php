@@ -14,6 +14,7 @@ use app\modules\user\models\User;
 use app\modules\user\models\UserSearch;
 use app\modules\user\models\PasswordResetRequestForm;
 use app\modules\user\models\ResetPasswordForm;
+use app\modules\user\models\DateIntervalForm;
 
 class DefaultController extends Controller
 {
@@ -22,15 +23,15 @@ class DefaultController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout', 'create', 'view', 'update', 'delete', 'index', 'unlink', 'unlinkall'],
+                'only' => ['logout', 'create', 'view', 'update', 'delete', 'index', 'unlink', 'unlinkall', 'getkpi', ],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['logout', 'getkpi', ],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
                     [
-                        'actions' => ['create', 'update', 'view', 'delete', 'index', 'changerole'],
+                        'actions' => ['create', 'update', 'view', 'delete', 'index', 'changerole', ],
                         'allow' => true,
                         'roles' => ['createUser'],
                     ],
@@ -49,6 +50,27 @@ class DefaultController extends Controller
                 ],
             ],
         ];
+    }
+
+    /**
+     *
+     * @return string|\yii\web\Response
+     */
+    public function actionGetkpi()
+    {
+        $model = new DateIntervalForm();
+        $aData = [];
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            return $this->render('kpi', [
+                'model' => $model,
+                'data' => $model->calcKpi(),
+            ]);
+        } else {
+            return $this->render('kpi', [
+                'model' => $model,
+                'data' => $aData,
+            ]);
+        }
     }
 
     /**
