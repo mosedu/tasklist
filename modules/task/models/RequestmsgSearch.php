@@ -12,6 +12,10 @@ use app\modules\task\models\Requestmsg;
  */
 class RequestmsgSearch extends Requestmsg
 {
+    public function behaviors() {
+        return [
+        ];
+    }
     /**
      * @inheritdoc
      */
@@ -42,12 +46,29 @@ class RequestmsgSearch extends Requestmsg
     public function search($params)
     {
         $query = Requestmsg::find();
+        $query->with(['task', 'user', ]);
+        $query->joinWith(['task', 'user', ]);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
 
         $this->load($params);
+
+        $dataProvider->sort->defaultOrder = [
+            'req_is_active' => SORT_DESC,
+            'req_created' => SORT_DESC,
+        ];
+
+        $dataProvider->sort->attributes['req_user_id'] = [
+            'asc' => ['us_lastname' => SORT_ASC, 'us_name' => SORT_ASC],
+            'desc' => ['us_lastname' => SORT_DESC, 'us_name' => SORT_DESC],
+        ];
+
+        $dataProvider->sort->attributes['req_task_id'] = [
+            'asc' => ['task_dep_id' => SORT_ASC, 'task_num' => SORT_ASC],
+            'desc' => ['task_dep_id' => SORT_DESC, 'task_num' => SORT_DESC],
+        ];
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails

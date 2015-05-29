@@ -120,6 +120,33 @@ class RequestmsgController extends Controller
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 $aValidate = ActiveForm::validate($model);
                 if( count($aValidate) == 0 ) {
+                    if( !$model->isNewRecord ) {
+                        if( $model->req_is_active == 1 ) {
+                            // nothing else
+                            Yii::info('N0 change task data');
+                        }
+                        else if( $model->req_is_active == 0 ) {
+                            // need to change task data
+                            Yii::info('Need to change task data');
+                            $a = unserialize($model->req_data);
+                            foreach($a As $k=>$v) {
+                                $task->{$k} = $v;
+                            }
+                            Yii::info('unserialize(model->req_data): ' . print_r(unserialize($model->req_data), true));
+                            Yii::info('new task attributes: ' . print_r($task->attributes, true));
+                            if( !$task->save() ) {
+                                $s = 'Error save Request Task: ' . print_r($task->getErrors(), true);
+
+                                Yii::info($s);
+                                Yii::error($s);
+                            }
+
+                        }
+                        $model->req_is_active = 0;
+                    }
+                    else {
+                        $model->prepareData();
+                    }
                     if( !$model->save() ) {
                         $s = 'Error save Requestmsg: ' . print_r($model->getErrors(), true);
 

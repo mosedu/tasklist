@@ -20,10 +20,10 @@ use yii\web\View;
 </div>
 
 <?php
-$formId = $form->options['id'];
-
-if( $bAjax ) {
-    $sJs = <<<EOT
+if( isset($form) ) {
+    $formId = $form->options['id'];
+    if( $bAjax ) {
+        $sJs = <<<EOT
 var oForm = jQuery('#{$formId}'),
     oCancel = jQuery('#{$formId}-cancel'),
     oDialog = oForm.parents('[role="dialog"]');
@@ -62,9 +62,9 @@ oForm
     });
 //console.log("oForm = ", oForm);
 EOT;
-}
-else {
-    $sJs = <<<EOT
+    }
+    else {
+        $sJs = <<<EOT
 var oCancel = jQuery('#{$formId}-cancel');
 
 oCancel.on(
@@ -78,5 +78,7 @@ oCancel.on(
 
 EOT;
 
+    }
+    $this->registerJs($sJs, View::POS_READY, 'submit_resource_form');
 }
-$this->registerJs($sJs, View::POS_READY, 'submit_resource_form');
+

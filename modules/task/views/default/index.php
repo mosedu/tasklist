@@ -298,7 +298,7 @@ $aColumns = array_merge(
             },
             'findate'=>function ($url, $model) {
                 $bFinish = ($model->task_progress == Tasklist::PROGRESS_FINISH);
-                return $bFinish ? Html::a( '<span class="glyphicon glyphicon-new-window"></span>', ['requestmsg/create', 'taskid' => $model->task_id], ['title' => 'Запрос на перенос даты', 'class'=>'showinmodal']) : '';
+                return $bFinish ? Html::a( '<span class="glyphicon glyphicon-new-window"></span>', ['requestmsg/create', 'taskid' => $model->task_id], ['title' => 'Запрос на перенос даты окончания задачи', 'class'=>'showinmodal']) : '';
             },
             'delete' => function ($url, $model, $key) {
                 /** @var Tasklist $model */

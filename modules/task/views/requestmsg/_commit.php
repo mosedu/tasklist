@@ -26,25 +26,24 @@ $bAjax = Yii::$app->request->isAjax;
         'validateOnType' => false,
         /* ********************** bootstrap options ********************** */
 //        'layout' => 'horizontal',
-    ]); ?>
+    ]);
+    $aData = unserialize($model->req_data);
+    ?>
 
-    <div class="col-sm-6">
-        <?= $form
-                ->field($model, 'req_text')
-                ->textarea(['rows' => 5])
-                ->hint('Текущая дата окончания задачи: ' . date('d.m.Y', strtotime($model->task->task_finishtime)) . '<br />Задача: ' . Html::encode($model->task->task_name))
-        ?>
+    <div class="col-sm-12">
+        <p><strong>Запрос:</strong> <?= Html::encode($model->req_text) ?><p>
+        <p><strong>От:</strong> <?= Html::encode($model->user->getFullname()) ?><p>
+        <p><strong>Задача:</strong> <?= Html::encode($model->task->task_name) ?><p>
+        <p><strong>Дата окончания:</strong> <?= date('d.m.Y', strtotime($model->task->task_finishtime)) ?> -&gt; <?= date('d.m.Y', strtotime($aData['task_finishtime'])) ?><p>
+        <?=  $form->field($model, 'req_is_active', ['template' => '{input}'])->hiddenInput() ?>
     </div>
-    <div class="col-sm-6">
-        <?= $form
-            ->field($model, 'new_finish_date')
-            ->widget(DatePicker::className(), ['type' => DatePicker::TYPE_INLINE,])
-        ?>
+    <div class="col-sm-12">
     </div>
 
     <div class="form-group">
         <div class="col-sm-6">
-            <?= Html::submitButton('Отправить запрос', ['class' => 'btn btn-success']) ?>
+            <?= Html::submitButton('Принять', ['class' => 'btn btn-success setactiveval', 'data-val' => 0]) ?>
+            <?= Html::submitButton('Отклонить', ['class' => 'btn btn-danger setactiveval', 'data-val' => 1]) ?>
             <?= Html::a('Отмена', '', ['class' => 'btn btn-default', 'id' => "{$form->options['id']}-cancel"]) ?>
         </div>
         <div class="col-sm-6">
@@ -57,13 +56,6 @@ $bAjax = Yii::$app->request->isAjax;
 </div>
 
 <?php
-$sCss = <<<EOT
-#requestmsg-new_finish_date {
-    display: none;
-}
-EOT;
-
-$this->registerCss($sCss);
 
 $formId = $form->options['id'];
 
@@ -124,4 +116,15 @@ oCancel.on(
 EOT;
 
 }
+
+$sId = Html::getInputId($model, 'req_is_active');
+$sJs .= <<<EOT
+
+    jQuery(".setactiveval").on("click", function(event){
+        var ob = jQuery(this),
+            nval = ob.attr("data-val");
+        jQuery("#{$sId}").val(nval);
+    });
+
+EOT;
 $this->registerJs($sJs, View::POS_READY, 'submit_resource_form');

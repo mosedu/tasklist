@@ -7,6 +7,8 @@ use yii\behaviors\AttributeBehavior;
 use yii\db\ActiveRecord;
 use yii\base\Event;
 use app\modules\task\models\Tasklist;
+use app\modules\user\models\User;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "{{%requestmsg}}".
@@ -43,6 +45,18 @@ class Requestmsg extends \yii\db\ActiveRecord
                 },
             ],
 
+            [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => 'req_created',
+                ],
+                'value' => function ($event) {
+                    /** @var Event $event */
+                    /** @var Requestmsg $ob */
+                    return new Expression('NOW()');
+                },
+            ],
+
         ];
     }
 /**
@@ -59,7 +73,14 @@ class Requestmsg extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['req_user_id', 'req_task_id'], 'required'],
+            [['req_user_id', 'req_task_id', 'req_text', ], 'required'],
+            [
+                ['new_finish_date', ],
+                'required',
+                'when' => function($model){ return $model->isNewRecord; },
+                'whenClient' => 'function (attribute, value) { return '.($this->isNewRecord ? 'true' : 'false').'; }',
+                'message' => 'Необходимо выбрать новую дату окончания',
+            ],
             [['req_user_id', 'req_task_id', 'req_is_active'], 'integer'],
             [['req_created', 'new_finish_date', ], 'safe'],
             [['req_data'], 'string'],
@@ -88,7 +109,20 @@ class Requestmsg extends \yii\db\ActiveRecord
 
     public function getTask()
     {
-        // Order has_one Customer via Customer.id -> customer_id
         return $this->hasOne(Tasklist::className(), ['task_id' => 'req_task_id']);
     }
+
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['us_id' => 'req_user_id']);
+    }
+
+    public function prepareData()
+    {
+        $a = explode('.', $this->new_finish_date);
+        return $this->req_data = serialize([
+            'task_finishtime' => date('Y-m-d H:i:s', mktime(23, 59, 59, $a[1], $a[0], $a[2])),
+        ]);
+    }
+
 }

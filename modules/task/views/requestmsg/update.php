@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\modules\task\models\Requestmsg */
 
-$this->title = 'Изменение запроса: ' . $model->req_id;
+$this->title = ($model->isNewRecord ? 'Создание' : 'Изменение') . ' запроса: ' . $model->req_id;
 $this->params['breadcrumbs'][] = ['label' => 'Requestmsgs', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->req_id, 'url' => ['view', 'id' => $model->req_id]];
 $this->params['breadcrumbs'][] = 'Update';
