@@ -433,7 +433,7 @@ Yii::$app->params['panelcheckbox'] = array_merge(
         'dataProvider' => $dataProvider,
         'filterModel' => null, // $searchModel,
         'headerRowOptions' => ['class' => 'center-top'],
-        'layout' => "<div style=\"margin-left: 16px; padding: 6px; float: right;\" class=\"pagination\">{summary}</div>\n{pager}\n{items}\n{pager}",
+        'layout' => "<div style=\"margin-left: 16px; padding: 6px; float: right;\" class=\"pagination\">{summary}</div><div class=\"clearfix\"></div>\n{pager}\n{items}\n{pager}",
         'columns' => $aColumns,
     ]); ?>
 
