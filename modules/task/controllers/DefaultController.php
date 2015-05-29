@@ -291,7 +291,7 @@ class DefaultController extends Controller
         $response->format = \yii\web\Response::FORMAT_JSON;
         $a = Subject::getList();
         foreach($a As $k=>$v) {
-            $a[$k] = wordwrap($v, 60, "<br />\n");
+            $a[$k] = wordwrap($v, 120, "<br />\n");
         }
 //            wordwrap($text, 20, "<br />\n");
 //        $response->data = $aData;

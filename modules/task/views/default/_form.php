@@ -151,7 +151,7 @@ if( !$bEditDates ) {
 
     <div class="col-sm-8">
         <?= $form->field($model, 'task_direct', $aTextParam)
-            ->textarea(array_merge(['rows' => 2], $aDisable)) // $bEditDates ? [] :
+            ->textarea(array_merge(['rows' => 2], ['readonly' => true, ])) // $bEditDates ? [] : $aDisable
             ->hint(Html::tag('div', Html::a('Выбрать направление', '', ['class' => 'btn btn-default', 'id'=>'idshowselectdirection',]), ['style'=>'text-align: right;'])) ?>
 
         <?= ''
