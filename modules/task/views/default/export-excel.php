@@ -195,6 +195,11 @@ $aField = [
 //        'val' => function($model) { return str_replace("\n", "\r\n", str_replace("\\n", "\n", $model->task_reasonchanges)); },
     ],
     [
+        'attribute' => 'task_expectation',
+        'w' => 30,
+        'val' => function($model) { return str_replace("\n", "\r\n", $model->task_expectation); },
+    ],
+    [
         'attribute' => 'task_summary',
         'w' => 30,
         'val' => function($model) { return str_replace("\n", "\r\n", $model->task_summary); },
