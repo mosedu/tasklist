@@ -92,6 +92,19 @@ $aWorkerSelect = [
     ],
 ];
 
+$aSubjectSelect = [
+//    'data' =>  Subject::getList(),
+    'language' => 'ru',
+    'options' => [
+        'placeholder' => 'Выберите из списка ...',
+        'multiple' => false,
+    ],
+    'pluginOptions' => [
+        'allowClear' => true,
+        'data' =>  array_values(Subject::getList()),
+    ],
+];
+
 /*
 var oSelDepartment = jQuery("#{$sDepartmentId}"),
     oSelWorker = jQuery("#{$sWorkerId}");
@@ -150,12 +163,20 @@ if( !$bEditDates ) {
     ?>
 
     <div class="col-sm-8">
-        <?= $form->field($model, 'task_direct', $aTextParam)
-            ->textarea(array_merge(['rows' => 2], ['readonly' => true, ])) // $bEditDates ? [] : $aDisable
-            ->hint(Html::tag('div', Html::a('Выбрать направление', '', ['class' => 'btn btn-default', 'id'=>'idshowselectdirection',]), ['style'=>'text-align: right;'])) ?>
+        <?php
+        if( $model->isNewRecord ) {
+        ?>
+            <?= $form->field($model, 'task_direct', $aTextParam, $bEditDates ? [] : $aDisable)
+                ->widget(Select2::classname(), $aSubjectSelect) ?>
+        <?php
+        } else {
+        ?>
+            <?= $form->field($model, 'task_direct', $aTextParam)
+                ->textarea(array_merge(['rows' => 2], ['readonly' => true, ])) // $bEditDates ? [] : $aDisable
+                ->hint($bEditDates ? Html::tag('div', Html::a('Выбрать направление', '', ['class' => 'btn btn-default', 'id'=>'idshowselectdirection',]), ['style'=>'text-align: right;']) : '') ?>
 
-        <?= ''
-        // Subject::getList()
+        <?php
+        }
         ?>
 
         <?= $form->field($model, 'task_name', $aTextParam)->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable)) ?>
