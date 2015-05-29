@@ -17,6 +17,7 @@ use app\modules\task\models\TasklistSearch;
 use app\modules\task\models\File;
 use app\rbac\DepartmentRule;
 use yii\web\Response;
+use app\modules\task\models\Subject;
 
 class DefaultController extends Controller
 {
@@ -281,13 +282,20 @@ class DefaultController extends Controller
      */
     public function actionLastdirect()
     {
-        $aData = Yii::$app
+/*        $aData = Yii::$app
             ->db
             ->createCommand('SELECT Distinct task_direct FROM tlst_tasklist Where task_dep_id = :depid And LENGTH(task_direct) > 0 Order By task_id Desc', ['depid'=>Yii::$app->request->get('depid', 0)])
             ->queryColumn();
+*/
         $response = Yii::$app->response;
         $response->format = \yii\web\Response::FORMAT_JSON;
-        $response->data = $aData;
+        $a = Subject::getList();
+        foreach($a As $k=>$v) {
+            $a[$k] = wordwrap($v, 60, "<br />\n");
+        }
+//            wordwrap($text, 20, "<br />\n");
+//        $response->data = $aData;
+        $response->data = $a;
         return $response;
     }
 

@@ -16,6 +16,8 @@ use app\modules\user\models\User;
 use app\modules\task\models\File;
 
 use mosedu\multirows\MultirowsWidget;
+use app\modules\task\models\Subject;
+
 
 /* @var $this yii\web\View */
 /* @var $model app\modules\task\models\Tasklist */
@@ -149,8 +151,12 @@ if( !$bEditDates ) {
 
     <div class="col-sm-8">
         <?= $form->field($model, 'task_direct', $aTextParam)
-            ->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable))
-            ->hint(Html::tag('div', Html::a('Выбрать направление', '', ['id'=>'idshowselectdirection',]), ['style'=>'text-align: right;'])) ?>
+            ->textarea(array_merge(['rows' => 2], $aDisable)) // $bEditDates ? [] :
+            ->hint(Html::tag('div', Html::a('Выбрать направление', '', ['class' => 'btn btn-default', 'id'=>'idshowselectdirection',]), ['style'=>'text-align: right;'])) ?>
+
+        <?= ''
+        // Subject::getList()
+        ?>
 
         <?= $form->field($model, 'task_name', $aTextParam)->textarea(array_merge(['rows' => 2], $bEditDates ? [] : $aDisable)) ?>
 
@@ -193,6 +199,7 @@ if( !$bEditDates ) {
             Modal::begin([
                 'header' => 'Выбрать направление из списка',
                 'id' => 'selectmodal',
+                'size' => "modal-lg",
                 'footer' => '<button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button><button type="button" class="btn btn-primary" id="setselecteddata">Вставить</button>',
             ]);
 

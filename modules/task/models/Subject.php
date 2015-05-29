@@ -6,6 +6,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\db\BaseActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "{{%subject}}".
@@ -79,6 +80,7 @@ class Subject extends \yii\db\ActiveRecord
                 $ob = new Subject();
                 $ob->subj_title = $v;
                 $ob->subj_is_active = 1;
+                $ob->subj_comment = 'импорт excel [' . Yii::$app->user->identity->getId() . ']';
                 if( !$ob->save() ) {
                     Yii::info('Error save import data to Subject: ' . print_r($ob->getErrors(), true) . "\nattributes = " . print_r($ob->attributes, true));
                 }
@@ -87,5 +89,13 @@ class Subject extends \yii\db\ActiveRecord
                 Yii::info('Subject::import(): exists ['.$k.'] ' . $v . ' = ' . print_r($ob->attributes, true));
             }
         }
+    }
+
+    public static function getList() {
+        return ArrayHelper::map(
+            self::find()->where(['subj_is_active' => 1])->all(),
+            'subj_id',
+            'subj_title'
+        );
     }
 }
