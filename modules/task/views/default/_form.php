@@ -46,7 +46,7 @@ $aTextParamSummary = [
 
 $aDisable = [];
 if( !Yii::$app->user->can('createUser') ) {
-    $aDisable = ['readonly' => true, 'disabled' => true];
+    $aDisable = ['readonly' => true, 'disabled' => true ];
 }
 $bCanChange = $model->canChangeDate();
 
@@ -115,7 +115,8 @@ oSelDepartment.on("change", function(event){
 */
 
 if( !$bEditDates ) {
-    $aWorkerSelect = array_merge($aWorkerSelect, ['readonly' => true, 'disabled' => true]);
+    $aWorkerSelect = array_merge($aWorkerSelect, ['readonly' => true, 'disabled' => true]); //
+    $aSubjectSelect = array_merge($aSubjectSelect, ['readonly' => true, 'disabled' => true]); //
 }
 
 ?>
@@ -453,7 +454,17 @@ EOT;
         <div class="form-group">
             <div class="col-sm-3">&nbsp;</div>
             <div class="col-sm-3">
-                <?= Html::submitButton('<span class="glyphicon glyphicon-ok"></span> Сохранить', ['class' => 'btn btn-success btn-lg']) ?>
+                <?php
+                if( $bEditDates ) {
+                ?>
+                    <?= Html::submitButton('<span class="glyphicon glyphicon-ok"></span> Сохранить', ['class' => 'btn btn-success btn-lg']) ?>
+                <?php
+                } else {
+                ?>
+                    <?= Html::a('Назад', '', ['class' => 'btn btn-default btn-lg', 'id'=>'idbacklink']) /*<span class="glyphicon glyphicon-check"></span> */ ?>
+                <?php
+                }
+                ?>
                 <?= '' // Html::submitButton('Сохранить изменения', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
             </div>
             <div class="col-sm-6">
@@ -471,6 +482,11 @@ var oSelDepartment = jQuery("#{$sDepartmentId}"),
 oSelDepartment.on("change", function(event){
     $("#{$sCurWorkersId}").select2("val", null);
 //    jQuery.get("{$sUrl}", {id: oSelDepartment.val()}, function(data, textStatus, jqXHR){ oSelWorker.html(''); jQuery('<option>').val(0).text("").appendTo(oSelWorker); for(var i in data) { jQuery('<option>').val(i).text(data[i]).appendTo(oSelWorker); } }, 'json');
+});
+jQuery("#idbacklink").on("click", function(event){
+    event.preventDefault();
+    window.history.go(-1);
+    return false;
 });
 EOT;
     $this->registerJs($sJs, View::POS_READY, 'fillselectworker');
