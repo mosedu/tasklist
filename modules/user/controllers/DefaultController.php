@@ -59,6 +59,7 @@ class DefaultController extends Controller
     public function actionGetkpi()
     {
         $model = new DateIntervalForm();
+        $model->setdefaultValues();
         $aData = [];
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             return $this->render('kpi', [

@@ -20,7 +20,18 @@ if( $model->to_date == '' ) {
     $model->to_date = date('d.m.Y');
 }
 
-$aDisable = [];
+$aDisable = [
+    'disabled' => true,
+];
+
+$aDepartment = Department::getList(false);
+if( Yii::$app->user->can('createUser') || (Yii::$app->user->identity->us_dep_id == 1) ) {
+    $a = [""=>""];
+    foreach($aDepartment As $k=>$v) {
+        $a[$k] = $v;
+    }
+    $aDepartment = $a;
+}
 
 ?>
 
@@ -66,6 +77,7 @@ $aDisable = [];
                 'options2' => ['placeholder' => $model->getAttributeLabel('to_date')],
                 'type' => DatePicker::TYPE_RANGE,
                 'form' => $form,
+                'separator' => '...',
                 'pluginOptions' => [
                     'format' => 'dd.mm.yyyy',
                     'autoclose' => true,
@@ -76,8 +88,8 @@ $aDisable = [];
             ?>
         </div>
         <div class="col-sm-6">
-            <?= $form->field($model, 'department_id')->dropDownList(Department::getList(false), $aDisable) ?>
-            <?= $form->field($model, 'user_id')->dropDownList([], $aDisable) ?>
+            <?= $form->field($model, 'department_id')->dropDownList($aDepartment, (Yii::$app->user->can('createUser') || (Yii::$app->user->identity->us_dep_id == 1)) ? [] : $aDisable) ?>
+            <?= $form->field($model, 'user_id')->dropDownList([], (Yii::$app->user->can('createUser') || (Yii::$app->user->identity->us_dep_id == 1) || Yii::$app->user->can('department') ) ? [] : $aDisable) ?>
         </div>
         <div class="clearfix"></div>
     </div>
@@ -99,12 +111,14 @@ $aDisable = [];
 
 $sDepartmentId = Html::getInputId($model, 'department_id');
 $sUserId = Html::getInputId($model, 'user_id');
+$UserId = $model->user_id;
 $sUrl = Url::to(['/user/worker/list'], true);
 
 $sJs = <<<EOT
     var setUsers = function() {
         var oDep = jQuery("#{$sDepartmentId}"),
-            depId = oDep.val();
+            depId = oDep.val(),
+            oldVal = "{$UserId}";
         jQuery.ajax({
             dataType: "json",
             url: "{$sUrl}",
@@ -115,7 +129,17 @@ $sJs = <<<EOT
                 var olist = jQuery("#{$sUserId}");
                 olist.append(jQuery('<option>').text("").attr('value', ""));
                 for(var i in data) {
-                    olist.append(jQuery('<option>').text(data[i]).attr('value', i));
+                    var oOpt = jQuery('<option>').text(data[i]).attr('value', i);
+//                    if( i == oldVal ) {
+//                        console.log("op["+i+"] ("+oldVal+")");
+//                        oOpt.attr("selected", true);
+//                    }
+                    olist.append(oOpt);
+                }
+
+                if( jQuery("#{$sUserId} option[value=\""+oldVal+"\"]").length > 0 ) {
+                    jQuery("#{$sUserId}").val(oldVal).trigger("change");
+//                    console.log("Set value: to #{$sUserId} val("+oldVal+")");
                 }
             }
         });
