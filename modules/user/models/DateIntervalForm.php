@@ -107,6 +107,7 @@ class DateIntervalForm extends Model {
         $sChangesTable = Changes::tableName();
         $sWorkerTable = Worker::tableName();
         $sDepartmentTable = Department::tableName();
+        $nTaksActiveFlag = Tasklist::STATUS_ACTIVE;
         $sStart = date('Y-m-d H:i:s', $this->mkTime($this->from_date) - 1);
         $sFinish = date('Y-m-d H:i:s', $this->mkTime($this->to_date) + 24 * 3600);
         $sDop = "";
@@ -132,8 +133,9 @@ class DateIntervalForm extends Model {
 // Для завершенной задачи берем верхнюю границу для вычисления среднего количества задач - минимальную из верхней границы диапазона и времени окончания
 //    , IF(ta.task_finishtime Is Not Null, IF(ta.task_finishtime < '{$sFinish}', ta.task_finishtime, '{$sFinish}'), '{$sFinish}') As fdate
 //    , IF(ta.task_createtime > '{$sStart}', ta.task_createtime, '{$sStart}') As sdate
+// Distinct
         $sSql = <<<EOT
-Select Distinct ta.task_id
+Select ta.task_id
     , ta.task_dep_id
     , ta.task_type
     , ta.task_createtime
@@ -150,6 +152,7 @@ Left Join {$sChangesTable} cn On cn.ch_task_id = ta.task_id
 Where ta.task_createtime < '{$sFinish}'
   And ta.task_finaltime > '{$sStart}'
   And (ta.task_finishtime > '{$sStart}' Or ta.task_finishtime Is Null )
+  And (ta.task_task_active = {$nTaksActiveFlag} )
   {$sDop}
 Group By ta.task_id
 EOT;
