@@ -32,7 +32,7 @@ if( !isset($index) ) {
             <div class="col-sm-9">
                 <?= $form->field($model, '[' . $index . ']filedata', ['template' => "{input}\n{hint}\n{error}"])->fileInput() ?>
             </div>
-            <div class="col-sm-3" style="text-align: right;">
+            <div class="" style="text-align: right;">
                 <?= Html::a(
                         Html::tag('span', '', ['class' => 'glyphicon glyphicon-remove']),
                         '',

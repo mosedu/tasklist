@@ -45,15 +45,11 @@ $this->title = 'Вывод KPI';
         if( $bExists ) {
             echo '</table>' . "\n</div>";
             echo '<table class="table table-bordered table-striped">';
-            echo '<tr><td>Задач в указанном диапазоне:</td><td>' . $nTasks . "</td></tr>\n";
-            echo '<tr><td>Задачи в срок:</td><td>' . sprintf("%.2f", 100 * $nOkTasks / $nTasks) . "% ({$nOkTasks})</td></tr>\n";
-            echo '<tr><td>Задач перенесено:</td><td>' . sprintf("%.2f", 100 * $nMovedTasks / $nTasks) . "% ({$nMovedTasks})</td></tr>\n";
-            echo '<tr><td>Внеплановых задач:</td><td>' . sprintf("%.2f", 100 * $nAvralTasks / $nTasks) . "% ({$nAvralTasks})</td></tr>\n";
-            echo '<tr><td>Среднее кол-во задач:</td><td>' . sprintf("%.1f", $nTaskActiveDays / $nPeriodDays) . "</td></tr>\n";
-//            echo 'Задачи в срок: ' . sprintf("%.2f", $nOkTasks / $nTasks) . "% ({$nOkTasks})<br />\n";
-//            echo 'Задач перенесено: ' . sprintf("%.2f", $nMovedTasks / $nTasks) . "% ({$nMovedTasks})<br />\n";
-//            echo 'Внеплановых задач: ' . sprintf("%.2f", $nAvralTasks / $nTasks) . "% ({$nAvralTasks})<br />\n";
-//            echo 'Среднее кол-во задач: ' . sprintf("%.1f", $nTaskActiveDays / $nPeriodDays) . "<br />\n";
+            echo '<tr><td>Количество задач в указанном диапазоне:</td><td>' . $nTasks . "</td></tr>\n";
+            echo '<tr><td>Количество задач без нарушения базового срока:</td><td>' . sprintf("%.2f", 100 * $nOkTasks / $nTasks) . "% ({$nOkTasks})</td></tr>\n";
+            echo '<tr><td>Количество задач с перенесением базового срока:</td><td>' . sprintf("%.2f", 100 * $nMovedTasks / $nTasks) . "% ({$nMovedTasks})</td></tr>\n";
+            echo '<tr><td>Среднее количество задач в течение выбранного периода:</td><td>' . sprintf("%.1f", $nTaskActiveDays / $nPeriodDays) . "</td></tr>\n";
+            echo '<tr><td>Количество внеплановых задач:</td><td>' . sprintf("%.2f", 100 * $nAvralTasks / $nTasks) . "% ({$nAvralTasks})</td></tr>\n";
             echo '</table>' . "\n";
         }
         else {

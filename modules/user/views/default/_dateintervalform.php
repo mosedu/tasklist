@@ -26,12 +26,62 @@ $aDisable = [
 
 $aDepartment = Department::getList(false);
 if( Yii::$app->user->can('createUser') || (Yii::$app->user->identity->us_dep_id == 1) ) {
-    $a = [""=>""];
+    $a = [""=>"ГАУ \"ТемоЦентр\""];
     foreach($aDepartment As $k=>$v) {
         $a[$k] = $v;
     }
     $aDepartment = $a;
 }
+
+$dNow = mktime(0, 0, 0, date('m'), 1, date('Y'));
+$dPrevMonth = mktime(0, 0, 0, date('m', $dNow - 1), 1, date('Y', $dNow - 1));
+
+$aPeriods = [
+    [
+        'title' => 'Текущий месяц',
+        'from' => date('d.m.Y', $dNow),
+        'to' => date('d.m.Y'),
+    ],
+    [
+        'title' => 'Предыдущий месяц',
+        'from' => date('d.m.Y', $dPrevMonth),
+        'to' => date('d.m.Y', $dNow-1),
+    ],
+/*
+
+    [
+        'title' => 'Текущий квартал',
+        'from' => '',
+        'to' => '',
+    ],
+    [
+        'title' => 'Предыдущий квартал',
+        'from' => '',
+        'to' => '',
+    ],
+    [
+        'title' => 'Текущее полугодие',
+        'from' => '',
+        'to' => '',
+    ],
+    [
+        'title' => 'Предыдущее полугодие',
+        'from' => '',
+        'to' => '',
+    ],
+    [
+        'title' => 'Текущий год',
+        'from' => '',
+        'to' => '',
+    ],
+    [
+        'title' => 'Предыдущий год',
+        'from' => '',
+        'to' => '',
+    ],
+*/
+];
+
 
 ?>
 
@@ -86,6 +136,25 @@ if( Yii::$app->user->can('createUser') || (Yii::$app->user->identity->us_dep_id 
             ]);
 
             ?>
+            <?php
+            echo '<div class="form-group"><label class="control-label">&nbsp;</label><div class="btn-group">';
+            echo '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">';
+            echo 'Периоды <span class="caret"></span>';
+            echo '</button>';
+            echo '<ul class="dropdown-menu" role="menu">';
+/*
+    <li><a href="#">Action</a></li>
+    <li><a href="#">Another action</a></li>
+    <li><a href="#">Something else here</a></li>
+    <li class="divider"></li>
+    <li><a href="#">Separated link</a></li>
+*/
+            foreach($aPeriods As $v) {
+                echo '<li><a href="" class="setperiod" data-from="'.$v['from'].'" data-to="'.$v['to'].'">'.Html::encode($v['title']).'</a></li>';
+            }
+            echo '</ul></div>';
+            echo '</div>';
+            ?>
         </div>
         <div class="col-sm-6">
             <?= $form->field($model, 'department_id')->dropDownList($aDepartment, (Yii::$app->user->can('createUser') || (Yii::$app->user->identity->us_dep_id == 1)) ? [] : $aDisable) ?>
@@ -113,6 +182,8 @@ $sDepartmentId = Html::getInputId($model, 'department_id');
 $sUserId = Html::getInputId($model, 'user_id');
 $UserId = $model->user_id;
 $sUrl = Url::to(['/user/worker/list'], true);
+$sDateFromId = Html::getInputId($model, 'from_date');
+$sDateToId = Html::getInputId($model, 'to_date');
 
 $sJs = <<<EOT
     var setUsers = function() {
@@ -152,6 +223,20 @@ $sJs = <<<EOT
         }
     );
     setUsers();
+
+    jQuery(".setperiod")
+        .on(
+            "click",
+            function(event){
+                var oLink = jQuery(this);
+                event.preventDefault();
+                jQuery("#{$sDateFromId}").val(oLink.attr("data-from"));
+                jQuery("#{$sDateToId}").val(oLink.attr("data-to"));
+                console.log(oLink.attr("data-from") + " - " + oLink.attr("data-to"));
+                jQuery('.btn-group.open .dropdown-toggle').dropdown('toggle');
+                return false;
+            }
+        );
 EOT;
 
 $this->registerJs($sJs, View::POS_READY, 'deteinterval');
