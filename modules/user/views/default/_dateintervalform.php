@@ -35,7 +35,14 @@ if( Yii::$app->user->can('createUser') || (Yii::$app->user->identity->us_dep_id 
 
 $dNow = mktime(0, 0, 0, date('m'), 1, date('Y'));
 $dPrevMonth = mktime(0, 0, 0, date('m', $dNow - 1), 1, date('Y', $dNow - 1));
-
+$mKvatr = intval((date('m') - 1) / 3) * 3 + 1;
+$kvartNow = mktime(0, 0, 0, $mKvatr, 1, date('Y'));
+$kvartPrev = mktime(0, 0, 0, $mKvatr - 3, 1, date('Y'));
+$mHalf = intval((date('m') - 1) / 6) * 6 + 1;
+$halfNow = mktime(0, 0, 0, $mHalf, 1, date('Y'));
+$halfPrev = mktime(0, 0, 0, $mHalf - 6, 1, date('Y'));
+$yearNow = mktime(0, 0, 0, 1, 1, date('Y'));
+$yearPrev = mktime(0, 0, 0, 1, 1, date('Y')-1);
 $aPeriods = [
     [
         'title' => 'Текущий месяц',
@@ -47,39 +54,37 @@ $aPeriods = [
         'from' => date('d.m.Y', $dPrevMonth),
         'to' => date('d.m.Y', $dNow-1),
     ],
-/*
-
     [
         'title' => 'Текущий квартал',
-        'from' => '',
-        'to' => '',
+        'from' => date('d.m.Y', $kvartNow),
+        'to' => date('d.m.Y'),
     ],
     [
         'title' => 'Предыдущий квартал',
-        'from' => '',
-        'to' => '',
+        'from' => date('d.m.Y', $kvartPrev),
+        'to' => date('d.m.Y', $kvartNow - 1),
     ],
+
     [
         'title' => 'Текущее полугодие',
-        'from' => '',
-        'to' => '',
+        'from' => date('d.m.Y', $halfNow),
+        'to' => date('d.m.Y'),
     ],
     [
         'title' => 'Предыдущее полугодие',
-        'from' => '',
-        'to' => '',
+        'from' => date('d.m.Y', $halfPrev),
+        'to' => date('d.m.Y', $halfNow - 1),
     ],
     [
         'title' => 'Текущий год',
-        'from' => '',
-        'to' => '',
+        'from' => date('d.m.Y', $yearNow),
+        'to' => date('d.m.Y'),
     ],
     [
         'title' => 'Предыдущий год',
-        'from' => '',
-        'to' => '',
+        'from' => date('d.m.Y', $yearPrev),
+        'to' => date('d.m.Y', $yearNow - 1),
     ],
-*/
 ];
 
 
@@ -115,29 +120,32 @@ $aPeriods = [
     </div>
     <div class="form-group">
         <div class="col-sm-6">
+            <div class="form-group">
+                <?php
+
+
+                echo '<label class="control-label">Период</label>';
+                echo DatePicker::widget([
+                    'model' => $model,
+                    'attribute' => 'from_date',
+                    'attribute2' => 'to_date',
+                    'options' => ['placeholder' => $model->getAttributeLabel('from_date')],
+                    'options2' => ['placeholder' => $model->getAttributeLabel('to_date')],
+                    'type' => DatePicker::TYPE_RANGE,
+                    'form' => $form,
+                    'separator' => '...',
+                    'pluginOptions' => [
+                        'format' => 'dd.mm.yyyy',
+                        'autoclose' => true,
+                        'endDate' => date('d.m.Y'),
+                    ]
+                ]);
+
+                ?>
+            </div>
+
             <?php
-
-
-            echo '<label class="control-label">Период</label>';
-            echo DatePicker::widget([
-                'model' => $model,
-                'attribute' => 'from_date',
-                'attribute2' => 'to_date',
-                'options' => ['placeholder' => $model->getAttributeLabel('from_date')],
-                'options2' => ['placeholder' => $model->getAttributeLabel('to_date')],
-                'type' => DatePicker::TYPE_RANGE,
-                'form' => $form,
-                'separator' => '...',
-                'pluginOptions' => [
-                    'format' => 'dd.mm.yyyy',
-                    'autoclose' => true,
-                    'endDate' => date('d.m.Y'),
-                ]
-            ]);
-
-            ?>
-            <?php
-            echo '<div class="form-group"><label class="control-label">&nbsp;</label><div class="btn-group">';
+            echo '<div class="form-group"><!-- label class="control-label">&nbsp;</label --><div class="btn-group">';
             echo '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">';
             echo 'Периоды <span class="caret"></span>';
             echo '</button>';
