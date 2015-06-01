@@ -152,7 +152,7 @@ Left Join {$sChangesTable} cn On cn.ch_task_id = ta.task_id
 Where ta.task_createtime < '{$sFinish}'
   And ta.task_finaltime > '{$sStart}'
   And (ta.task_finishtime > '{$sStart}' Or ta.task_finishtime Is Null )
-  And (ta.task_task_active = {$nTaksActiveFlag} )
+  And (ta.task_active = {$nTaksActiveFlag} )
   {$sDop}
 Group By ta.task_id
 EOT;
