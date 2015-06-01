@@ -26,7 +26,7 @@ use app\modules\task\models\Subject;
 $sDepartmentId = Html::getInputId($model, 'task_dep_id');
 $sWorkerId = Html::getInputId($model, 'task_worker_id');
 $sCurWorkersId = Html::getInputId($model, 'curworkers');
-
+$sUrl = Url::to(['/user/worker/list'], true);
 
 $aTextParam = [
     'horizontalCssClasses' => [
