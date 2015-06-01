@@ -288,7 +288,7 @@ $aColumns = array_merge(
     $aColumns,
     [[
         'class' => 'yii\grid\ActionColumn',
-        'template'=>'{update}' . (Yii::$app->user->can('createUser') ? ' {delete} {undelete}' : '') . (Yii::$app->user->can('department') ? ' {findate}' : ''), // {view}  {answer} {toword}
+        'template'=>'{update}' . (Yii::$app->user->can('createUser') ? ' {delete} {undelete}' : '') . ' {taskfiles}' . (Yii::$app->user->can('department') ? ' {findate}' : ''), // {view}  {answer} {toword}
         'contentOptions' => [
             'class' => 'commandcell',
         ],
@@ -299,6 +299,36 @@ $aColumns = array_merge(
             'findate'=>function ($url, $model) {
                 $bFinish = ($model->task_progress == Tasklist::PROGRESS_FINISH);
                 return $bFinish ? Html::a( '<span class="glyphicon glyphicon-new-window"></span>', ['requestmsg/create', 'taskid' => $model->task_id], ['title' => 'Запрос на перенос даты окончания задачи', 'class'=>'showinmodal']) : '';
+            },
+            'taskfiles'=>function ($url, $model) {
+                $sFiles = '';
+                $nFiles = count($model->taskfiles);
+                if( $nFiles > 0 ) {
+                    $s = array_reduce(
+                        $model->taskfiles,
+                        function($carry, $item) {
+                            return $carry . Html::a(
+                                '<span class="glyphicon glyphicon-floppy-disk"></span> ' . $item->file_orig_name,
+                                $item->url,
+                                ['class'=>'', 'target'=>'_blank', 'title'=>$item->file_comment . ' ( '.$item->humanSize().' )' . ' ' . date('d.m.Y', strtotime($item->file_time))]) . "\n";
+                        },
+                        ''
+                    );
+                    $sFiles = Html::a(
+                        '<span class="glyphicon glyphicon-cloud-download"></span>',
+                        '',
+                        [
+                            'title' => 'Список файлов',
+                            'class'=>'popoverlink',
+                            'role' => "button",
+                            'data-placement' => "left",
+                            'data-toggle' => "popover",
+                            'data-trigger' => "focus",
+                            'data-content' => nl2br(Html::encode($s)),
+                        ]
+                    );
+                }
+                return $sFiles;
             },
             'delete' => function ($url, $model, $key) {
                 /** @var Tasklist $model */
@@ -402,6 +432,7 @@ oLink.on(
     function(event){ event.preventDefault(); toggleSearchPanel(); return false; }
 );
 
+jQuery('.popoverlink').popover();
 EOT;
 
 $sJs .=  <<<EOT
