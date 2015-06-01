@@ -303,6 +303,28 @@ EOT;
             );
 */
         ?>
+
+        <div class="form-group">
+            <div class="col-sm-3">
+                <?php
+                if( $bEditDates ) {
+                    ?>
+                    <?= Html::submitButton('<span class="glyphicon glyphicon-ok"></span> Сохранить', ['class' => 'btn btn-success btn-lg']) ?>
+                <?php
+                } else {
+                    ?>
+                    <?= Html::a('Назад', '', ['class' => 'btn btn-default btn-lg', 'id'=>'idbacklink']) /*<span class="glyphicon glyphicon-check"></span> */ ?>
+                <?php
+                }
+                ?>
+                <?= '' // Html::submitButton('Сохранить изменения', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+            </div>
+            <div class="col-sm-9">
+                <?= ($bHideSummary ? Html::a('<span class="glyphicon glyphicon-file"></span> Добавить промежут. результат', '', ['class' => 'btn btn-default btn-lg', 'id'=>'showsummaryfield']) : '') ?>
+                <?= Html::a('<span class="glyphicon glyphicon-cloud-upload"></span> Добавить файл', '', ['id' => 'add-task-file-link', 'class'=>'btn btn-default btn-lg pull-right']) ?>
+            </div>
+        </div>
+
     </div>
 
     <div class="col-sm-4">
@@ -433,7 +455,7 @@ EOT;
             <div class="form-group">
                 <div class="col-sm-3">&nbsp;</div>
                 <div class="col-sm-9">
-                    <?= Html::a('<span class="glyphicon glyphicon-cloud-upload"></span> Добавить файл', '', ['id' => 'add-task-file-link', 'class'=>'btn btn-default btn-lg']) ?>
+                    <?= '' // Html::a('<span class="glyphicon glyphicon-cloud-upload"></span> Добавить файл', '', ['id' => 'add-task-file-link', 'class'=>'btn btn-default btn-lg']) ?>
                 </div>
                 <?php
                 /*
@@ -450,28 +472,6 @@ EOT;
 
     <div class="clearfix"></div>
 
-    <div class="col-sm-8">
-        <div class="form-group">
-            <div class="col-sm-3">&nbsp;</div>
-            <div class="col-sm-3">
-                <?php
-                if( $bEditDates ) {
-                ?>
-                    <?= Html::submitButton('<span class="glyphicon glyphicon-ok"></span> Сохранить', ['class' => 'btn btn-success btn-lg']) ?>
-                <?php
-                } else {
-                ?>
-                    <?= Html::a('Назад', '', ['class' => 'btn btn-default btn-lg', 'id'=>'idbacklink']) /*<span class="glyphicon glyphicon-check"></span> */ ?>
-                <?php
-                }
-                ?>
-                <?= '' // Html::submitButton('Сохранить изменения', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-            </div>
-            <div class="col-sm-6">
-                <?= ($bHideSummary ? Html::a('<span class="glyphicon glyphicon-file"></span> Добавить промежуточный результат', '', ['class' => 'btn btn-default btn-lg', 'id'=>'showsummaryfield']) : '') ?>
-            </div>
-        </div>
-    </div>
 
     <?php ActiveForm::end(); ?>
     <?php
