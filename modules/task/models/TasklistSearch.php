@@ -90,7 +90,11 @@ class TasklistSearch extends Tasklist
     {
         $query = Tasklist::find();
         $query->with(['changes', 'department', /*'worker', */'allworker', 'workers', 'workersdata', 'taskfiles']);
-        $query->joinWith(['department', 'workers']);
+        $aJoin = ['department'];
+        if( Yii::$app->user->identity->isUserWorker() ) {
+            $aJoin[] = 'workers';
+        }
+        $query->joinWith($aJoin);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
