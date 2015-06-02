@@ -142,8 +142,8 @@ Select ta.task_id
     , ta.task_finaltime
     , ta.task_finishtime
     , IF((ta.task_finishtime Is Not Null And (ta.task_finishtime <= ta.task_finaltime Or ta.task_finaltime > '{$sFinish}') Or (ta.task_finishtime Is Null And ta.task_finaltime > '{$sFinish}')), 1, 0) As ok
-    , DATEDIFF(IF(ta.task_finishtime Is Not Null, IF(ta.task_finishtime < '{$sFinish}', ta.task_finishtime, '{$sFinish}'), '{$sFinish}'), IF(ta.task_createtime > '{$sStart}', ta.task_createtime, '{$sStart}')) As ndays
-    , DATEDIFF('{$sFinish}', '{$sStart}') As nperioddays
+    , DATEDIFF(IF(ta.task_finishtime Is Not Null, IF(ta.task_finishtime < '{$sFinish}', ta.task_finishtime, '{$sFinish}'), '{$sFinish}'), IF(ta.task_createtime > '{$sStart}', ta.task_createtime, '{$sStart}'))-1 As ndays
+    , DATEDIFF('{$sFinish}', '{$sStart}') - 1 As nperioddays
     , t1.changes
 From {$sTaskTable} ta
 Left Join {$sWorkerTable} wk On wk.worker_task_id = ta.task_id

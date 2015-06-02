@@ -23,7 +23,7 @@ $this->title = 'Вывод KPI';
         $bExists = ($nTasks > 0);
         if( $bExists ) {
 //            echo '<p>Задач в указанном диапазоне: ' . $nTasks . '</p>';
-            echo '<div style="display: none;">';
+            echo '<div>'; //  style="display: none;"
             echo '<table class="table table-bordered table-striped">';
             echo '<tr><th>' . implode('</th><th>', array_keys($data[0])) . '</th><th>?</th></tr>' . "\n";
         }
