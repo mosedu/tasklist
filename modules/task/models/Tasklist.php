@@ -293,7 +293,7 @@ class Tasklist extends \yii\db\ActiveRecord
                 'whenClient' => "function (attribute, value) { return " . ($this->isNewRecord ? 'true' : 'false') . "; }"
             ],
 
-            [['curworkers'], 'filter', 'filter' => function($val){ if( is_string($val) ) { if( trim($val) == '' ) { $val = []; } else { $val = [intval($val)]; } } else if( is_array($val) ) { foreach($val As $k=>$v) { if( trim($v) == '' ) { unset($val[$k]); } } } return $val; }],
+            [['curworkers'], 'filter', 'filter' => function($val){ if( is_string($val) ) { if( trim($val) == '' ) { $val = []; } else { $val = [intval($val)]; } } else if( is_array($val) ) { foreach($val As $k=>$v) { if( trim($v) == '' ) { unset($val[$k]); } else { $val[$k] = intval($v); } } } return $val; }],
 //            [['curworkers'], 'in', 'range' => array_keys($this->getTaskAvailWokers()), 'allowArray' => true],
             [['curworkers'], 'isWorkersInDepartment'],
             [['task_summary', ], 'required',
