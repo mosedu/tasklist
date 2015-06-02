@@ -150,12 +150,12 @@ Left Join {$sWorkerTable} wk On wk.worker_task_id = ta.task_id
 Left Join ( Select ch_task_id, COUNT(cn.ch_id) As changes From {$sChangesTable} cn Group By ch_task_id) t1 On t1.ch_task_id = ta.task_id
 Left Join {$sChangesTable} cn On cn.ch_task_id = ta.task_id
 Where ta.task_createtime < '{$sFinish}'
-  And ta.task_finaltime > '{$sStart}'
-  And (ta.task_finishtime > '{$sStart}' Or ta.task_finishtime Is Null )
+  And (ta.task_finishtime > '{$sStart}' Or ta.task_finishtime Is Null)
   And (ta.task_active = {$nTaksActiveFlag} )
   {$sDop}
 Group By ta.task_id
 EOT;
+//  And ta.task_finaltime > '{$sStart}'
         $reader = Yii::$app->db->createCommand($sSql, $aParam)->query();
         foreach($reader As $k=>$v) {
             $aData[] = $v;
