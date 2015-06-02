@@ -26,6 +26,7 @@ use app\components\ExecfunctionBehavior;
 class Requestmsg extends \yii\db\ActiveRecord
 {
     public $new_finish_date;
+    public $task_create_date;
 
     public function behaviors() {
         return [

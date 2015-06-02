@@ -105,6 +105,7 @@ class RequestmsgController extends Controller
             $model = new Requestmsg();
             $sForm = '_requestdate';
             $model->req_task_id = Yii::$app->request->getQueryParam('taskid', 0);
+
         }
         else {
             $model = $this->findModel($id);
@@ -113,6 +114,12 @@ class RequestmsgController extends Controller
         $task = $model->task;
         if( $task === null  ) {
             $sForm = '_notask';
+        }
+        else {
+            if( $id == 0 ) {
+                $model->new_finish_date = date('d.m.Y', strtotime($task->task_finishtime));
+                $model->task_create_date = date('d.m.Y', strtotime($task->task_finaltime));
+            }
         }
 
         if( Yii::$app->request->isAjax ) {

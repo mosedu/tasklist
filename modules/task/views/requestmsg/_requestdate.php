@@ -38,7 +38,16 @@ $bAjax = Yii::$app->request->isAjax;
     <div class="col-sm-6">
         <?= $form
             ->field($model, 'new_finish_date')
-            ->widget(DatePicker::className(), ['type' => DatePicker::TYPE_INLINE,])
+            ->widget(
+                DatePicker::className(),
+                [
+                    'type' => DatePicker::TYPE_INLINE,
+                    'pluginOptions' => [
+                        'endDate' => date('d.m.Y'),
+                        'startDate' => $model->task_create_date,
+                    ],
+                ]
+            )
         ?>
     </div>
 
