@@ -142,7 +142,7 @@ Select ta.task_id
     , ta.task_finaltime
     , ta.task_finishtime
     , IF((ta.task_finishtime Is Not Null And (ta.task_finishtime <= ta.task_finaltime Or ta.task_finaltime > '{$sFinish}') Or (ta.task_finishtime Is Null And ta.task_finaltime > '{$sFinish}')), 1, 0) As ok
-    , DATEDIFF(IF(ta.task_finishtime Is Not Null, IF(ta.task_finishtime < '{$sFinish}', ta.task_finishtime, '{$sFinish}'), '{$sFinish}'), IF(ta.task_createtime > '{$sStart}', ta.task_createtime, '{$sStart}'))-1 As ndays
+    , DATEDIFF(IF(ta.task_finishtime Is Not Null, IF(ta.task_finishtime < '{$sFinish}', DATE_ADD(ta.task_finishtime, INTERVAL 1 DAY), '{$sFinish}'), '{$sFinish}'), IF(ta.task_createtime > '{$sStart}', DATE_SUB(ta.task_createtime, INTERVAL 1 DAY), '{$sStart}'))-1 As ndays
     , DATEDIFF('{$sFinish}', '{$sStart}') - 1 As nperioddays
     , t1.changes
 From {$sTaskTable} ta
@@ -155,6 +155,7 @@ Where ta.task_createtime < '{$sFinish}'
   {$sDop}
 Group By ta.task_id
 EOT;
+//        , DATEDIFF(IF(ta.task_finishtime Is Not Null, IF(ta.task_finishtime < '{$sFinish}', ta.task_finishtime, '{$sFinish}'), '{$sFinish}'), IF(ta.task_createtime > '{$sStart}', ta.task_createtime, '{$sStart}'))-1 As ndays
 //  And ta.task_finaltime > '{$sStart}'
         $reader = Yii::$app->db->createCommand($sSql, $aParam)->query();
         foreach($reader As $k=>$v) {
