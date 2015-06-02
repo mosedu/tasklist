@@ -2,6 +2,8 @@
 
 use yii\helpers\Html;
 use app\modules\task\models\Tasklist;
+use app\modules\user\models\User;
+use app\modules\user\models\Department;
 
 /* @var $this yii\web\View */
 /* @var $model app\modules\user\models\User */
@@ -24,7 +26,7 @@ $this->title = 'Вывод KPI';
         $sGroup = 'task_dep_id';
         if( $bExists ) {
 //            echo '<p>Задач в указанном диапазоне: ' . $nTasks . '</p>';
-            echo '<div>'; //  style="display: none;"
+            echo '<div style="display: none;">'; //
             echo '<table class="table table-bordered table-striped">';
             echo '<tr><th>' . implode('</th><th>', array_keys($data[0])) . '</th><th>?</th></tr>' . "\n";
             if( isset($data[0]['worker_us_id']) ) {
@@ -72,17 +74,22 @@ $this->title = 'Вывод KPI';
             echo '</table>' . "\n";
 
             $aResult = [
-                'sGroup',
-                'id',
-                'nCountTasks',
-                'nOkTasks',
-                'nMovedTasks',
-                'nAvralTasks',
+//                'sGroup',
+                ($sGroup == 'worker_us_id') ? 'Сотрудник' : 'Подразделение',
+                'Кол-во задач',
+                'В срок',
+                'Задач с переносами',
+                'Среднее кол-во',
+                'Внеплановых задач',
             ];
             echo '<table class="table table-bordered table-striped">';
             $s = '<tr><td>' . implode('</td><td>', $aResult) . '</td><td></td></tr>';
             echo $s . "\n";
+            $aGroupData = ($sGroup == 'worker_us_id') ? User::getWorkerList(0) : Department::getList(false);
             foreach($aGroup As $k=>$aGroup) {
+                if( !isset($aGroupData[$k]) ) {
+                    continue;
+                }
                 $nPeriodDays = 0;
                 $nTaskActiveDays = 0;
                 $nOkTasks = 0;
@@ -105,11 +112,12 @@ $this->title = 'Вывод KPI';
                     $nAvralTasks += ($v['task_type'] == Tasklist::TYPE_AVRAL) ? 1 : 0;
                 }
                 $aResult = [
-                    $sGroup,
-                    $k,
+//                    $sGroup,
+                    $aGroupData[$k],
                     $nCountTasks,
                     $nOkTasks,
                     $nMovedTasks,
+                    sprintf("%.1f", $nTaskActiveDays / $nPeriodDays),
                     $nAvralTasks,
                 ];
 
