@@ -123,6 +123,11 @@ class RequestmsgController extends Controller
                     if( !$model->isNewRecord ) {
                         if( $model->req_is_active == 1 ) {
                             // nothing else
+                            $model->user->sendNotificate(
+                                'request_answer_task_finish',
+                                'Ответ на запрос переноса даты по задаче ' . $model->task->task_name,
+                                ['request' => $model, 'isok' => false]
+                            );
                             Yii::info('N0 change task data');
                         }
                         else if( $model->req_is_active == 0 ) {
@@ -139,6 +144,13 @@ class RequestmsgController extends Controller
 
                                 Yii::info($s);
                                 Yii::error($s);
+                            }
+                            else {
+                                $model->user->sendNotificate(
+                                    'request_answer_task_finish',
+                                    'Ответ на запрос переноса даты по задаче ' . $model->task->task_name,
+                                    ['request' => $model, 'isok' => true, ]
+                                );
                             }
 
                         }

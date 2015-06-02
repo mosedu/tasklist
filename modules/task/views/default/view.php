@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         [
             'attribute' => 'task_finaltime',
-            'value' => date('d.m.Y', strtotime($model->task_finaltime)) . ' / ' . ($model->task_progress == Tasklist::PROGRESS_FINISH ? $model->task_finishtime : $model->task_actualtime),
+            'value' => date('d.m.Y', strtotime($model->task_finaltime)) . ' / ' . date('d.m.Y', strtotime(($model->task_progress == Tasklist::PROGRESS_FINISH ? $model->task_finishtime : $model->task_actualtime))),
             'label' => 'Базовый / ' . ($model->task_progress == Tasklist::PROGRESS_FINISH ? 'Реальный' : 'Новый') . ' сроки',
         ],
 //            'task_createtime',

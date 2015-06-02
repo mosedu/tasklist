@@ -9,6 +9,7 @@ use yii\base\Event;
 use app\modules\task\models\Tasklist;
 use app\modules\user\models\User;
 use yii\db\Expression;
+use app\components\ExecfunctionBehavior;
 
 /**
  * This is the model class for table "{{%requestmsg}}".
@@ -54,6 +55,38 @@ class Requestmsg extends \yii\db\ActiveRecord
                     /** @var Event $event */
                     /** @var Requestmsg $ob */
                     return new Expression('NOW()');
+                },
+            ],
+
+            [
+                'class' => ExecfunctionBehavior::className(),
+                'function_events' => [
+                    ActiveRecord::EVENT_AFTER_INSERT,
+                ],
+                'function_def' => function ($model, $event) {
+                    /** @var Event $event */
+                    /** @var Requestmsg $model */
+                    $sTemplate = 'request_task_finish_date';
+                    $sTitle = 'Запрос на перенос срока окончания задачи';
+                    if( $model->task->task_dep_id != 1 ) {
+                        $aUsers = User::find()
+                            ->where([
+                                'us_dep_id' => 1,
+                                'us_active' => User::STATUS_ACTIVE,
+                            ])
+                            ->all();
+                        foreach($aUsers As $ob) {
+                            $ob->sendNotificate(
+                                $sTemplate,
+                                $sTitle,
+                                [
+                                    'task' => $model->task,
+                                    'request' => $model,
+                                    'user' => $model->user,
+                                ]
+                            );
+                        }
+                    }
                 },
             ],
 
