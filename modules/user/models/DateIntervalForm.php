@@ -110,21 +110,23 @@ class DateIntervalForm extends Model {
         $nTaksActiveFlag = Tasklist::STATUS_ACTIVE;
         $sStart = date('Y-m-d H:i:s', $this->mkTime($this->from_date) - 1);
         $sFinish = date('Y-m-d H:i:s', $this->mkTime($this->to_date) + 24 * 3600);
-        $sDop = "";
+        $sDopField = "";
+        $sDopWhere = "";
         $aParam = [];
         $aData = [];
 
         if( $this->department_id != '' ) {
             $sp = ':depid';
-            $sDop .= " And ta.task_dep_id = {$sp}";
+            $sDopWhere .= " And ta.task_dep_id = {$sp}";
             $aParam[$sp] = $this->department_id;
+            $sDopField = ', wk.worker_us_id';
+            if( $this->user_id != '' ) {
+                $sp = ':userid';
+                $sDopWhere .= " And wk.worker_us_id = {$sp}";
+                $aParam[$sp] = $this->user_id;
+            }
         }
 
-        if( $this->user_id != '' ) {
-            $sp = ':userid';
-            $sDop .= " And wk.worker_us_id = {$sp}";
-            $aParam[$sp] = $this->user_id;
-        }
 //        Left Join {$sDepartmentTable} dep dep.dep_id = ta.task_dep_id
 
 // Среднее количество задач считаем так:
@@ -137,6 +139,7 @@ class DateIntervalForm extends Model {
         $sSql = <<<EOT
 Select ta.task_id
     , ta.task_dep_id
+    {$sDopField}
     , ta.task_type
     , ta.task_createtime
     , ta.task_finaltime
@@ -152,9 +155,10 @@ Left Join {$sChangesTable} cn On cn.ch_task_id = ta.task_id
 Where ta.task_createtime < '{$sFinish}'
   And (ta.task_finishtime > '{$sStart}' Or ta.task_finishtime Is Null)
   And (ta.task_active = {$nTaksActiveFlag} )
-  {$sDop}
-Group By ta.task_id
+  {$sDopWhere}
+Order By ta.task_dep_id, ta.task_id {$sDopField}
 EOT;
+//        Group By ta.task_id
 //        , DATEDIFF(IF(ta.task_finishtime Is Not Null, IF(ta.task_finishtime < '{$sFinish}', ta.task_finishtime, '{$sFinish}'), '{$sFinish}'), IF(ta.task_createtime > '{$sStart}', ta.task_createtime, '{$sStart}'))-1 As ndays
 //  And ta.task_finaltime > '{$sStart}'
         $reader = Yii::$app->db->createCommand($sSql, $aParam)->query();
