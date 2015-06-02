@@ -304,6 +304,23 @@ $aColumns = array_merge(
                 $sFiles = '';
                 $nFiles = count($model->taskfiles);
                 if( $nFiles > 0 ) {
+                    $s = '<div class="btn-group">'
+                    . '<a type="button" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'
+                    . '<span class="glyphicon glyphicon-cloud-download"></span>'
+                    . '</a>'
+                    . '<ul class="dropdown-menu" role="menu">'
+                    . array_reduce(
+                            $model->taskfiles,
+                            function($carry, $item) {
+                                return $carry . '<li>' . Html::a(
+                                    '<span class="glyphicon glyphicon-floppy-disk"></span> ' . Html::encode($item->file_orig_name),
+                                    $item->url,
+                                    ['class'=>'', 'target'=>'_blank', 'title'=>$item->file_comment . ' ( '.$item->humanSize().' )' . ' ' . date('d.m.Y', strtotime($item->file_time))]) . "</li>\n";
+                            },
+                            ''
+                        )
+                    . '</ul></div>';
+/*
                     $s = array_reduce(
                         $model->taskfiles,
                         function($carry, $item) {
@@ -314,12 +331,15 @@ $aColumns = array_merge(
                         },
                         ''
                     );
+*/
+/*
                     $sFiles = Html::a(
                         '<span class="glyphicon glyphicon-cloud-download"></span>',
                         '',
                         [
+                            'tabindex' => "0",// class="btn btn-lg btn-danger" role="button" data-toggle="popover" data-trigger="focus"
                             'title' => 'Список файлов',
-                            'class'=>'popoverlink',
+                            'class'=>'popoverlink btn',
                             'role' => "button",
                             'data-placement' => "left",
                             'data-toggle' => "popover",
@@ -327,6 +347,8 @@ $aColumns = array_merge(
                             'data-content' => nl2br(Html::encode($s)),
                         ]
                     );
+*/
+                    $sFiles = $s;
                 }
                 return $sFiles;
             },
