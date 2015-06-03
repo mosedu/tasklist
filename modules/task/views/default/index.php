@@ -306,14 +306,14 @@ $aColumns = array_merge(
                 if( $nFiles > 0 ) {
                     $s = '<div class="btn-group">'
                     . '<a type="button" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">'
-                    . '<span class="glyphicon glyphicon-cloud-download"></span>'
+                    . '<span class="glyphicon glyphicon-floppy-disk"></span>'
                     . '</a>'
-                    . '<ul class="dropdown-menu" role="menu">'
+                    . '<ul class="dropdown-menu" role="menu" style="left: auto; right: 0;">'
                     . array_reduce(
                             $model->taskfiles,
                             function($carry, $item) {
                                 return $carry . '<li>' . Html::a(
-                                    '<span class="glyphicon glyphicon-floppy-disk"></span> ' . Html::encode($item->file_orig_name),
+                                    Html::encode($item->file_orig_name), // '<span class="glyphicon glyphicon-floppy-disk"></span> ' .
                                     $item->url,
                                     ['class'=>'', 'target'=>'_blank', 'title'=>$item->file_comment . ' ( '.$item->humanSize().' )' . ' ' . date('d.m.Y', strtotime($item->file_time))]) . "</li>\n";
                             },

@@ -10,7 +10,7 @@ use app\modules\user\models\DateIntervalForm;
 /* @var $this yii\web\View */
 /* @var $model app\modules\user\models\DateIntervalForm */
 
-$this->title = 'Вывод KPI';
+$this->title = 'KPI';
 $bExcel = true;
 if( $bExcel ) {
     $objPHPExcel = new PHPExcel();
@@ -190,9 +190,6 @@ if( !function_exists('calcKpi') ) {
 
             $aGroup = [];
             foreach($data As $v) {
-                if( empty($v[$sGroup]) ) {
-                    continue;
-                }
                 if( !isset($aGroup[$v[$sGroup]]) ) {
                     $aGroup[$v[$sGroup]] = [];
                 }
@@ -229,15 +226,16 @@ if( !function_exists('calcKpi') ) {
                     $oSheet->getColumnDimension('J')->setWidth(24);
                     $oSheet->getColumnDimension('K')->setWidth(24);
                 }
+
                 $aGroupData = ($sGroup == 'worker_us_id') ? User::getWorkerList($model->department_id) : Department::getList(false);
                 foreach ($aGroup As $k => $aGroup) {
-                    if (!isset($aGroupData[$k])) {
-                        continue;
-                    }
+//                    if (!isset($aGroupData[$k])) {
+//                        continue;
+//                    }
                     $aRes = calcKpi($aGroup);
                     $aResult = [
 //                    $sGroup,
-                        $aGroupData[$k],
+                        isset($aGroupData[$k]) ? $aGroupData[$k] : 'Не назначенные',
                         $aRes['taskcount'], // $nCountTasks,
                         sprintf("%.2f", 100 * $aRes['oktaskcount'] / $aRes['taskcount']) . '% (' . $aRes['oktaskcount'] . ')', // $nOkTasks,
                         sprintf("%.2f", 100 * $aRes['movetaskcount'] / $aRes['taskcount']) . '% (' . $aRes['movetaskcount'] . ')', // $nMovedTasks,
