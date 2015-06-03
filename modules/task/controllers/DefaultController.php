@@ -81,7 +81,19 @@ class DefaultController extends Controller
     public function actionIndex()
     {
         $searchModel = new TasklistSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $aQuery = Yii::$app->request->queryParams;
+        if( isset($aQuery['TasklistSearch']) ) {
+            if( isset($aQuery['TasklistSearch']['task_progress']) ) {
+                Yii::$app->session['TasklistSearch'] = $aQuery['TasklistSearch'];
+            }
+            else if( Yii::$app->session->has('TasklistSearch') ) {
+                Yii::$app->session['TasklistSearch'] = array_merge(Yii::$app->session['TasklistSearch'], $aQuery['TasklistSearch']);
+            }
+        }
+        else if( Yii::$app->session->has('TasklistSearch') ) {
+            $aQuery['TasklistSearch'] = Yii::$app->session['TasklistSearch'];
+        }
+        $dataProvider = $searchModel->search($aQuery);
 
         return $this->render('index', [
             'searchModel' => $searchModel,

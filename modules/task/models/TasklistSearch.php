@@ -276,6 +276,9 @@ class TasklistSearch extends Tasklist
         if( isset($params[$sFormName]) ) {
             $a = $params[$sFormName];
         }
+        else if( Yii::$app->session->has($sFormName) ) {
+            $a = Yii::$app->session[$sFormName];
+        }
         $bEmpty = true;
         $aDel = ['showFilterForm', 'showFinishedTask', 'showTaskSummary'];
         foreach($aAttr As $v) {
