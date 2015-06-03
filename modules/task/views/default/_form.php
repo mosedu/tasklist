@@ -351,7 +351,7 @@ EOT;
                         //            'pickerButton' => false,
                         'removeButton' => false,
                         'options' => [
-                            'placeholder' => 'Срок исполнения',
+                            'placeholder' => $model->getAttributeLabel($model->isNewRecord ? 'task_finaltime' : 'task_actualtime'), // 'Срок исполнения',
                         ],
                         'pluginOptions' => [
                             'autoclose' => true,
