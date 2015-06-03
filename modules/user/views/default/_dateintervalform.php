@@ -206,7 +206,7 @@ $sJs = <<<EOT
             success: function(data, textStatus, jqXHR) {
                 jQuery("#{$sUserId} option").remove();
                 var olist = jQuery("#{$sUserId}");
-                olist.append(jQuery('<option>').text("").attr('value', ""));
+                olist.append(jQuery('<option>').text("Все сотрудники").attr('value', ""));
                 for(var i in data) {
                     var oOpt = jQuery('<option>').text(data[i]).attr('value', i);
 //                    if( i == oldVal ) {
