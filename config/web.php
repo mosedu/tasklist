@@ -7,6 +7,17 @@ $config = [
     'defaultRoute' => 'main/default/index',
     'language' => 'ru',
     'components' => [
+        'assetManager' => [
+            'bundles' => [
+                'yii\bootstrap\BootstrapAsset' => [
+                    'sourcePath' => null,
+                    'basePath' => '@webroot',
+                    'baseUrl' => '@web',
+                    'css' => ['css/custom-bootstrap.css'],
+                ],
+            ],
+        ],
+
         'request' => [
             'cookieValidationKey' => 'MRUy44nr8pp124k94uZaxH0JI9KD92w-',
         ],

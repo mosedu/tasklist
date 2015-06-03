@@ -1,0 +1,14 @@
+@import "variable";
+@import "bootstrap";
+@import "bootstrap/theme";
+
+.select-common-row {
+  @extend .panel;
+  @extend .panel-default;
+  margin-top: $form-group-margin-bottom;
+  margin-bottom: $form-group-margin-bottom;
+}
+
+.select-common-row .panel-heading {
+  padding: 20px 0 10px;
+}

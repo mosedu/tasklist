@@ -33,3 +33,4 @@ runtime
 /config/db*.php
 /web/upload
 *-local.php
+/node_modules
