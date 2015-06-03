@@ -288,7 +288,10 @@ $aColumns = array_merge(
     $aColumns,
     [[
         'class' => 'yii\grid\ActionColumn',
-        'template'=>'{update}' . (Yii::$app->user->can('createUser') ? ' {delete} {undelete}' : '') . ' {taskfiles}' . (Yii::$app->user->can('department') ? ' {findate}' : ''), // {view}  {answer} {toword}
+        'template'=>'{update}'
+            . (Yii::$app->user->can('createUser') ? ' {delete} {undelete}' : '')
+            . ' {taskfiles}'
+            . ((Yii::$app->user->can('department') || Yii::$app->user->can('control')) ? ' {findate}' : ''), // {view}  {answer} {toword}
         'contentOptions' => [
             'class' => 'commandcell',
         ],
@@ -298,6 +301,11 @@ $aColumns = array_merge(
             },
             'findate'=>function ($url, $model) {
                 $bFinish = ($model->task_progress == Tasklist::PROGRESS_FINISH);
+                if( Yii::$app->user->can('control') ) {
+                    if( Yii::$app->user->identity->us_dep_id != $model->task_dep_id ) {
+                        $bFinish = false;
+                    }
+                }
                 return $bFinish ? Html::a( '<span class="glyphicon glyphicon-new-window"></span>', ['requestmsg/create', 'taskid' => $model->task_id], ['title' => 'Запрос на перенос даты окончания задачи', 'class'=>'showinmodal']) : '';
             },
             'taskfiles'=>function ($url, $model) {
@@ -320,34 +328,6 @@ $aColumns = array_merge(
                             ''
                         )
                     . '</ul></div>';
-/*
-                    $s = array_reduce(
-                        $model->taskfiles,
-                        function($carry, $item) {
-                            return $carry . Html::a(
-                                '<span class="glyphicon glyphicon-floppy-disk"></span> ' . $item->file_orig_name,
-                                $item->url,
-                                ['class'=>'', 'target'=>'_blank', 'title'=>$item->file_comment . ' ( '.$item->humanSize().' )' . ' ' . date('d.m.Y', strtotime($item->file_time))]) . "\n";
-                        },
-                        ''
-                    );
-*/
-/*
-                    $sFiles = Html::a(
-                        '<span class="glyphicon glyphicon-cloud-download"></span>',
-                        '',
-                        [
-                            'tabindex' => "0",// class="btn btn-lg btn-danger" role="button" data-toggle="popover" data-trigger="focus"
-                            'title' => 'Список файлов',
-                            'class'=>'popoverlink btn',
-                            'role' => "button",
-                            'data-placement' => "left",
-                            'data-toggle' => "popover",
-                            'data-trigger' => "focus",
-                            'data-content' => nl2br(Html::encode($s)),
-                        ]
-                    );
-*/
                     $sFiles = $s;
                 }
                 return $sFiles;
