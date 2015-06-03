@@ -81,6 +81,7 @@ class DefaultController extends Controller
     public function actionIndex()
     {
         $searchModel = new TasklistSearch();
+        // Кусочек по сбросу и сохранению настроек фильтрации
         $aQuery = Yii::$app->request->queryParams;
         if( isset($aQuery['reset']) ) {
             unset(Yii::$app->session['TasklistSearch']);
