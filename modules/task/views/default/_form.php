@@ -30,8 +30,8 @@ $sUrl = Url::to(['/user/worker/list'], true);
 
 $aTextParam = [
     'horizontalCssClasses' => [
-        'label' => 'col-sm-3',
-        'offset' => 'col-sm-offset-3',
+        'label' => 'col-sm-2',
+        'offset' => 'col-sm-offset-2',
         'wrapper' => 'col-sm-9',
     ],
 ];
@@ -79,7 +79,7 @@ $aWorkerSelect = [
     'data' =>  $model->getTaskAvailWokers(),//ArrayHelper::map(Tags::getTagslist(Tags::TAGTYPE_SUBJECT), 'tag_id', 'tag_title'),
     'language' => 'ru',
     'options' => [
-        'placeholder' => 'Выберите из списка ...',
+        'placeholder' => 'Сотрудники',
         'multiple' => true,
     ],
     'pluginOptions' => [
@@ -153,10 +153,10 @@ if( !$bEditDates ) {
         ],
         'fieldConfig' => [
             'horizontalCssClasses' => [
-                'label' => 'col-sm-3',
-                'offset' => 'col-sm-offset-3',
+                'label' => 'col-sm-2',
+                'offset' => 'col-sm-offset-2',
                 'wrapper' => 'col-sm-9',
-                'hint' => 'col-sm-9 col-sm-offset-3',
+                'hint' => 'col-sm-9 col-sm-offset-2',
             ],
         ],
     ]);
@@ -305,7 +305,7 @@ EOT;
         ?>
 
         <div class="form-group">
-            <div class="col-sm-3">
+            <div class="col-sm-11">
                 <?php
                 if( $bEditDates ) {
                     ?>
@@ -318,8 +318,6 @@ EOT;
                 }
                 ?>
                 <?= '' // Html::submitButton('Сохранить изменения', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-            </div>
-            <div class="col-sm-9">
                 <?= ($bHideSummary ? Html::a('<span class="glyphicon glyphicon-file"></span> Добавить промежут. результат', '', ['class' => 'btn btn-default btn-lg', 'id'=>'showsummaryfield']) : '') ?>
                 <?= Html::a('<span class="glyphicon glyphicon-cloud-upload"></span> Добавить файл', '', ['id' => 'add-task-file-link', 'class'=>'btn btn-default btn-lg pull-right']) ?>
             </div>
@@ -328,11 +326,11 @@ EOT;
     </div>
 
     <div class="col-sm-4">
-                <?= $form->field($model, 'task_dep_id')->dropDownList(Department::getList(false), $aDisable) ?>
-                <?= $form->field($model, 'task_type')->dropDownList(Tasklist::getAllTypes(), $bEditDates ? [] : $aDisable) ?>
+                <?= $form->field($model, 'task_dep_id', ['template' => "{input}\n{error}"])->dropDownList(Department::getList(false), $aDisable) ?>
+                <?= $form->field($model, 'task_type', ['template' => "{input}\n{error}"])->dropDownList(Tasklist::getAllTypes(), $bEditDates ? [] : $aDisable) ?>
                 <?= '' // $form->field($model, 'task_worker_id')->dropDownList($aWorker, $bEditDates ? [] : $aDisable) ?>
-                <?= $form->field($model, 'curworkers')->widget(Select2::classname(), $aWorkerSelect) ?>
-                <?= $form->field($model, 'task_progress')->dropDownList(Tasklist::getAllProgresses(), $bEditDates ? [] : $aDisable) ?>
+                <?= $form->field($model, 'curworkers', ['template' => "{input}\n{error}"])->widget(Select2::classname(), $aWorkerSelect) ?>
+                <?= $form->field($model, 'task_progress', ['template' => "{input}\n{error}"])->dropDownList(Tasklist::getAllProgresses(), $bEditDates ? [] : $aDisable) ?>
                 <?= $form->field(
                     $model,
                     'task_actualtime',
@@ -340,6 +338,7 @@ EOT;
                         'labelOptions'=>[
                             'label'=>$model->getAttributeLabel($model->isNewRecord ? 'task_finaltime' : 'task_actualtime'),
                         ],
+                        'template' => "{input}\n{error}",
                     ]
                 )->widget(
                     DatePicker::className(),
@@ -389,8 +388,8 @@ EOT;
 
         <div class="file-data" id="filedata">
             <div class="form-group">
-                <label class="control-label col-sm-3"></label>
-                <div class="col-sm-9">
+                <!-- label class="control-label col-sm-3"></label>
+                <div class="col-sm-9" -->
                     <?php
 
                     echo MultirowsWidget::widget(
@@ -413,16 +412,16 @@ EOT;
                         ]
                     );
                     ?>
-                </div>
-                <div class="clearfix"></div>
+                <!-- /div>
+                <div class="clearfix"></div -->
             </div>
         </div>
 
 
         <div class="file-data" id="filesummdata">
             <div class="form-group">
-                <label class="control-label col-sm-3"></label>
-                <div class="col-sm-9">
+                <!-- label class="control-label col-sm-3"></label>
+                <div class="col-sm-9" -->
                     <?php
 
                     echo MultirowsWidget::widget(
@@ -445,8 +444,8 @@ EOT;
                     );
 
                     ?>
-                </div>
-                <div class="clearfix"></div>
+                <!-- /div>
+                <div class="clearfix"></div -->
             </div>
         </div>
 

@@ -29,7 +29,7 @@ if( !isset($index) ) {
             else {
         ?>
             <div style="margin-top: 12px; background-color: #eeeeee; padding: 6px; border: 1px solid #999999; border-radius: 4px;">
-            <div class="col-sm-9">
+            <div class="col-sm-11">
                 <?= $form->field($model, '[' . $index . ']filedata', ['template' => "{input}\n{hint}\n{error}"])->fileInput() ?>
             </div>
             <div class="" style="text-align: right;">

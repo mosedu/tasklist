@@ -145,18 +145,17 @@ $aPeriods = [
             </div>
 
             <?php
-            echo '<div class="form-group"><!-- label class="control-label">&nbsp;</label --><div class="btn-group">';
+            echo '<div class="form-group">';
+
+            echo '<div style="float: right;">';
+            echo $form->field($model, 'use_not_started')->checkbox();
+            echo '</div>';
+
+            echo '<div class="btn-group">';
             echo '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">';
             echo 'Периоды <span class="caret"></span>';
             echo '</button>';
             echo '<ul class="dropdown-menu" role="menu">';
-/*
-    <li><a href="#">Action</a></li>
-    <li><a href="#">Another action</a></li>
-    <li><a href="#">Something else here</a></li>
-    <li class="divider"></li>
-    <li><a href="#">Separated link</a></li>
-*/
             foreach($aPeriods As $v) {
                 echo '<li><a href="" class="setperiod" data-from="'.$v['from'].'" data-to="'.$v['to'].'">'.Html::encode($v['title']).'</a></li>';
             }

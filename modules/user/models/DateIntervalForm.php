@@ -21,6 +21,7 @@ class DateIntervalForm extends Model {
     public $to_date;
     public $department_id;
     public $user_id;
+    public $use_not_started;
 
     /**
      * @inheritdoc
@@ -41,6 +42,7 @@ class DateIntervalForm extends Model {
             [['from_date', 'to_date', ], 'required'], // 'department_id', 'user_id',
 //            [['dep_user_roles'], 'in', 'range' => array_keys(User::getUserRoles())],
             [['department_id', 'user_id', ], 'integer'],
+            [['use_not_started', ], 'boolean'],
         ];
     }
 
@@ -54,6 +56,7 @@ class DateIntervalForm extends Model {
             'to_date' => 'Окончание периода',
             'department_id' => 'Отдел',
             'user_id' => 'Сотрудник',
+            'use_not_started' => 'Учитывать неначатые задачи',
         ];
     }
 
@@ -136,6 +139,12 @@ class DateIntervalForm extends Model {
 //    , IF(ta.task_finishtime Is Not Null, IF(ta.task_finishtime < '{$sFinish}', ta.task_finishtime, '{$sFinish}'), '{$sFinish}') As fdate
 //    , IF(ta.task_createtime > '{$sStart}', ta.task_createtime, '{$sStart}') As sdate
 // Distinct
+
+        $aProgress = Tasklist::getAllProgresses();
+        if( !$this->use_not_started ) {
+            unset($aProgress[Tasklist::PROGRESS_STOP]);
+        }
+        $sProgress = implode(',', array_keys($aProgress));
         $sSql = <<<EOT
 Select ta.task_id
     , ta.task_dep_id
@@ -155,6 +164,7 @@ Left Join {$sChangesTable} cn On cn.ch_task_id = ta.task_id
 Where ta.task_createtime < '{$sFinish}'
   And (ta.task_finishtime > '{$sStart}' Or ta.task_finishtime Is Null)
   And (ta.task_active = {$nTaksActiveFlag} )
+  And (ta.task_progress In ({$sProgress}))
   {$sDopWhere}
 Order By ta.task_dep_id, ta.task_id {$sDopField}
 EOT;
