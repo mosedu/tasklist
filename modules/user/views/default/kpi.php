@@ -190,12 +190,16 @@ if( !function_exists('calcKpi') ) {
 
             $aGroup = [];
             foreach($data As $v) {
+                if( empty($v[$sGroup]) ) {
+                    continue;
+                }
                 if( !isset($aGroup[$v[$sGroup]]) ) {
                     $aGroup[$v[$sGroup]] = [];
                 }
                 $aGroup[$v[$sGroup]][] = $v;
             }
 
+            $bGroupExists = (count($aGroup) > 0);
             $aResult = [
                 ($sGroup == 'worker_us_id') ? 'Сотрудник' : 'Подразделение',
                 'Кол-во задач',
@@ -206,54 +210,57 @@ if( !function_exists('calcKpi') ) {
             ];
 
 
-            echo '<table class="table table-bordered table-striped">';
-            $s = '<tr><td>' . implode('</td><td>', $aResult) . '</td><td></td></tr>';
-            echo $s . "\n";
-            if( $bExcel ) {
-                $nRow = 4;
-                $oSheet->fromArray(
-                    $aResult,
-                    null,
-                    'F' . $nRow
-                );
-                $oSheet->getStyle('F'.$nRow.':K'.$nRow)->applyFromArray($styleTitle);
-                $oSheet->getColumnDimension('F')->setWidth(30);
-                $oSheet->getColumnDimension('G')->setWidth(24);
-                $oSheet->getColumnDimension('H')->setWidth(24);
-                $oSheet->getColumnDimension('I')->setWidth(24);
-                $oSheet->getColumnDimension('J')->setWidth(24);
-                $oSheet->getColumnDimension('K')->setWidth(24);
-            }
-            $aGroupData = ($sGroup == 'worker_us_id') ? User::getWorkerList(0) : Department::getList(false);
-            foreach($aGroup As $k=>$aGroup) {
-                if( !isset($aGroupData[$k]) ) {
-                    continue;
-                }
-                $aRes = calcKpi($aGroup);
-                $aResult = [
-//                    $sGroup,
-                    $aGroupData[$k],
-                    $aRes['taskcount'], // $nCountTasks,
-                    sprintf("%.2f", 100 * $aRes['oktaskcount'] / $aRes['taskcount']) . '% (' . $aRes['oktaskcount'] . ')', // $nOkTasks,
-                    sprintf("%.2f", 100 * $aRes['movetaskcount'] / $aRes['taskcount']) . '% (' . $aRes['movetaskcount'] . ')', // $nMovedTasks,
-                    sprintf("%.1f", $aRes['taskdayscount'] / $aRes['dayscount']), // $nTaskActiveDays / $nPeriodDays),
-                    sprintf("%.2f", 100 * $aRes['avraltaskcount'] / $aRes['taskcount']) . '% (' . $aRes['avraltaskcount'] . ')', // $nAvralTasks,
-                ];
+            if($bGroupExists) {
+                echo '<table class="table table-bordered table-striped">';
                 $s = '<tr><td>' . implode('</td><td>', $aResult) . '</td><td></td></tr>';
                 echo $s . "\n";
-                if( $bExcel ) {
-                    $nRow += 1;
+                if ($bExcel) {
+                    $nRow = 4;
                     $oSheet->fromArray(
                         $aResult,
                         null,
                         'F' . $nRow
                     );
-                    $oSheet->getStyle('F'.$nRow.':K'.$nRow)->applyFromArray($styleCell);
-                    $oSheet->getStyle('G'.$nRow.':K'.$nRow)->applyFromArray($styleRightCell);
+                    $oSheet->getStyle('F' . $nRow . ':K' . $nRow)->applyFromArray($styleTitle);
+                    $oSheet->getColumnDimension('F')->setWidth(30);
+                    $oSheet->getColumnDimension('G')->setWidth(24);
+                    $oSheet->getColumnDimension('H')->setWidth(24);
+                    $oSheet->getColumnDimension('I')->setWidth(24);
+                    $oSheet->getColumnDimension('J')->setWidth(24);
+                    $oSheet->getColumnDimension('K')->setWidth(24);
                 }
+                $aGroupData = ($sGroup == 'worker_us_id') ? User::getWorkerList($model->department_id) : Department::getList(false);
+                foreach ($aGroup As $k => $aGroup) {
+                    if (!isset($aGroupData[$k])) {
+                        continue;
+                    }
+                    $aRes = calcKpi($aGroup);
+                    $aResult = [
+//                    $sGroup,
+                        $aGroupData[$k],
+                        $aRes['taskcount'], // $nCountTasks,
+                        sprintf("%.2f", 100 * $aRes['oktaskcount'] / $aRes['taskcount']) . '% (' . $aRes['oktaskcount'] . ')', // $nOkTasks,
+                        sprintf("%.2f", 100 * $aRes['movetaskcount'] / $aRes['taskcount']) . '% (' . $aRes['movetaskcount'] . ')', // $nMovedTasks,
+                        sprintf("%.1f", $aRes['taskdayscount'] / $aRes['dayscount']), // $nTaskActiveDays / $nPeriodDays),
+                        sprintf("%.2f", 100 * $aRes['avraltaskcount'] / $aRes['taskcount']) . '% (' . $aRes['avraltaskcount'] . ')', // $nAvralTasks,
+                    ];
+                    $s = '<tr><td>' . implode('</td><td>', $aResult) . '</td><td></td></tr>';
+                    echo $s . "\n";
+                    if ($bExcel) {
+                        $nRow += 1;
+                        $oSheet->fromArray(
+                            $aResult,
+                            null,
+                            'F' . $nRow
+                        );
+                        $oSheet->getStyle('F' . $nRow . ':K' . $nRow)->applyFromArray($styleCell);
+                        $oSheet->getStyle('G' . $nRow . ':K' . $nRow)->applyFromArray($styleRightCell);
+                    }
 
+                }
+                echo '</table>' . "\n";
             }
-            echo '</table>' . "\n";
+
             if( $bExcel ) {
                 $format = 'xls';
                 $oUtil = new Exportutil();
