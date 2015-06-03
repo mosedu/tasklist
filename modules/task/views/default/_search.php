@@ -565,7 +565,7 @@ EOT;
         </div></div>
     <div class="col-sm-4">
         <!-- div class="form-group" -->
-        <?= Html::a('Сбросить настройки', $action, ['class' => 'btn btn-default pull-right']) ?>
+        <?= Html::a('Сбросить настройки', array_merge($action, ['reset' => 1]), ['class' => 'btn btn-default pull-right']) ?>
         <div class="pull-right" style="width: 2em;">&nbsp;</div>
         <?= Html::submitButton('Искать', ['class' => 'btn btn-success pull-right']) ?>
         <!-- /div -->

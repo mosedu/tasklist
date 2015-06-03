@@ -82,6 +82,11 @@ class DefaultController extends Controller
     {
         $searchModel = new TasklistSearch();
         $aQuery = Yii::$app->request->queryParams;
+        if( isset($aQuery['reset']) ) {
+            unset(Yii::$app->session['TasklistSearch']);
+            unset($aQuery['TasklistSearch']);
+        }
+
         if( isset($aQuery['TasklistSearch']) ) {
             if( isset($aQuery['TasklistSearch']['task_progress']) ) {
                 Yii::$app->session['TasklistSearch'] = $aQuery['TasklistSearch'];
