@@ -124,12 +124,13 @@ if( !function_exists('calcKpi') ) {
 ?>
 <div class="user-kpi">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <div class="col-sm-12"><h1><?= Html::encode($this->title) ?></h1></div>
 
     <?= $this->render('_dateintervalform', [
         'model' => $model,
     ]) ?>
 
+    <div class="col-sm-12">
     <?php
         //nl2br(Html::encode(print_r($data, true)));
         $nTasks = count($data);
@@ -286,5 +287,6 @@ if( !function_exists('calcKpi') ) {
             echo '<p>Не найдено задач в указанном диапазоне.</p>';
         }
     ?>
+    </div>
 
 </div>
