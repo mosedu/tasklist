@@ -311,10 +311,12 @@ class Tasklist extends \yii\db\ActiveRecord
 
             $aRules[] =
             [['task_reasonchanges', ], 'required',
-                'when' => function($model) { return $model->task_actualtime != $model->_oldAttributes['task_actualtime']; },
-                'whenClient' => "function (attribute, value) {
-                 console.log(jQuery('#".Html::getInputId($this, 'task_reasonchanges')."').attr('data-old') + ' ? ' + '".$this->_oldAttributes['task_actualtime']."');
-                return jQuery('#".Html::getInputId($this, 'task_reasonchanges')."').attr('data-old') != '".$this->_oldAttributes['task_actualtime']."'; }",
+               // причина нужна когда дату переносим дальше
+               'when' => function($model) { return implode('', array_reverse(explode('.', $model->task_actualtime))) > implode('', array_reverse(explode('.', $model->_oldAttributes['task_actualtime']))); },
+                // whenClient не используется, если нужен, то его надо тоже переделать как и 'when'
+               'whenClient' => "function (attribute, value) {
+                    console.log('data-old = ' + jQuery('#".Html::getInputId($this, 'task_reasonchanges')."').attr('data-old') + ' ? ' + '".$this->_oldAttributes['task_actualtime']."');
+                    return jQuery('#".Html::getInputId($this, 'task_reasonchanges')."').attr('data-old') != '".$this->_oldAttributes['task_actualtime']."'; }",
             ];
 /*
             [['reasonchange', ], 'required',

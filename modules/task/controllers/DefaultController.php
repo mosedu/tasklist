@@ -226,9 +226,8 @@ class DefaultController extends Controller
 
         $model->load(Yii::$app->request->post());
         $aModelResult = ActiveForm::validate($model);
-        Yii::info('result = ' . print_r($result, true));
-        Yii::info('aModelResult = ' . print_r($aModelResult, true));
-
+//        Yii::info('result = ' . print_r($result, true));
+//        Yii::info('aModelResult = ' . print_r($aModelResult, true));
         return array_merge($result, $aModelResult);
     }
 
