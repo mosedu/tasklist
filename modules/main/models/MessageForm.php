@@ -5,6 +5,7 @@ namespace app\modules\main\models;
 use Yii;
 use yii\base\Model;
 use app\modules\user\models\User;
+use app\components\SwiftHeaders;
 
 /**
  * ContactForm is the model behind the contact form.

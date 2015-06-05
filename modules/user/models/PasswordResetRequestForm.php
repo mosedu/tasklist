@@ -4,6 +4,7 @@ namespace app\modules\user\models;
 use yii;
 use yii\base\Model;
 use app\modules\user\models\User;
+use app\components\SwiftHeaders;
 
 /**
  * Password reset request form
