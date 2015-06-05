@@ -116,7 +116,7 @@ class User extends ActiveRecord implements IdentityInterface
                 'value' => function ($event, $attribute) {
                     $model = $event->sender;
                     if( ($attribute === 'us_role_name') ) {
-                        if( !in_array($model->us_role_name, array_keys(User::getWorkerRoles())) ) {
+                        if( ($model->scenario != 'passwordop') && !in_array($model->us_role_name, array_keys(User::getWorkerRoles())) ) {
                             $role = Department::getDepartmentrole($model->us_dep_id);
                             return $role->name;
                         }
