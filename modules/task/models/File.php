@@ -5,6 +5,7 @@ namespace app\modules\task\models;
 use Yii;
 use yii\web\UploadedFile;
 use yii\db\Expression;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "{{%file}}".
@@ -28,6 +29,22 @@ class File extends \yii\db\ActiveRecord
     public $filedata; // загружаемый файл
 
     public $uploadDir = '@webroot/upload/files'; // путь к сохранению
+
+    public function behaviors()
+    {
+        [
+            'class' => AttributeBehavior::className(),
+            'attributes' => [
+                ActiveRecord::EVENT_AFTER_INSERT => 'file_size',
+            ],
+            'value' => function ($event) {
+                /** $event */
+                $ob = $event;
+                return 'some value';
+            },
+        ],
+
+    }
 
     /**
      * @inheritdoc

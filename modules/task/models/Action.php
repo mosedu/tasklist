@@ -12,6 +12,7 @@ use app\modules\user\models\User;
  * @property integer $act_id
  * @property integer $act_us_id
  * @property integer $act_type
+ * @property integer $act_parenttype
  * @property string $act_createtime
  * @property string $act_data
  * @property string $act_table
@@ -27,6 +28,15 @@ class Action extends \yii\db\ActiveRecord
     const TYPE_TEXT_UPDATE = "Изменение";
     const TYPE_TEXT_DELETE = "Удаление";
 
+    protected $type_of_action = '';
+
+    public static function instantiate($attributes)
+    {
+        $class = $attributes['act_parenttype'] . 'Action'; // Класс выбирается по полю type
+        $model = new $class(null);
+        return $model;
+    }
+
     /**
      * @inheritdoc
      */
@@ -41,7 +51,7 @@ class Action extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['act_createtime', 'act_us_id', 'act_type', 'act_table_pk', ], 'required'],
+            [['act_createtime', 'act_us_id', 'act_type', 'act_table_pk', 'act_parenttype'], 'required'],
             [['act_us_id', 'act_type', 'act_table_pk'], 'integer'],
             [['act_createtime'], 'safe'],
             [['act_data'], 'string'],
@@ -56,12 +66,13 @@ class Action extends \yii\db\ActiveRecord
     {
         return [
             'act_id' => 'id',
-            'act_us_id' => 'Поьзователь',
+            'act_us_id' => 'Пользователь',
             'act_type' => 'Операция',
             'act_createtime' => 'Дата',
             'act_data' => 'Изменения',
             'act_table' => 'Таблица',
             'act_table_pk' => 'id',
+            'act_parenttype' => 'Класс данных',
         ];
     }
 
@@ -110,6 +121,7 @@ class Action extends \yii\db\ActiveRecord
     public static function appendData($type, $data) {
         $ob = new Action();
         list($id, $table) = self::getBaseInfo($data);
+        $ob->type_of_action = ucfirst(str_replace(array('{{%', '}}'), array('', ''), $table));
 
         $ob->attributes = [
             'act_createtime' => new Expression('NOW()'),
@@ -118,6 +130,7 @@ class Action extends \yii\db\ActiveRecord
             'act_table'      => $table,
             'act_table_pk'   => $id,
             'act_data'       => (count($data) > 0) ? serialize($data) : '',
+            'act_parenttype' => $ob->type_of_action,
         ];
         if( !$ob->save() ) {
             Yii::warning('Error save appendData('.self::getTypeText($type).') log data: ' . print_r($ob->getErrors(), true));
@@ -152,6 +165,16 @@ class Action extends \yii\db\ActiveRecord
         self::appendData(self::TYPE_UPDATE, $data);
     }
 
+
+    /**
+     *
+     * Отношение лога к задаче
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMaterial() {
+        return $this->hasOne(Tasklist::className(), ['task_id' => 'act_table_pk']);
+    }
 
     /**
      *
