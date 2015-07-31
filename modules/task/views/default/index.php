@@ -196,8 +196,7 @@ $aColumns = [
                 return '';
             }
             $sNumChanges = '';
-            $nChanges = count($model->changes);
-//            if( $nChanges > 0 ) {
+//            $nChanges = count($model->changes);
             if( $model->task_numchanges > 0 ) {
                 $sTip = array_reduce(
                     // explode("\n", $model->task_reasonchanges),

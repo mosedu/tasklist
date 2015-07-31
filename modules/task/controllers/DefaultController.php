@@ -361,7 +361,7 @@ class DefaultController extends Controller
                     $ob->delete();
                 }
                 $model->task_reasonchanges = '';
-                $model->task_finaltime = $model->task_actualtime;
+                $model->task_finaltime = preg_match('|([\\d]+).([\\d]+).([\\d]+)|', $model->task_actualtime, $a) ? date('Y-m-d H:i:s', mktime(23, 59, 59, $a[2], $a[1], $a[3])) : $model->task_actualtime;
                 $s = '';
                 if( !$model->save() ) {
                     foreach($model->getErrors() As $a) {
