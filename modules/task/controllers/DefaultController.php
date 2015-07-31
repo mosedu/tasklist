@@ -2,6 +2,7 @@
 
 namespace app\modules\task\controllers;
 
+use app\modules\task\models\AskForm;
 use app\modules\user\models\User;
 use Yii;
 use yii\bootstrap\ActiveForm;
@@ -35,7 +36,7 @@ class DefaultController extends Controller
                         'roles' => ['createUser'],
                     ],
                     [
-                        'actions' => ['view', 'index', 'create', 'update', 'export', 'lastdirect', 'setworker', 'validatetask'],
+                        'actions' => ['view', 'index', 'create', 'update', 'export', 'lastdirect', 'setworker', 'validatetask', 'deltimeshift'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -342,6 +343,47 @@ class DefaultController extends Controller
         else {
             echo $sf;
 //            throw new NotFoundHttpException('The requested export file does not exist.');
+        }
+    }
+
+    /**
+     * Удаление всех переносов дат у задачи
+     */
+    public function actionDeltimeshift($id = 0)
+    {
+        if( Yii::$app->request->isAjax ) {
+            $model = $this->findModel($id);
+            $form = new AskForm();
+            $form->text = 'Удалить переносы задачи ' . $model->getTasknum() . ' ?';
+            $form->buttons[0]['exec'] = function() use ($model) {
+                $model->task_numchanges = 0;
+                foreach($model->changes As $ob) {
+                    $ob->delete();
+                }
+                $model->task_reasonchanges = '';
+                $s = '';
+                if( !$model->save() ) {
+                    foreach($model->getErrors() As $a) {
+                        $s .= implode(', ', $a);
+                    }
+                }
+                return $s;
+            };
+            $form->buttons[0]['js'] = 'window.location.reload();';
+            if( $form->load(Yii::$app->request->post()) ) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return $form->runCommand();
+            }
+            else {
+                return $this->renderAjax(
+                    '/default/askform',
+                    [
+                        'model' => $form,
+                    ]
+                );
+            }
+
+
         }
     }
 

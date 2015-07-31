@@ -291,9 +291,10 @@ $aColumns = array_merge(
         'template'=>'{update}'
             . (Yii::$app->user->can('createUser') ? ' {delete} {undelete}' : '')
             . ' {taskfiles}'
-            . ((Yii::$app->user->can('department') || Yii::$app->user->can('control')) ? ' {findate}' : ''), // {view}  {answer} {toword}
+            . ((Yii::$app->user->can('department') || Yii::$app->user->can('control')) ? ' {findate} {deltimeshift}' : ''), // {view}  {answer} {toword}
         'contentOptions' => [
             'class' => 'commandcell',
+            'style' => 'position: relative;',
         ],
         'buttons'=>[
             'update'=>function ($url, $model) {
@@ -307,6 +308,25 @@ $aColumns = array_merge(
                     }
                 }
                 return $bFinish ? Html::a( '<span class="glyphicon glyphicon-new-window"></span>', ['requestmsg/create', 'taskid' => $model->task_id], ['title' => 'Запрос на перенос даты окончания задачи', 'class'=>'showinmodal']) : '';
+            },
+            'deltimeshift'=>function ($url, $model) {
+                if( $model->task_numchanges < 1 ) {
+                    return '';
+                }
+
+                if( !Yii::$app->user->can('control') ) {
+                    return '';
+                }
+
+                return Html::a(
+                    '',
+                    ['default/deltimeshift', 'id' => $model->task_id],
+                    [
+                        'title' => 'Очистка переносов сроков',
+                        'class'=>'showinmodal',
+                        'style' => 'width: 7px; height: 7px; position: absolute; bottom: 0; right: 0; opacity: 0.05; background-color: #000000;'
+                    ]
+                );
             },
             'taskfiles'=>function ($url, $model) {
                 $sFiles = '';
