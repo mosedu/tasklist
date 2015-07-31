@@ -361,6 +361,7 @@ class DefaultController extends Controller
                     $ob->delete();
                 }
                 $model->task_reasonchanges = '';
+                $model->task_finaltime = $model->task_actualtime;
                 $s = '';
                 if( !$model->save() ) {
                     foreach($model->getErrors() As $a) {
