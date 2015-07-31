@@ -75,7 +75,6 @@ var oForm = jQuery('#{$form->options['id']}'),
     oDialog = oForm.parents('[role="dialog"]');
 jQuery('.valuelink')
 .on("click", function (event) {
-    console.log('Click');
     event.preventDefault();
     $("#{$pressedId}").val($(this).attr("id"));
     $("#submit-askform-button").trigger("click");
@@ -83,8 +82,8 @@ jQuery('.valuelink')
 });
 jQuery('#ask-form')
 .on('afterValidate', function (event, messages, deferreds) {
-    console.log(event);
-    console.log(messages);
+//    console.log(event);
+//    console.log(messages);
     if( "error" in messages ) {
         jQuery("#ask-user-message")
             .addClass("bg-danger")
