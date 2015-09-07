@@ -24,7 +24,8 @@ class m150907_074707_add_cron_table extends Migration
         ], $tableOptionsMyISAM);
 
         $this->createIndex('idx_cron_isactive', '{{%crontab}}', 'cron_isactive');
-        $this->createIndex('idx_cron_tlast', '{{%crontab}}', 'cron_tlast');
+//        $this->createIndex('idx_cron_tlast', '{{%crontab}}', 'cron_tlast');
+        $this->createIndex('idx_cron_tstart', '{{%crontab}}', 'cron_tstart');
 
         $this->refreshCache();
     }

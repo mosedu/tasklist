@@ -204,7 +204,7 @@ class Crontab extends \yii\db\ActiveRecord
                     }
                 }
             }
-//            $aAllParts[$k][] = $this->generateValues($v, $nMin, $nMax);
+            $aAllParts[$k][] = $this->generateValues($v, $nMin, $nMax);
         }
 
         return $aAllParts;
@@ -252,5 +252,102 @@ class Crontab extends \yii\db\ActiveRecord
             }
         }
         return $aRet;
+    }
+
+    /**
+     * получение всех значений элементов cron
+     * @return array
+     */
+    public function getTime() {
+        $aRet = [];
+        foreach (['cron_min', 'cron_hour', 'cron_day', 'cron_wday'] as $v) {
+            $aPeriods = $this->getPeriodValues($this->$v, $this->aIntervals[$v][0], $this->aIntervals[$v][1]);
+            $sKey = substr($v, 5);
+            $aRet[$sKey] = [];
+            foreach($aPeriods As $a) {
+//                Yii::info('aRet['.$sKey.'] = ' . print_r($aRet[$sKey], true));
+                $aRet[$sKey] = array_merge($aRet[$sKey], $a[3]);
+            }
+        }
+        return $aRet;
+    }
+
+    /**
+     * Сравнение времени в массиве $aTime с возможными значениями в $aCron
+     * @param array $aCron
+     * @param array $aTime
+     * @return bool
+     */
+    public function isTimeInRange($aCron, $aTime) {
+        $bRet = true;
+        foreach(['min', 'hour', 'day', 'wday'] as $v) {
+            if( !in_array($aTime[$v], $aCron[$v]) ) {
+                $bRet = false;
+                break;
+            }
+        }
+        return $bRet;
+    }
+
+    /**
+     * Равны ли 2 времени
+     * @param array $t1
+     * @param array $t2
+     * @return bool
+     */
+    public function isTimeEqual($t1, $t2) {
+        $bRet = true;
+        foreach(['min', 'hour', 'day', 'wday'] as $v) {
+            if( $t1[$v] != $t2[$v] ) {
+                $bRet = false;
+                break;
+            }
+        }
+        return $bRet;
+    }
+
+    /**
+     *
+     */
+    public static function getTaskUrl() {
+        $t = time();
+
+        $aTime = [
+            'min' => intval(date('i', $t), 10),
+            'hour' => date('G', $t),
+            'day' => date('j', $t),
+            'wday' => date('N', $t),
+        ];
+
+        Yii::info('aTime = ' . print_r($aTime, true));
+
+        $aTask = self::find()
+            ->where([
+                'cron_isactive' => 1,
+                'cron_tstart' => null,
+            ])
+            ->all();
+
+        foreach($aTask As $ob) {
+            $t1 = strtotime($ob->cron_tlast !== null ? $ob->cron_tlast : '2014-01-01');
+            $aLast = [
+                'min' => intval(date('i', $t1), 10),
+                'hour' => date('G', $t1),
+                'day' => date('j', $t1),
+                'wday' => date('N', $t1),
+            ];
+            $aCron = $ob->getTime();
+
+            Yii::info($ob->getFulltime("\t") . ' : ' . $ob->cron_id);
+
+            if( ($ob->cron_tstart === null)
+             && $ob->isTimeInRange($aCron, $aTime) ) {
+                Yii::info($ob->getFulltime("\t") . ' now ');
+                if( !$ob->isTimeEqual($aTime, $aLast) ) {
+                    Yii::info($ob->getFulltime("\t") . ' now != last need to run');
+                }
+            }
+        }
+//        $aTask
     }
 }

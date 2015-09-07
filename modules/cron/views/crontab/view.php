@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use app\modules\cron\models\Crontab;
 
 /* @var $this yii\web\View */
 /* @var $model app\modules\cron\models\Crontab */
@@ -43,11 +44,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php
 
+    echo $model->getFulltime(' \ ') . ' = ' . nl2br(print_r($model->getTime(), true));
+
+    Crontab::getTaskUrl();
+/*
+
     echo $model->cron_min . ' = ' . nl2br(print_r($model->getPeriodValues($model->cron_min, $model->aIntervals['cron_min'][0], $model->aIntervals['cron_min'][1]), true));
     echo $model->cron_hour . ' = ' . nl2br(print_r($model->getPeriodValues($model->cron_hour, $model->aIntervals['cron_hour'][0], $model->aIntervals['cron_hour'][1]), true));
     echo $model->cron_day . ' = ' . nl2br(print_r($model->getPeriodValues($model->cron_day, $model->aIntervals['cron_day'][0], $model->aIntervals['cron_day'][1]), true));
     echo $model->cron_wday . ' = ' . nl2br(print_r($model->getPeriodValues($model->cron_wday, $model->aIntervals['cron_wday'][0], $model->aIntervals['cron_wday'][1]), true));
-
+*/
     ?>
 
 </div>
