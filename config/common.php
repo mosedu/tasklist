@@ -26,6 +26,9 @@ return [
         'task' => [
             'class' => 'app\modules\task\Module',
         ],
+        'cron' => [
+            'class' => 'app\modules\cron\Module',
+        ],
     ],
     'components' => [
         'db' => [
