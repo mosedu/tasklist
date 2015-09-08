@@ -4,6 +4,7 @@ namespace app\modules\cron\models;
 
 use Yii;
 use yii\base\InvalidValueException;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "{{%crontab}}".
@@ -150,7 +151,7 @@ class Crontab extends \yii\db\ActiveRecord
             }
 
             $nNextState = (isset($aStates[$nRow]) ? $aStates[$nRow][$nState] : -1);
-            Yii::info("nState = {$nState} ch = {$ch} nRow = {$nRow} nNextState = {$nNextState}");
+//            Yii::info("nState = {$nState} ch = {$ch} nRow = {$nRow} nNextState = {$nNextState}");
 
             if( $nNextState == -1 ) {
                 // ошибка в строке
@@ -307,10 +308,12 @@ class Crontab extends \yii\db\ActiveRecord
     }
 
     /**
-     *
+     * Получаем запись для выполнения в текущее время
+     * @return Crontab
      */
-    public static function getTaskUrl() {
+    public static function getTaskForRun() {
         $t = time();
+        $oRet = null;
 
         $aTime = [
             'min' => intval(date('i', $t), 10),
@@ -319,16 +322,18 @@ class Crontab extends \yii\db\ActiveRecord
             'wday' => date('N', $t),
         ];
 
-        Yii::info('aTime = ' . print_r($aTime, true));
+        Yii::info('Cron time = ' . print_r($aTime, true));
 
         $aTask = self::find()
             ->where([
                 'cron_isactive' => 1,
                 'cron_tstart' => null,
             ])
+            ->orderBy('cron_tlast')
             ->all();
 
         foreach($aTask As $ob) {
+            /** @var Crontab $ob */
             $t1 = strtotime($ob->cron_tlast !== null ? $ob->cron_tlast : '2014-01-01');
             $aLast = [
                 'min' => intval(date('i', $t1), 10),
@@ -338,16 +343,72 @@ class Crontab extends \yii\db\ActiveRecord
             ];
             $aCron = $ob->getTime();
 
-            Yii::info($ob->getFulltime("\t") . ' : ' . $ob->cron_id);
+            Yii::info('Cron record ' . $ob->cron_id . ' : ' . $ob->getFulltime("\t"));
 
             if( ($ob->cron_tstart === null)
              && $ob->isTimeInRange($aCron, $aTime) ) {
-                Yii::info($ob->getFulltime("\t") . ' now ');
+                Yii::info('Cron record ' . $ob->getFulltime("\t") . ' time in cron range');
                 if( !$ob->isTimeEqual($aTime, $aLast) ) {
-                    Yii::info($ob->getFulltime("\t") . ' now != last need to run');
+                    Yii::info('Cron record ' . $ob->getFulltime("\t") . ' now != last need to run');
+                    $nUpdated = self::updateAll(
+                        [
+                            'cron_tstart' => date('Y-m-d H:i:s', $t),
+                        ],
+                        [
+                            'cron_id' => $ob->cron_id,
+                            'cron_tstart' => null,
+                        ]
+                    );
+                    if( $nUpdated > 0 ) {
+                        // мы поставили время запуска, а не другой процесс
+                        $oRet = $ob;
+                        Yii::info('Cron record ' . $ob->getFulltime("\t") . ' will run');
+                        break;
+                    }
+                }
+                else {
+                    Yii::info('Cron record ' . $ob->getFulltime("\t") . ' last run time is now');
                 }
             }
         }
-//        $aTask
+
+        return $oRet;
+    }
+
+    /**
+     * @param int $id
+     */
+    public static function finishTask($id) {
+        $ob = self::findOne($id);
+        Yii::info('finishTask('.$id.'): Task ' . $id . ' = '.($ob === null ? 'null' : print_r($ob->attributes, true)));
+        if( ($ob !== null) && ($ob->cron_tstart !== null) ) {
+            $nUpdated = self::updateAll(
+                [
+                    'cron_tstart' => null,
+                    'cron_tlast' => $ob->cron_tstart,
+                ],
+                [
+                    'cron_id' => $ob->cron_id,
+                ]
+            );
+//            Yii::info('Finish task: ' . $ob->cron_id . ' ['.$nUpdated.']');
+        }
+
+        $nUpdated = self::updateAll(
+            [
+                'cron_tstart' => null,
+            ],
+            [
+                '<', 'cron_tstart', new Expression('DATE_SUB(NOW(), INTERVAL 3 MINUTE)'),
+            ]
+        );
+
+    }
+
+    /**
+     *
+     */
+    public function createJsRunScript() {
+        return 'setTimeout( function(){ console.log("Run cron '.$this->cron_path.' ['.$this->cron_id.']"); jQuery.getJSON("'.$this->cron_path.'", function(data){ console.log("Finish cron '.$this->cron_path.' ['.$this->cron_id.']"); console.log(data); }); }, 1000 );';
     }
 }

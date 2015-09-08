@@ -22,6 +22,7 @@ use app\modules\task\models\Action;
 use app\modules\task\models\Changes;
 use app\modules\task\models\Worker;
 use app\components\NotifyBehavior;
+use app\modules\task\models\Taskflag;
 use yii\helpers\Url;
 
 /**
@@ -564,6 +565,16 @@ class Tasklist extends \yii\db\ActiveRecord
 
     /**
      *
+     * Отношение задачи к флагам
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFlags() {
+        return $this->hasMany(Taskflag::className(), ['tf_task_id' => 'task_id']);
+    }
+
+    /**
+     *
      * Подсчет задач отдела
      *
      * @return \yii\db\ActiveQuery
@@ -632,10 +643,7 @@ class Tasklist extends \yii\db\ActiveRecord
     public function getTaskattibutes() {
         $a = $this->attributes;
         unset($a['task_numchanges']);
-//        $a['task_worker_id'] = intval($a['task_worker_id']);
-//        $a['curworkers'] = array_keys($this->curworkers);
         $a['curworkers'] = array_values($this->curworkers);
-//        unset($a['task_reasonchanges']);
         return $a;
     }
 
@@ -934,34 +942,6 @@ class Tasklist extends \yii\db\ActiveRecord
             $oFile = next($aNeedDel);
         }
 
-        return;
-
-        /** @var  UploadedFile $ob */
-/*        foreach($aData['data'] As $k=>$data) {
-//            $ob = $files[$k];
-            $ob = UploadedFile::getInstance(new File(), '['.$k.']filedata');
-            Yii::info("uploadFiles() files = " . print_r($ob, true));
-
-            if( $data['file_id'] == 0 ) {
-                Yii::info("uploadFiles() new file " . $k);
-                $oFile = new File();
-                $oFile->addFile($ob, $this->task_id, $data['file_comment'], $data['file_group']);
-            }
-            else {
-                Yii::info("uploadFiles() old file " . $k);
-                $oFile = File::findOne($data['file_id']);
-                $oFile->file_comment = $data['file_comment'];
-                $oFile->save();
-            }
-
-            if( $oFile->hasErrors() ) {
-                Yii::info('uploadFiles(): File error: ' . print_r($oFile->getErrors(), true));
-            }
-            else {
-                Yii::info('uploadFiles(): save file ['.$k.'] ' . $oFile->file_orig_name . ' [' . $oFile->file_size . ']');
-            }
-        }
-*/
     }
 
     /**
@@ -978,5 +958,69 @@ class Tasklist extends \yii\db\ActiveRecord
             }
         }
         return $index;
+    }
+
+    /**
+     * Поиск задач, заканчивающихся через $nDays рабочих дней, праздники не учитываем
+     * @param array $aParam параметры выборки задач:
+     *      'days' - количество дней до окончания задачи
+     *      'isworkdays' - считаем рабочие дни (true) или любые (false)
+     *      'curdate' - дата, от которой считаем срок 'days'
+     * @return array
+     */
+    public static function getExpireTasks($aParam) {
+        /**
+         * @var int $nDays
+         * @var boolean $bWorkdays
+         * @var int $curDate
+         */
+        $aDefault = [
+            'days' => 3,
+            'isworkdays' => true,
+            'curdate' => time(),
+        ];
+
+        $aParam = array_merge($aDefault, $aParam);
+
+        Yii::info('getExpireTasks(): ' . print_r($aParam, true));
+
+        $curDate = $aParam['curdate'];
+        $nDays = $aParam['days'];
+        $bWorkdays = $aParam['isworkdays'];
+
+        $diff = $nDays * 24 * 3600;
+        $t = $curDate + $diff;
+
+        if( $bWorkdays ) {
+            if( $nDays > 5 ) {
+                $t += floor($nDays / 5) * 2 * 24 * 3600;
+            }
+            $wd = date('N', $t);
+            if(($wd == 6) || ($wd == 7)) {
+                $t += 2 * 24 * 3600;
+            }
+            else if( $wd < date('N', $curDate) ) {
+                $t += 2 * 24 * 3600;
+            }
+        }
+
+        $query = self::find()
+            ->with(['workersdata', 'flags'])
+            ->where(
+                array_merge(
+                    [
+                        'and',
+                        ['not in', 'task_progress', Tasklist::PROGRESS_FINISH],
+                        ['=', 'DATE(task_actualtime)', date('Y-m-d', $t)],
+                    ],
+                    isset($aParam['where']) ? $aParam['where'] : []
+                )
+            );
+
+        if( isset($aParam['join']) ) {
+            $query->joinWith($aParam['join'], true);
+        }
+
+        return $query->all();
     }
 }

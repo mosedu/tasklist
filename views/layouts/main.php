@@ -9,6 +9,7 @@ use yii\web\View;
 use app\assets\AppAsset;
 use app\modules\user\models\User;
 use app\components\widgets\Alert;
+use app\modules\cron\models\Crontab;
 
 use yii\helpers\Json;
 
@@ -268,6 +269,25 @@ jQuery('#showmessagedialog').on("click", function (event){
 EOT;
 
 // $this->registerJs($sJs, View::POS_READY, 'showmodalmessage');
+
+$session = Yii::$app->session;
+$idTask = $session->get('cronid');
+if( $idTask !== null ) {
+    Crontab::finishTask($idTask);
+}
+
+$oTask = Crontab::getTaskForRun();
+
+if( $oTask !== null ) {
+    $this->registerJs($oTask->createJsRunScript(), View::POS_READY, 'runcrontask');
+    $session->set('cronid', $oTask->cron_id);
+//    Yii::info('Run: ' . $oTask->cron_id . ' ' . $oTask->cron_path);
+//        Crontab::finishTask($oTask->cron_id);
+}
+//else {
+//    Yii::info('No Task for run');
+//}
+
 ?>
 
 <?php $this->endBody() ?>

@@ -2,6 +2,8 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use yii\web\View;
+
 use app\modules\cron\models\Crontab;
 
 /* @var $this yii\web\View */
@@ -44,9 +46,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php
 
-    echo $model->getFulltime(' \ ') . ' = ' . nl2br(print_r($model->getTime(), true));
+//    echo $model->getFulltime(' \ ') . ' = ' . nl2br(print_r($model->getTime(), true));
 
-    Crontab::getTaskUrl();
+
+
 /*
 
     echo $model->cron_min . ' = ' . nl2br(print_r($model->getPeriodValues($model->cron_min, $model->aIntervals['cron_min'][0], $model->aIntervals['cron_min'][1]), true));
