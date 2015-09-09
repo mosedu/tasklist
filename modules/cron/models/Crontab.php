@@ -322,7 +322,7 @@ class Crontab extends \yii\db\ActiveRecord
             'wday' => date('N', $t),
         ];
 
-        Yii::info('Cron time = ' . print_r($aTime, true));
+        Yii::info('Cron cur time = ' . print_r($aTime, true));
 
         $aTask = self::find()
             ->where([
@@ -347,7 +347,7 @@ class Crontab extends \yii\db\ActiveRecord
 
             if( ($ob->cron_tstart === null)
              && $ob->isTimeInRange($aCron, $aTime) ) {
-                Yii::info('Cron record ' . $ob->getFulltime("\t") . ' time in cron range');
+                Yii::info('Cron record ' . $ob->getFulltime("\t") . ' cur time in cron range');
                 if( !$ob->isTimeEqual($aTime, $aLast) ) {
                     Yii::info('Cron record ' . $ob->getFulltime("\t") . ' now != last need to run');
                     $nUpdated = self::updateAll(
@@ -362,12 +362,12 @@ class Crontab extends \yii\db\ActiveRecord
                     if( $nUpdated > 0 ) {
                         // мы поставили время запуска, а не другой процесс
                         $oRet = $ob;
-                        Yii::info('Cron record ' . $ob->getFulltime("\t") . ' will run');
+                        Yii::info('Cron record ' . $ob->getFulltime("\t") . ' will run ' . $ob->cron_path);
                         break;
                     }
                 }
                 else {
-                    Yii::info('Cron record ' . $ob->getFulltime("\t") . ' last run time is now');
+                    Yii::info('Cron record ' . $ob->getFulltime("\t") . ' last run time is now ' . $ob->cron_tlast);
                 }
             }
         }
@@ -380,7 +380,7 @@ class Crontab extends \yii\db\ActiveRecord
      */
     public static function finishTask($id) {
         $ob = self::findOne($id);
-        Yii::info('finishTask('.$id.'): Task ' . $id . ' = '.($ob === null ? 'null' : print_r($ob->attributes, true)));
+        Yii::info('Cron finishTask('.$id.'): Task ' . $id . ' = '.($ob === null ? 'null' : print_r($ob->attributes, true)));
         if( ($ob !== null) && ($ob->cron_tstart !== null) ) {
             $nUpdated = self::updateAll(
                 [

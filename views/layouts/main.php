@@ -270,7 +270,7 @@ EOT;
 
 // $this->registerJs($sJs, View::POS_READY, 'showmodalmessage');
 
-/*
+
 $session = Yii::$app->session;
 $idTask = $session->get('cronid');
 if( $idTask !== null ) {
@@ -288,7 +288,7 @@ if( $oTask !== null ) {
 //else {
 //    Yii::info('No Task for run');
 //}
-*/
+
 ?>
 
 <?php $this->endBody() ?>

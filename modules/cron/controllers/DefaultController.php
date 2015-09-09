@@ -69,17 +69,17 @@ class DefaultController extends Controller
 //            $r[] = $ob->flags;
             $bContinue = false;
             foreach($ob->flags As $oFlag) {
+                // если уже есть такой флаг - значит, отправили уведомление и пропускаем задачу.
                 if( $oFlag->tf_flag == $aWhere[$nType]['flag'] ) {
                     $bContinue = true;
                     break;
                 }
             }
             if( $bContinue ) {
-                Yii::info('Finalnotify: ' . $ob->task_id . ' ---');
-
+//                Yii::info('Finalnotify: ' . $ob->task_id . ' ---');
                 continue;
             }
-            Yii::info('Finalnotify: ' . $ob->task_id . ' +++');
+            Yii::info('Finalnotify: task_id = ' . $ob->task_id . ' +++');
 
             foreach($ob->workersdata As $oUser) {
                 /** @var User $oUser*/
@@ -101,7 +101,7 @@ class DefaultController extends Controller
     public function finishCron() {
         $session = Yii::$app->session;
         $idTask = $session->get('cronid', 0);
-        Yii::info('Cron task need to finish: ' . $idTask);
+        Yii::info('Cron task need to finish: ' . $idTask . ': clear session');
         Crontab::finishTask($idTask);
         $session->remove('cronid');
     }

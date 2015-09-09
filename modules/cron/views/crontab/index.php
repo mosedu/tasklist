@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel app\modules\cron\models\CrontabSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Задачи';
+$this->title = 'Crontab';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="crontab-index">
