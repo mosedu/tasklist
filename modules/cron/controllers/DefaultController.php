@@ -43,7 +43,7 @@ class DefaultController extends Controller
             1 => [
                     'flag' => Taskflag::FLAG_SEND_3_DAY_EMAIL,
                     'where' => [['tf_flag' => Taskflag::FLAG_SEND_3_DAY_EMAIL, ]],
-                    'days' => 6,
+                    'days' => 3,
                 ],
             2 => [
                     'flag' => Taskflag::FLAG_SEND_1_DAY_EMAIL,
