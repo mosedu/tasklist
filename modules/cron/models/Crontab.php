@@ -312,6 +312,8 @@ class Crontab extends \yii\db\ActiveRecord
      * @return Crontab
      */
     public static function getTaskForRun() {
+        self::clearOldCronTask();
+        
         $t = time();
         $oRet = null;
 
@@ -394,6 +396,12 @@ class Crontab extends \yii\db\ActiveRecord
 //            Yii::info('Finish task: ' . $ob->cron_id . ' ['.$nUpdated.']');
         }
 
+    }
+
+    /**
+     *
+     */
+    public static function clearOldCronTask() {
         $nUpdated = self::updateAll(
             [
                 'cron_tstart' => null,
@@ -402,7 +410,6 @@ class Crontab extends \yii\db\ActiveRecord
                 '<', 'cron_tstart', new Expression('DATE_SUB(NOW(), INTERVAL 3 MINUTE)'),
             ]
         );
-
     }
 
     /**
