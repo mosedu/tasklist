@@ -91,10 +91,6 @@ class TasklistSearch extends Tasklist
         $query = Tasklist::find();
         $query->with(['changes', 'department', /*'worker', */'allworker', 'workers', 'workersdata', 'taskfiles']);
         $aJoin = ['department'];
-        if( Yii::$app->user->identity->isUserWorker() ) {
-            $aJoin[] = 'workers';
-        }
-        $query->joinWith($aJoin);
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -179,7 +175,11 @@ class TasklistSearch extends Tasklist
 
         if( !empty($this->curworkers) ) {
             $query->andFilterWhere(['in', Worker::tableName() . '.worker_us_id', $this->curworkers]);
+//            if( Yii::$app->user->identity->isUserWorker() ) {
+                $aJoin[] = 'workers';
+//            }
         }
+        $query->joinWith($aJoin);
 
         if( $this->task_active == '' ) {
             $this->task_active = Tasklist::STATUS_ACTIVE;

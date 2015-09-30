@@ -313,7 +313,7 @@ class Crontab extends \yii\db\ActiveRecord
      */
     public static function getTaskForRun() {
         self::clearOldCronTask();
-        
+
         $t = time();
         $oRet = null;
 
@@ -351,7 +351,7 @@ class Crontab extends \yii\db\ActiveRecord
              && $ob->isTimeInRange($aCron, $aTime) ) {
                 Yii::info('Cron record ' . $ob->getFulltime("\t") . ' cur time in cron range');
                 if( !$ob->isTimeEqual($aTime, $aLast) ) {
-                    Yii::info('Cron record ' . $ob->getFulltime("\t") . ' now != last need to run');
+                    Yii::info('Cron record ' . $ob->getFulltime("\t") . ' now != last; need to run cron task');
                     $nUpdated = self::updateAll(
                         [
                             'cron_tstart' => date('Y-m-d H:i:s', $t),
