@@ -27,6 +27,7 @@ $aLink = ['default/login'];
 
 $task = $data['task'];
 $department = $data['department'];
+$worker = User::findOne($oTask->task_worker_id);
 
 ?>
 
@@ -34,19 +35,29 @@ $department = $data['department'];
 
 <p><?= Html::encode('В Системе мониторинга текущих задач структурных подразделений ГАУ «ТемоЦентр» создана новая задача') ?>.</p>
 
-<p><?= Html::encode('Отдел: ' . $department->dep_name) ?>.</p>
+<table style="width: 100%">
+    <tr><td style="width: 170px; vertical-align: top;">Отдел</td><td><?= Html::encode($department->dep_name) ?></td></tr>
+    <?php if( !empty($task->task_direct) ) { ?>
+        <tr><td style="width: 170px; vertical-align: top;">Направление</td><td><?= Html::encode($task->task_direct) ?></td></tr>
+    <?php } ?>
+    <tr><td style="width: 170px; vertical-align: top;">Задача</td><td><?= Html::encode($task->getTasknum() . ' ' . $task->task_name) . '<br />' . Html::a($task->url(true), $task->url(true)) ?></td></tr>
+    <?php if( !empty($worker) ) { ?>
+        <tr><td style="width: 170px; vertical-align: top;">Ответственный</td><td><?= Html::encode($worker->getFullName()) ?></td></tr>
+    <?php } ?>
+    <tr><td style="width: 170px; vertical-align: top;">Базовый срок</td><td><?= Html::encode(date('d.m.Y', strtotime($task->task_finaltime))) ?></td></tr>
+</table>
 
-<p><?= Html::encode('Задача: ' . $task->getTasknum() . ' ' . $task->task_name) . ' ' . Html::a($task->url(true), $task->url(true)) ?>.</p>
+<!-- p><?= '' // Html::encode($task->getTasknum() . ' ' . $task->task_name) . ' ' . Html::a($task->url(true), $task->url(true)) ?>.</p -->
 
-<?php if( !empty($task->task_worker_id) ) { ?>
+<?php if( false && !empty($task->task_worker_id) ) { ?>
     <p><?= Html::encode('Ответственный: ' . $task->worker->getFullName()) ?>.</p>
 <?php } ?>
 
-<?php if( !empty($task->task_direct) ) { ?>
+<?php if( false && !empty($task->task_direct) ) { ?>
     <p><?= Html::encode('Направление: ' . $task->task_direct) ?>.</p>
 <?php } ?>
 
-<p><?= Html::encode('Базовый срок: ' . date('d.m.Y', strtotime($task->task_finaltime))) ?>.</p>
+<!-- p><?= '' // Html::encode('Базовый срок: ' . date('d.m.Y', strtotime($task->task_finaltime))) ?>.</p -->
 
 <p><?= Html::encode('Список задач доступен по адресу: ') . Html::a(Url::to('/', true), Url::to('/', true)) ?>.</p>
 

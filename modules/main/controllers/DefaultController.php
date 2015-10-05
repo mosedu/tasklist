@@ -9,6 +9,7 @@ use yii\widgets\ActiveForm;
 use yii\web\Response;
 use yii\helpers\Html;
 use app\modules\main\models\MessageForm;
+use app\modules\task\models\Tasklist;
 
 class DefaultController extends Controller
 {
@@ -28,11 +29,15 @@ class DefaultController extends Controller
 
     public function actionTestmail()
     {
-        $oUser = User::findOne(1);
-        $oUser->sendNotificate(
+        $model = Tasklist::find()->where('task_worker_id Is Not Null')->orderBy('task_id Desc')->one();
+        $oUser = User::findOne($model->task_worker_id);
+        $oUser->sendNotificate('user_new_task', 'Новая задача', ['task'=>$model]);
+//        $oUser = User::findOne(1);
+/*        $oUser->sendNotificate(
             'user_test_message',
             'Тестовое сообщение на портале ' . Yii::$app->name
         );
+*/
     }
 
     public function actionSupport()
