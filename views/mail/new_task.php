@@ -27,7 +27,7 @@ $aLink = ['default/login'];
 
 $task = $data['task'];
 $department = $data['department'];
-$worker = User::findOne($oTask->task_worker_id);
+$worker = User::findOne($task->task_worker_id);
 
 ?>
 
