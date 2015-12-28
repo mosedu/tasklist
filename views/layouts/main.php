@@ -34,7 +34,7 @@ AppAsset::register($this);
     <div class="wrap">
         <?php
             NavBar::begin([
-                'brandLabel' => str_replace("\n", "<br />\n", Html::encode("Система мониторинга текущих задач\nструктурных подразделений\nГАУ «ТемоЦентр»")), // 'Задачи ГАУ ТемоЦентр',
+                'brandLabel' => str_replace("\n", "<br />\n", Html::encode("Система мониторинга текущих задач\nструктурных подразделений\nГАОУ ДПО «ТемоЦентр»")), // 'Задачи ГАУ ТемоЦентр',
                 'brandUrl' => false, // Yii::$app->homeUrl,
                 'options' => [
                     'class' => 'navbar-inverse navbar-fixed-top',
