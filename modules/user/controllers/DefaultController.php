@@ -364,7 +364,7 @@ class DefaultController extends Controller
         try {
             $model = new ResetPasswordForm($token);
         } catch (InvalidParamException $e) {
-            throw new BadRequestHttpException($e->getMessage());
+            throw new BadRequestHttpException($e->getMessage(), null, $e);
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->resetPassword()) {
