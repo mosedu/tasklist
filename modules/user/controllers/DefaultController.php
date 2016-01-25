@@ -8,6 +8,8 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\base\InvalidParamException;
+use yii\web\BadRequestHttpException;
 
 use app\modules\user\models\LoginForm;
 use app\modules\user\models\User;
